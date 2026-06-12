@@ -158,6 +158,14 @@ BOOL ProtocolCoreEx(BYTE head,BYTE* lpMsg,int size,int key) // OK
 			}
 			break;
 #endif
+		case 0xE7:
+			switch (((lpMsg[0] == 0xC1) ? lpMsg[3] : lpMsg[4]))
+			{
+				case 0x03:
+					gMiniMap.RecvMiniMapInfo((MINIMAP_INFO_RECV*)lpMsg);
+					return 1;
+			}
+			break;
 		case 0xF1:
 			switch(((lpMsg[0]==0xC1)?lpMsg[3]:lpMsg[4]))
 			{

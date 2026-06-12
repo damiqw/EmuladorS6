@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "MiniMap.h"
 #include "Import.h"
 #include "Util.h"
@@ -58,6 +58,37 @@ POINT Coord;
 //----- (0082ABA0)
 char CMinimap::MapRender(int a1)
 {
+	static bool lastMapState = false;
+	static int lastMapNumber = -1;
+	bool currentMapState = (*(BYTE*)(a1 + 13500) != 0);
+
+	if (pMapNumber != lastMapNumber)
+	{
+		lastMapState = false;
+		lastMapNumber = pMapNumber;
+	}
+
+	if (currentMapState && !lastMapState)
+	{
+		gMiniMap.m_MiniMapSpotInfo.clear();
+		BYTE send[4];
+		send[0] = 0xC1;
+		send[1] = 4;
+		send[2] = 0xE7;
+		send[3] = 0x01;
+		DataSend(send, 4);
+	}
+	else if (!currentMapState && lastMapState)
+	{
+		BYTE send[4];
+		send[0] = 0xC1;
+		send[1] = 4;
+		send[2] = 0xE7;
+		send[3] = 0x02;
+		DataSend(send, 4);
+	}
+	lastMapState = currentMapState;
+
 	float DIRPointer;
 	lpViewObj ObjectPointer;
 
@@ -212,81 +243,64 @@ char CMinimap::MapRender(int a1)
 				sub_637E80(32450, XNPC + 5.0, YNPC - 5.0, 10.0, 10.0, DIRPointer, 0.0, 0.0, 0.546875, 0.546875);
 
 			}
-			//-- CICLO PARA PINTAR LOS NPC
-			for (i = 0; i < 100 && (signed int)*(BYTE*)(v44 + 116 * i + 300) > 0; ++i)
-			{
-
-				//Y
-				v46 = (double)*(signed int*)(v44 + 116 * i + 308) /*/ 256.0
-																   * (double)*(signed int *)(v44 + 8 * *(DWORD *)(v44 + 124) + 76)*/;
-																   //v46 = (v46/(double)*(signed int *)(v44 + 8 * *(DWORD *)(v44 + 124) + 76))*256.0;
-																   //X
-				v50 = (double)*(signed int*)(v44 + 116 * i + 304) /*/ 256.0
-																   * (double)*(signed int *)(v44 + 8 * *(DWORD *)(v44 + 124) + 80)*/;
-																   //v50 = (v50/(double)*(signed int *)(v44 + 8 * *(DWORD *)(v44 + 124) + 80))*256.0;
-
-				XNPC = (float)(StartX + (v50 * 1.8700005));
-				YNPC = (float)(StartY + ((255.0 - v46) * 1.85));
-
-				XNPC = XNPC;
-				YNPC = YNPC - 10;
-
-				//=== Show Name Info 
-				if (pCheckMouseOver((int)XNPC, (int)YNPC, (int)15, (int)15)) //Nombre Monsters
-				{
-					//pDrawToolTip((int) XNPC, (int) YNPC - 10, (char *)(v44 + 116 * i + 316)); //Nombre Monsters
-					CustomFont.Draw(CustomFont.FontNormal, XNPC + 5, YNPC - 15, 0xFFFFFFFF, 0x0000005D, 0, 0, 8, "%s", (char*)(v44 + 116 * i + 316));
-				}
-
-				if (*(BYTE*)(v44 + 116 * i + 300) == 1)
-				{
-					if (pMapNumber != 34 || (signed int)(unsigned __int8)0x986746A <= 0 || *(DWORD*)(v44 + 116 * i + 304) == 228 && *(DWORD*)(v44 + 116 * i + 308) == 48 && pMapNumber == 34)
-					{
-						//-- PINTAMOS LOS NPC
-						//CustomFont.Draw(CustomFont.FontNormal, XNPC-40, YNPC-10, 0xFFFFFFFF, 0x0000005D, 100, 0, 3, "%s",(char *)(v44 + 116 * i + 316));
-						RenderBitMapColored(32452, XNPC, YNPC, 10.0, 10.0, 0.0, 0.0, 0.546875, 0.546875, pMakeColor(255, 255, 255, 255));
-						//CustomFont.Draw(CustomFont.FontNormal, XNPC, YNPC, 0xBBFF00FF, 0x0, 0, 0, 1, "X %f Y %f T %f", v50,v46,(double)*(signed int *)(v44 + 116 * i + 312));
-						//CustomFont.Draw(CustomFont.FontNormal, XNPC, YNPC, 0xBBFF00FF, 0x0, 0, 0, 1, "%s",(char *)(v44 + 116 * i + 316));
-
-						//pDrawMapObject(32452, v46, v50, v14, v13, v12, v11, v10, v9, v47, v49, 0.546875, 0.546875, i);
-					}
-				}
-				else if (*(BYTE*)(v44 + 116 * i + 300) == 2)
-				{
-					//-- PINTAMOS PORTAL
-					//CustomFont.Draw(CustomFont.FontNormal, XNPC, YNPC, 0xBBFF00FF, 0x0, 0, 0, 1, "X %f Y %f T %f", v50,v46,(double)*(signed int *)(v44 + 116 * i + 312));
-					RenderBitMapColored(32451, XNPC, YNPC, 15.0, 15.0, 0.0, 0.0, 0.546875, 0.546875, pMakeColor(255, 255, 255, 155));
-					//pDrawMapObject(32451, v46, v50, v20, v19, v18, v17, v16, v15, v47, v49, 0.546875, 0.546875, i + 100);
-				}
-
-			}
-			/*else if (lpObj->m_Model.ObjectType == emMonster) {
-				RenderBitMapColored(31471, XNPC, YNPC, 5.0, 5.0, 0.0, 0.0, 0.546875, 0.546875, pMakeColor(255, 255, 255, 155));
-			}
-			else if (lpObj->m_Model.ObjectType == emNPC) {
-				if (lpObj->ID == 251)
-				{
-					RenderBitMapColored(31466, XNPC, YNPC - 5.0, 10.0, 10.0, 0.0, 0.0, 0.546875, 0.546875, pMakeColor(255, 255, 255, 255)); //Icono NPC
-				}
-				else if (lpObj->ID == 255 || lpObj->ID == 253)
-				{
-					RenderBitMapColored(31467, XNPC, YNPC - 5.0, 10.0, 10.0, 0.0, 0.0, 0.546875, 0.546875, pMakeColor(255, 255, 255, 255)); //Icono NPC
-				}
-				else if (lpObj->ID == 240) //-- Baul
-				{
-					RenderBitMapColored(31468, XNPC, YNPC - 5.0, 10.0, 10.0, 0.0, 0.0, 0.546875, 0.546875, pMakeColor(255, 255, 255, 255)); //Icono Baul
-				}
-				else if (lpObj->ID == 229 || lpObj->ID == 235 || lpObj->ID == 233 || lpObj->ID == 237) //-- Quest
-				{
-					RenderBitMapColored(31469, XNPC, YNPC - 5.0, 10.0, 10.0, 0.0, 0.0, 0.546875, 0.546875, pMakeColor(255, 255, 255, 255)); //Icono Quest
-				}
-				else
-				{
-					RenderBitMapColored(32452, XNPC, YNPC - 5.0, 10.0, 10.0, 0.0, 0.0, 0.546875, 0.546875, pMakeColor(255, 255, 255, 255)); //Icono Potion
-				}
-			}*/
-
 		}
+
+		//-- CICLO PARA PINTAR LOS NPC DESDE SERVIDOR
+		CustomFont.Draw(CustomFont.FontNormal, StartX + 20, StartY + 40, 0xFFFFFFFF, 0x00000000, 0, 0, 1, "SPOTS TOTAL: %d", gMiniMap.m_MiniMapSpotInfo.size());
+
+		for (i = 0; i < (signed int)gMiniMap.m_MiniMapSpotInfo.size(); ++i)
+		{
+			MINIMAP_SPOT_INFO* spot = &gMiniMap.m_MiniMapSpotInfo[i];
+
+			XNPC = (float)(StartX + (spot->x * 1.8700005));
+			YNPC = (float)(StartY + ((255.0 - spot->y) * 1.85));
+
+			XNPC = XNPC;
+			YNPC = YNPC - 10;
+
+			//=== Show Name Info 
+			if (pCheckMouseOver((int)XNPC, (int)YNPC, (int)15, (int)15)) //Nombre Monsters
+			{
+				CustomFont.Draw(CustomFont.FontNormal, XNPC + 5, YNPC - 15, 0xFFFFFFFF, 0x0000005D, 0, 0, 8, "%s", spot->text);
+			}
+
+			if (spot->group == 0) // Portales
+			{
+				RenderBitMapColored(32451, XNPC, YNPC, 15.0, 15.0, 0.0, 0.0, 0.546875, 0.546875, pMakeColor(255, 255, 255, 155));
+			}
+			else if (spot->group == 1) // Safezone NPCs
+			{
+				int textureId = 32452; // NPC clásico por defecto
+				float size = 10.0;
+
+				switch (spot->type)
+				{
+				case 1: // Phantom Soldier
+					textureId = 31469; // Usar quest o ícono personalizado
+					size = 12.0;
+					break;
+				case 2: // NPC General / Quest / Goblin
+					textureId = 31469;
+					size = 12.0;
+					break;
+				case 3: // Herrero / Reparar
+					textureId = 31466;
+					size = 12.0;
+					break;
+				case 4: // Pociones / Barmaid
+					textureId = 31467;
+					size = 12.0;
+					break;
+				case 5: // Almacén / Storage
+					textureId = 31468;
+					size = 12.0;
+					break;
+				}
+
+				RenderBitMapColored(textureId, XNPC, YNPC, size, size, 0.0, 0.0, 0.546875, 0.546875, pMakeColor(255, 255, 255, 255));
+			}
+		}
+
 		//===Tim Duong Di
 		if (!gBAiFindPath.pathTimDuongDi.empty())
 		{

@@ -312,7 +312,7 @@ void CServerInfo::ReadCommonInfo() // OK
 
 	gZenDrop.Load(gPath.GetFullPath("ZenDrop.txt"));
 
-	#if(GAMESERVER_UPDATE>=802)
+	#if(GAMESERVER_UPDATE>=603)
 
 	gMiniMap.Load(gPath.GetFullPath("MiniMap.txt"));
 

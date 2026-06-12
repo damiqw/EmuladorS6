@@ -44,3 +44,22 @@ void cMiniMap::InsertPartyInfo(MINIMAP_PARTY_INFO* lpInfo)
 	this->gPartyInfo[this->ListsCount].y = lpInfo->y;
 	this->ListsCount++;
 }
+
+void cMiniMap::RecvMiniMapInfo(MINIMAP_INFO_RECV* lpMsg)
+{
+	if (lpMsg->index == 0)
+	{
+		this->m_MiniMapSpotInfo.clear();
+	}
+
+	MINIMAP_SPOT_INFO info;
+	info.index = lpMsg->index;
+	info.group = lpMsg->group;
+	info.type = lpMsg->type;
+	info.flag = lpMsg->flag;
+	info.x = lpMsg->x;
+	info.y = lpMsg->y;
+	strcpy_s(info.text, lpMsg->text);
+
+	this->m_MiniMapSpotInfo.push_back(info);
+}

@@ -837,17 +837,17 @@ void ProtocolCore(BYTE head,BYTE* lpMsg,int size,int aIndex,int encrypt,int seri
 			switch(lpMsg[3])
 			{
 				case 0x01:
-					#if(GAMESERVER_UPDATE>=802)
+					#if(GAMESERVER_UPDATE>=603)
 					gMiniMap.CGMiniMapStartPartyInfoRecv(aIndex);
 					#endif
 					break;
 				case 0x02:
-					#if(GAMESERVER_UPDATE>=802)
+					#if(GAMESERVER_UPDATE>=603)
 					gMiniMap.CGMiniMapClosePartyInfoRecv(aIndex);
 					#endif
 					break;
 				case 0x03:
-					#if(GAMESERVER_UPDATE>=802)
+					#if(GAMESERVER_UPDATE>=603)
 					gMiniMap.CGMiniMapInfoRecv((PMSG_MINI_MAP_INFO_RECV*)lpMsg,aIndex);
 					#endif
 					break;

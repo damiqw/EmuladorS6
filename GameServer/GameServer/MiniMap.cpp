@@ -29,7 +29,7 @@ CMiniMap::~CMiniMap() // OK
 
 void CMiniMap::Load(char* path) // OK
 {
-	#if(GAMESERVER_UPDATE>=802)
+	#if(GAMESERVER_UPDATE>=603)
 
 	CMemScript* lpMemScript = new CMemScript;
 
@@ -57,28 +57,40 @@ void CMiniMap::Load(char* path) // OK
 				break;
 			}
 
-			if(strcmp("end",lpMemScript->GetString()) == 0)
+			int section = lpMemScript->GetNumber();
+
+			while(true)
 			{
-				break;
+				if(section == 0)
+				{
+					if(strcmp("end",lpMemScript->GetAsString()) == 0)
+					{
+						break;
+					}
+
+					MINI_MAP_INFO info;
+
+					memset(&info,0,sizeof(info));
+
+					info.Index = lpMemScript->GetNumber();
+
+					info.Group = lpMemScript->GetAsNumber();
+
+					info.Type = lpMemScript->GetAsNumber();
+
+					info.X = lpMemScript->GetAsNumber();
+
+					info.Y = lpMemScript->GetAsNumber();
+
+					strncpy_s(info.Text, sizeof(info.Text), lpMemScript->GetAsString(), _TRUNCATE);
+
+					this->m_MiniMapInfo.push_back(info);
+				}
+				else
+				{
+					break;
+				}
 			}
-
-			MINI_MAP_INFO info;
-
-			memset(&info,0,sizeof(info));
-
-			info.Index = lpMemScript->GetNumber();
-
-			info.Group = lpMemScript->GetAsNumber();
-
-			info.Type = lpMemScript->GetAsNumber();
-
-			info.X = lpMemScript->GetAsNumber();
-
-			info.Y = lpMemScript->GetAsNumber();
-
-			strcpy_s(info.Text,lpMemScript->GetAsString());
-
-			this->m_MiniMapInfo.push_back(info);
 		}
 	}
 	catch(...)
@@ -93,7 +105,7 @@ void CMiniMap::Load(char* path) // OK
 
 void CMiniMap::CGMiniMapStartPartyInfoRecv(int aIndex) // OK
 {
-	#if(GAMESERVER_UPDATE>=802)
+	#if(GAMESERVER_UPDATE>=603)
 
 	LPOBJ lpObj = &gObj[aIndex];
 
@@ -104,19 +116,16 @@ void CMiniMap::CGMiniMapStartPartyInfoRecv(int aIndex) // OK
 
 	lpObj->MiniMapState = 1;
 
-	if(lpObj->MiniMapValue != lpObj->Map)
-	{
-		this->GCMiniMapInfoSend(aIndex);
+	this->GCMiniMapInfoSend(aIndex);
 
-		lpObj->MiniMapValue = lpObj->Map;
-	}
+	lpObj->MiniMapValue = lpObj->Map;
 
 	#endif
 }
 
 void CMiniMap::CGMiniMapClosePartyInfoRecv(int aIndex) // OK
 {
-	#if(GAMESERVER_UPDATE>=802)
+	#if(GAMESERVER_UPDATE>=603)
 
 	LPOBJ lpObj = &gObj[aIndex];
 
@@ -132,7 +141,7 @@ void CMiniMap::CGMiniMapClosePartyInfoRecv(int aIndex) // OK
 
 void CMiniMap::CGMiniMapInfoRecv(PMSG_MINI_MAP_INFO_RECV* lpMsg,int aIndex) // OK
 {
-	#if(GAMESERVER_UPDATE>=802)
+	#if(GAMESERVER_UPDATE>=603)
 
 	LPOBJ lpObj = &gObj[aIndex];
 
@@ -210,7 +219,7 @@ void CMiniMap::GCMiniMapPartyInfoSend(int aIndex) // OK
 
 void CMiniMap::GCMiniMapInfoSend(int aIndex) // OK
 {
-	#if(GAMESERVER_UPDATE>=802)
+	#if(GAMESERVER_UPDATE>=603)
 
 	int count = 0;
 

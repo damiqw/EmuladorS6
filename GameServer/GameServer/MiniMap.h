@@ -10,6 +10,8 @@
 //************ Client -> GameServer ************//
 //**********************************************//
 
+#pragma pack(push, 1)
+
 struct PMSG_MINI_MAP_INFO_RECV
 {
 	PSBMSG_HEAD header; // C1:E7:03
@@ -45,6 +47,8 @@ struct PMSG_MINI_MAP_INFO_SEND
 	BYTE y;
 	char text[31];
 };
+
+#pragma pack(pop)
 
 //**********************************************//
 //**********************************************//

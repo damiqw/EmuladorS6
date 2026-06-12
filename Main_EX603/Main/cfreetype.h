@@ -101,6 +101,7 @@ public:
 public:
 	void Init();
 	void Create();
+	void Recreate();
 	static void __thiscall CWinMain(int This);
 
 	int ExtentPoint32(std::wstring wstrText);

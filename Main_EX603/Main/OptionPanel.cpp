@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "Import.h"
 #include "Util.h"
 #include "Defines.h"
@@ -11,6 +11,7 @@
 #include "ShowInfoItemDrop.h"
 #include "Offset.h"
 #include "Font.h"
+#include "cfreetype.h"
 #include "CustomFont.h"
 #include "InterfaceElemental.h"
 #include "EventInvasion.h"
@@ -130,33 +131,14 @@ int sub_10012730(int a1)
 	pFontBold = FontBool(); 
 	pFontNormal2 = FontFixed(); 
 	pFontBigBold = FontBig(); 
-	pFontNormal = FontNormal(); 
+	pFontNormal = FontNormal();
+	cfreetype::Instance()->Recreate(); 
 	v2 = (DWORD *)pWindowThis();
 	sub_830B70(v2[45], *v2, 1, 1);
 	//v1 = a1 - 11;
-	switch (v1)
-	{
-	case 11:
-		result = WritePrivateProfileStringA("FontInfo", "FontSize", " 11", ".\\Settings.ini");
-		break;
-	case 12:
-		result = WritePrivateProfileStringA("FontInfo", "FontSize", " 12", ".\\Settings.ini");
-		break;
-	case 13:
-		result = WritePrivateProfileStringA("FontInfo", "FontSize", " 13", ".\\Settings.ini");
-		break;
-	case 14:
-		result = WritePrivateProfileStringA("FontInfo", "FontSize", " 14", ".\\Settings.ini");
-		break;
-	case 15:
-		result = WritePrivateProfileStringA("FontInfo", "FontSize", " 15", ".\\Settings.ini");
-		break;
-	case 16:
-		result = WritePrivateProfileStringA("FontInfo", "FontSize", " 16", ".\\Settings.ini");
-		break;
-	default:
-		return result;
-	}
+	char szSize[16];
+	sprintf_s(szSize, " %d", a1);
+	result = WritePrivateProfileStringA("FontInfo", "FontSize", szSize, ".\\Settings.ini");
 
 	return result;
 
@@ -717,6 +699,105 @@ void RenderWindowsOption(int a1)
 
 	BotonX = 35;
 
+	if (FontSize == 8)
+	{
+		glColor3f(1.0f, 0.2f, 0.2f);
+		RenderBitmap(31563, x + BotonX, y + BotonY, 14.0, 13.0, 0.0, 0.0, 0.64999998, 0.80000001, 1, 1, 0);
+		gInterface.DrawFormat(eWhite, x + BotonX, y + BotonY + 3.5, 14.0, 3, "8");
+		glColor3f(1.0f, 1.0f, 1.0f);
+	}
+	else if (pCheckMouseOver(x + BotonX, y + BotonY, 14, 13) == 1)
+	{
+		glColor3f(0.0f, 1.0f, 1.0f);
+		RenderBitmap(31563, x + BotonX, y + BotonY, 14.0, 13.0, 0.0, 0.0, 0.64999998, 0.80000001, 1, 1, 0);
+		gInterface.DrawFormat(eWhite, x + BotonX, y + BotonY + 3.5, 14.0, 3, "8");
+		if (GetTickCount() - TickCountPro > 300)
+		{
+			if (GetKeyState(1) & 0x8000)
+			{
+
+				glColor3f(1.0f, 0.0f, 0.0f);
+				sub_10012730(8);
+				TickCountPro = GetTickCount();
+			}
+		}
+		glColor3f(1.0f, 1.0f, 1.0f);
+	}
+	else
+	{
+		glColor3f(1.0f, 1.0f, 1.0f);
+		RenderBitmap(31563, x + BotonX, y + BotonY, 14.0, 13.0, 0.0, 0.0, 0.64999998, 0.80000001, 1, 1, 0);
+		gInterface.DrawFormat(eWhite, x + BotonX, y + BotonY + 3.5, 14.0, 3, "8");
+	}
+
+	BotonX += 14;
+
+	if (FontSize == 9)
+	{
+		glColor3f(1.0f, 0.2f, 0.2f);
+		RenderBitmap(31563, x + BotonX, y + BotonY, 14.0, 13.0, 0.0, 0.0, 0.64999998, 0.80000001, 1, 1, 0);
+		gInterface.DrawFormat(eWhite, x + BotonX, y + BotonY + 3.5, 14.0, 3, "9");
+		glColor3f(1.0f, 1.0f, 1.0f);
+	}
+	else if (pCheckMouseOver(x + BotonX, y + BotonY, 14, 13) == 1)
+	{
+		glColor3f(0.0f, 1.0f, 1.0f);
+		RenderBitmap(31563, x + BotonX, y + BotonY, 14.0, 13.0, 0.0, 0.0, 0.64999998, 0.80000001, 1, 1, 0);
+		gInterface.DrawFormat(eWhite, x + BotonX, y + BotonY + 3.5, 14.0, 3, "9");
+		if (GetTickCount() - TickCountPro > 300)
+		{
+			if (GetKeyState(1) & 0x8000)
+			{
+
+				glColor3f(1.0f, 0.0f, 0.0f);
+				sub_10012730(9);
+				TickCountPro = GetTickCount();
+			}
+		}
+		glColor3f(1.0f, 1.0f, 1.0f);
+	}
+	else
+	{
+		glColor3f(1.0f, 1.0f, 1.0f);
+		RenderBitmap(31563, x + BotonX, y + BotonY, 14.0, 13.0, 0.0, 0.0, 0.64999998, 0.80000001, 1, 1, 0);
+		gInterface.DrawFormat(eWhite, x + BotonX, y + BotonY + 3.5, 14.0, 3, "9");
+	}
+
+	BotonX += 14;
+
+	if (FontSize == 10)
+	{
+		glColor3f(1.0f, 0.2f, 0.2f);
+		RenderBitmap(31563, x + BotonX, y + BotonY, 14.0, 13.0, 0.0, 0.0, 0.64999998, 0.80000001, 1, 1, 0);
+		gInterface.DrawFormat(eWhite, x + BotonX, y + BotonY + 3.5, 14.0, 3, "10");
+		glColor3f(1.0f, 1.0f, 1.0f);
+	}
+	else if (pCheckMouseOver(x + BotonX, y + BotonY, 14, 13) == 1)
+	{
+		glColor3f(0.0f, 1.0f, 1.0f);
+		RenderBitmap(31563, x + BotonX, y + BotonY, 14.0, 13.0, 0.0, 0.0, 0.64999998, 0.80000001, 1, 1, 0);
+		gInterface.DrawFormat(eWhite, x + BotonX, y + BotonY + 3.5, 14.0, 3, "10");
+		if (GetTickCount() - TickCountPro > 300)
+		{
+			if (GetKeyState(1) & 0x8000)
+			{
+
+				glColor3f(1.0f, 0.0f, 0.0f);
+				sub_10012730(10);
+				TickCountPro = GetTickCount();
+			}
+		}
+		glColor3f(1.0f, 1.0f, 1.0f);
+	}
+	else
+	{
+		glColor3f(1.0f, 1.0f, 1.0f);
+		RenderBitmap(31563, x + BotonX, y + BotonY, 14.0, 13.0, 0.0, 0.0, 0.64999998, 0.80000001, 1, 1, 0);
+		gInterface.DrawFormat(eWhite, x + BotonX, y + BotonY + 3.5, 14.0, 3, "10");
+	}
+
+	BotonX += 14;
+
 	if (FontSize == 11)
 	{
 		glColor3f(1.0f, 0.2f, 0.2f);
@@ -748,7 +829,7 @@ void RenderWindowsOption(int a1)
 		gInterface.DrawFormat(eWhite, x + BotonX, y + BotonY + 3.5, 14.0, 3, "11");
 	}
 
-	BotonX += 14;
+	BotonX += 15;
 
 	if (FontSize == 12)
 	{
@@ -781,7 +862,7 @@ void RenderWindowsOption(int a1)
 		gInterface.DrawFormat(eWhite, x + BotonX, y + BotonY + 3.5, 14.0, 3, "12");
 	}
 
-	BotonX += 14;
+	BotonX += 15;
 
 	if (FontSize == 13)
 	{
@@ -812,105 +893,6 @@ void RenderWindowsOption(int a1)
 		glColor3f(1.0f, 1.0f, 1.0f);
 		RenderBitmap(31563, x + BotonX, y + BotonY, 14.0, 13.0, 0.0, 0.0, 0.64999998, 0.80000001, 1, 1, 0);
 		gInterface.DrawFormat(eWhite, x + BotonX, y + BotonY + 3.5, 14.0, 3, "13");
-	}
-
-	BotonX += 14;
-
-	if (FontSize == 14)
-	{
-		glColor3f(1.0f, 0.2f, 0.2f);
-		RenderBitmap(31563, x + BotonX, y + BotonY, 14.0, 13.0, 0.0, 0.0, 0.64999998, 0.80000001, 1, 1, 0);
-		gInterface.DrawFormat(eWhite, x + BotonX, y + BotonY + 3.5, 14.0, 3, "14");
-		glColor3f(1.0f, 1.0f, 1.0f);
-	}
-	else if (pCheckMouseOver(x + BotonX, y + BotonY, 14, 13) == 1)
-	{
-		glColor3f(0.0f, 1.0f, 1.0f);
-		RenderBitmap(31563, x + BotonX, y + BotonY, 14.0, 13.0, 0.0, 0.0, 0.64999998, 0.80000001, 1, 1, 0);
-		gInterface.DrawFormat(eWhite, x + BotonX, y + BotonY + 3.5, 14.0, 3, "14");
-		if (GetTickCount() - TickCountPro > 300)
-		{
-			if (GetKeyState(1) & 0x8000)
-			{
-
-				glColor3f(1.0f, 0.0f, 0.0f);
-				sub_10012730(14);
-				TickCountPro = GetTickCount();
-			}
-		}
-		glColor3f(1.0f, 1.0f, 1.0f);
-	}
-	else
-	{
-		glColor3f(1.0f, 1.0f, 1.0f);
-		RenderBitmap(31563, x + BotonX, y + BotonY, 14.0, 13.0, 0.0, 0.0, 0.64999998, 0.80000001, 1, 1, 0);
-		gInterface.DrawFormat(eWhite, x + BotonX, y + BotonY + 3.5, 14.0, 3, "14");
-	}
-
-	BotonX += 15;
-
-	if (FontSize == 15)
-	{
-		glColor3f(1.0f, 0.2f, 0.2f);
-		RenderBitmap(31563, x + BotonX, y + BotonY, 14.0, 13.0, 0.0, 0.0, 0.64999998, 0.80000001, 1, 1, 0);
-		gInterface.DrawFormat(eWhite, x + BotonX, y + BotonY + 3.5, 14.0, 3, "15");
-		glColor3f(1.0f, 1.0f, 1.0f);
-	}
-	else if (pCheckMouseOver(x + BotonX, y + BotonY, 14, 13) == 1)
-	{
-		glColor3f(0.0f, 1.0f, 1.0f);
-		RenderBitmap(31563, x + BotonX, y + BotonY, 14.0, 13.0, 0.0, 0.0, 0.64999998, 0.80000001, 1, 1, 0);
-		gInterface.DrawFormat(eWhite, x + BotonX, y + BotonY + 3.5, 14.0, 3, "15");
-		if (GetTickCount() - TickCountPro > 300)
-		{
-			if (GetKeyState(1) & 0x8000)
-			{
-
-				glColor3f(1.0f, 0.0f, 0.0f);
-				sub_10012730(15);
-				TickCountPro = GetTickCount();
-			}
-		}
-		glColor3f(1.0f, 1.0f, 1.0f);
-	}
-	else
-	{
-		glColor3f(1.0f, 1.0f, 1.0f);
-		RenderBitmap(31563, x + BotonX, y + BotonY, 14.0, 13.0, 0.0, 0.0, 0.64999998, 0.80000001, 1, 1, 0);
-		gInterface.DrawFormat(eWhite, x + BotonX, y + BotonY + 3.5, 14.0, 3, "15");
-	}
-
-	BotonX += 15;
-
-	if (FontSize == 16)
-	{
-		glColor3f(1.0f, 0.2f, 0.2f);
-		RenderBitmap(31563, x + BotonX, y + BotonY, 14.0, 13.0, 0.0, 0.0, 0.64999998, 0.80000001, 1, 1, 0);
-		gInterface.DrawFormat(eWhite, x + BotonX, y + BotonY + 3.5, 14.0, 3, "16");
-		glColor3f(1.0f, 1.0f, 1.0f);
-	}
-	else if (pCheckMouseOver(x + BotonX, y + BotonY, 14, 13) == 1)
-	{
-		glColor3f(0.0f, 1.0f, 1.0f);
-		RenderBitmap(31563, x + BotonX, y + BotonY, 14.0, 13.0, 0.0, 0.0, 0.64999998, 0.80000001, 1, 1, 0);
-		gInterface.DrawFormat(eWhite, x + BotonX, y + BotonY + 3.5, 14.0, 3, "16");
-		if (GetTickCount() - TickCountPro > 300)
-		{
-			if (GetKeyState(1) & 0x8000)
-			{
-
-				glColor3f(1.0f, 0.0f, 0.0f);
-				sub_10012730(16);
-				TickCountPro = GetTickCount();
-			}
-		}
-		glColor3f(1.0f, 1.0f, 1.0f);
-	}
-	else
-	{
-		glColor3f(1.0f, 1.0f, 1.0f);
-		RenderBitmap(31563, x + BotonX, y + BotonY, 14.0, 13.0, 0.0, 0.0, 0.64999998, 0.80000001, 1, 1, 0);
-		gInterface.DrawFormat(eWhite, x + BotonX, y + BotonY + 3.5, 14.0, 3, "16");
 	}
 
 }

@@ -285,26 +285,34 @@ void cfreetype::Create()
 	}
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-	switch (m_Resolution)
+	extern int FontSize;
+	if (FontSize >= 8 && FontSize <= 24)
 	{
-	case 0:
-		iFontHeight = 10;
-		break;
-	case 1:
-		iFontHeight = 11;
-		break;
-	case 2:
-		iFontHeight = 12;
-		break;
-	case 3:
-		iFontHeight = 13;
-		break;
-	case 4:
-		iFontHeight = 14;
-		break;
-	default:
-		iFontHeight = 14;
-		break;
+		iFontHeight = FontSize;
+	}
+	else
+	{
+		switch (m_Resolution)
+		{
+		case 0:
+			iFontHeight = 10;
+			break;
+		case 1:
+			iFontHeight = 11;
+			break;
+		case 2:
+			iFontHeight = 12;
+			break;
+		case 3:
+			iFontHeight = 13;
+			break;
+		case 4:
+			iFontHeight = 14;
+			break;
+		default:
+			iFontHeight = 14;
+			break;
+		}
 	}
 
 	FT_ULong Charcode;
@@ -952,4 +960,26 @@ void cfreetype::Init()
 	SetCompleteHook(0xE8, 0x004D21EF, &cfreetype::MultiLanguage_allocator);
 	SetCompleteHook(0xE8, 0x004D2A04, &cfreetype::CWinMain);
 	//SetCompleteHook(0xE8, 0x005C0083, &cfreetype::FT_RenderTextOriginal); //-- ToolTip back
+}
+
+void cfreetype::Recreate()
+{
+	for (std::map<FT_ULong, FTBitmap*>::iterator it = characters.begin(); it != characters.end(); ++it)
+	{
+		if (it->second)
+		{
+			if (it->second->BitmapIndex != 0)
+			{
+				glDeleteTextures(1, &it->second->BitmapIndex);
+			}
+			if (it->second->PakBuffer)
+			{
+				delete[] it->second->PakBuffer;
+			}
+			delete it->second;
+		}
+	}
+	characters.clear();
+
+	this->Create();
 }

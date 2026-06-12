@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "Common.h"
 #include "CustomPing.h"
 #include "Interface.h"
@@ -473,6 +473,7 @@ void Interface::LoadImages()
 
 	pLoadImage("Custom\\Maps\\mini_map_ui_monsterred.tga", 31471, 0x2601, 0x2900, 1, 0); //-- Dungeon Red
 	pLoadImage("Custom\\Maps\\mini_map_ui_monsterblue.tga", 31472, 0x2601, 0x2900, 1, 0); //-- Dungeon Blue
+	pLoadImage("Custom\\hudMap_I4.tga", 31473, 0x2601, 0x2900, 1, 0);
 
 	pLoadImage("Custom\\Maps\\mini_map_ui_party.tga", 61520, 0x2601, 0x2901, 1, 0);
 

@@ -16,6 +16,32 @@
 
 CMinimap gRenderMap;
 
+#define CGlobalBitmap_GetTexture ((BITMAP_t* (__thiscall*)(void* This, int index)) 0x0042CFE0)
+
+BITMAP_t* GetTextureInfo(int index)
+{
+	void* cBitmap = (void*)0x9816AA0;
+	return CGlobalBitmap_GetTexture(cBitmap, index);
+}
+
+void DrawSubImage(int textureId, float x, float y, float width, float height, float x1, float x2, float y1, float y2, int color)
+{
+	BITMAP_t* tex = GetTextureInfo(textureId);
+	float texWidth = 256.0f;
+	float texHeight = 256.0f;
+	if (tex != nullptr)
+	{
+		texWidth = tex->Width;
+		texHeight = tex->Height;
+	}
+	float u = x1 / texWidth;
+	float v = y1 / texHeight;
+	float uw = (x2 - x1) / texWidth;
+	float vh = (y2 - y1) / texHeight;
+
+	RenderBitMapColored(textureId, x, y, width, height, u, v, uw, vh, color);
+}
+
 void  CMinimap::UpdateX(float X, float Y)
 {
 	this->DataMap.XSW_Minimap = MAX_WIN_WIDTH - (640 - 535); //-- MiniMapX (Mover Minimapa Izquierda o Derecha)
@@ -258,46 +284,54 @@ char CMinimap::MapRender(int a1)
 			XNPC = XNPC;
 			YNPC = YNPC - 10;
 
+			float drawW = 22.0f;
+			float drawH = 22.0f;
+			float size = 22.0f;
+
+			if (spot->group == 0) // Portales
+			{
+				drawW = 16.0f;
+				drawH = 24.0f;
+				size = 24.0f;
+			}
+
+			float drawX = XNPC - (drawW / 2.0f);
+			float drawY = YNPC - (drawH / 2.0f);
+
 			//=== Show Name Info 
-			if (pCheckMouseOver((int)XNPC, (int)YNPC, (int)15, (int)15)) //Nombre Monsters
+			if (pCheckMouseOver((int)(XNPC - size / 2.0f), (int)(YNPC - size / 2.0f), (int)size, (int)size)) //Nombre Monsters
 			{
 				CustomFont.Draw(CustomFont.FontNormal, XNPC + 5, YNPC - 15, 0xFFFFFFFF, 0x0000005D, 0, 0, 8, "%s", spot->text);
 			}
 
 			if (spot->group == 0) // Portales
 			{
-				RenderBitMapColored(32451, XNPC, YNPC, 15.0, 15.0, 0.0, 0.0, 0.546875, 0.546875, pMakeColor(255, 255, 255, 155));
+				DrawSubImage(BITMAP_EHUDMAP, drawX, drawY, drawW, drawH, 638.0f, 658.0f, 0.0f, 30.0f, pMakeColor(255, 255, 255, 255));
 			}
 			else if (spot->group == 1) // Safezone NPCs
 			{
-				int textureId = 32452; // NPC clásico por defecto
-				float size = 10.0;
-
 				switch (spot->type)
 				{
-				case 1: // Phantom Soldier
-					textureId = 31469; // Usar quest o ícono personalizado
-					size = 12.0;
+				case 0:
+				case 1: // Shield / Guard / Soldier
+					DrawSubImage(BITMAP_EHUDMAP, drawX, drawY, drawW, drawH, 606.0f, 636.0f, 0.0f, 30.0f, pMakeColor(255, 255, 255, 255));
 					break;
-				case 2: // NPC General / Quest / Goblin
-					textureId = 31469;
-					size = 12.0;
+				case 2: // NPC General / Dialog Bubble / Quest
+					DrawSubImage(BITMAP_EHUDMAP, drawX, drawY, drawW, drawH, 574.0f, 604.0f, 0.0f, 30.0f, pMakeColor(255, 255, 255, 255));
 					break;
-				case 3: // Herrero / Reparar
-					textureId = 31466;
-					size = 12.0;
+				case 3: // Herrero / Blacksmith / Repair
+					DrawSubImage(BITMAP_EHUDMAP, drawX, drawY, drawW, drawH, 446.0f, 476.0f, 0.0f, 30.0f, pMakeColor(255, 255, 255, 255));
 					break;
-				case 4: // Pociones / Barmaid
-					textureId = 31467;
-					size = 12.0;
+				case 4: // Pociones / Potion
+					DrawSubImage(BITMAP_EHUDMAP, drawX, drawY, drawW, drawH, 510.0f, 540.0f, 0.0f, 30.0f, pMakeColor(255, 255, 255, 255));
 					break;
-				case 5: // Almacén / Storage
-					textureId = 31468;
-					size = 12.0;
+				case 5: // Almacén / Storage / Lock
+					DrawSubImage(BITMAP_EHUDMAP, drawX, drawY, drawW, drawH, 478.0f, 508.0f, 0.0f, 30.0f, pMakeColor(255, 255, 255, 255));
+					break;
+				default:
+					DrawSubImage(BITMAP_EHUDMAP, drawX, drawY, drawW, drawH, 574.0f, 604.0f, 0.0f, 30.0f, pMakeColor(255, 255, 255, 255));
 					break;
 				}
-
-				RenderBitMapColored(textureId, XNPC, YNPC, size, size, 0.0, 0.0, 0.546875, 0.546875, pMakeColor(255, 255, 255, 255));
 			}
 		}
 

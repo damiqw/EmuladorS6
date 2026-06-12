@@ -1,5 +1,13 @@
 #pragma once
 #include "Protocol.h"
+#include "Defines2.h"
+#undef FogColor
+
+#define BITMAP_EHUDMAP 31473
+
+BITMAP_t* GetTextureInfo(int index);
+void DrawSubImage(int textureId, float x, float y, float width, float height, float x1, float x2, float y1, float y2, int color = 0xFFFFFFFF);
+
 //--/TAP FULLMAP
 //----- (00790DF0) --------------------------------------------------------
 //----- (00638130) --------------------------------------------------------

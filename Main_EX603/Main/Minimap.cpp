@@ -206,7 +206,7 @@ char CMinimap::MapRender(int a1)
 		Coord.y = 256.0 - (By / 1.85);
 		WORD* TerrainWall = (WORD*)0x82C6AA0;
 		int iTerrainIndex = TERRAIN_INDEX(Coord.x, Coord.y);
-		RenderBitmap(550000, StartX, StartY + 20.0f, MainWidth, 472.0f, 0, 0, 1.0, 1.0, 1, 1, 0.0);
+		RenderBitmap(550000, StartX - 4.0f, StartY + 20.0f, MainWidth, 472.0f, 0, 0, 1.0, 1.0, 1, 1, 0.0);
 
 
 		for (int n = 0; n < 400; n++)

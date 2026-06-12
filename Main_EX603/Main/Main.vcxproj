@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -46,7 +46,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>..\Release</OutDir>
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);SDK\include;SDK\src;</IncludePath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);SDK\include;SDK\src;..\..\Util\include;</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -114,6 +114,7 @@
     <ClInclude Include="CustomCommandInfo.h" />
     <ClInclude Include="CustomEventTime.h" />
     <ClInclude Include="CustomFlag.h" />
+    <ClInclude Include="cfreetype.h" />
     <ClInclude Include="CustomJewelBank.h" />
     <ClInclude Include="CustomRanking.h" />
     <ClInclude Include="DailyReward.h" />
@@ -274,6 +275,7 @@
     <ClCompile Include="CustomEarthQuakeSkill.cpp" />
     <ClCompile Include="CustomEventTime.cpp" />
     <ClCompile Include="CustomFlag.cpp" />
+    <ClCompile Include="cfreetype.cpp" />
     <ClCompile Include="CustomFog.cpp" />
     <ClCompile Include="CustomFont.cpp" />
     <ClCompile Include="CustomGloves.cpp" />

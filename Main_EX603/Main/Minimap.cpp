@@ -206,45 +206,7 @@ char CMinimap::MapRender(int a1)
 		Coord.y = 256.0 - (By / 1.85);
 		WORD* TerrainWall = (WORD*)0x82C6AA0;
 		int iTerrainIndex = TERRAIN_INDEX(Coord.x, Coord.y);
-		switch (pGameResolutionMode)
-		{
-		case 0:
-			RenderBitmap(550000, StartX, StartY + 35, MainWidth, MainHeight - 115, 0, 0, 1.0, 1.0, 1, 1, 0.0);
-			//RenderBitmap(31607, StartX - 45, StartY + 19, MainWidth + 130, MainHeight - 15, 0, 0, 1.0, 1.0, 1, 1, 0.0);
-			break;//listo
-		case 1:
-			RenderBitmap(550000, StartX, StartY + 35, MainWidth, MainHeight - 115, 0, 0, 1.0, 1.0, 1, 1, 0.0);
-			//RenderBitmap(31607, StartX - 45, StartY + 19, MainWidth + 130, MainHeight - 15, 0, 0, 1.0, 1.0, 1, 1, 0.0);
-			break;//listo
-		case 2:
-			RenderBitmap(550000, StartX, StartY + 1, MainWidth, MainHeight - 50, 0, 0, 1.0, 1.0, 1, 1, 0.0);
-			//RenderBitmap(31607, StartX - 45, StartY - 22, MainWidth + 130, MainHeight + 72, 0, 0, 1.0, 1.0, 1, 1, 0.0);
-			break;//listo
-		case 3:
-			RenderBitmap(550000, StartX, StartY - 20, MainWidth, MainHeight - 15, 0, 0, 1.0, 1.0, 1, 1, 0.0);
-			//RenderBitmap(31607, StartX - 45, StartY - 42, MainWidth + 130, MainHeight + 114, 0, 0, 1.0, 1.0, 1, 1, 0.0);
-			break;//listo
-		case 4:
-			RenderBitmap(550000, StartX, StartY - 20, MainWidth, MainHeight - 15, 0, 0, 1.0, 1.0, 1, 1, 0.0);
-			//RenderBitmap(31607, StartX - 45, StartY - 42, MainWidth + 130, MainHeight + 114, 0, 0, 1.0, 1.0, 1, 1, 0.0);
-			break;//listo
-		case 5:
-			RenderBitmap(550000, StartX, StartY - 20, MainWidth, MainHeight - 15, 0, 0, 1.0, 1.0, 1, 1, 0.0);
-			//RenderBitmap(31607, StartX - 45, StartY - 42, MainWidth + 130, MainHeight + 114, 0, 0, 1.0, 1.0, 1, 1, 0.0);
-			break;//listo
-		case 6:
-			RenderBitmap(550000, StartX, StartY - 20, MainWidth, MainHeight - 15, 0, 0, 1.0, 1.0, 1, 1, 0.0);
-			//RenderBitmap(31607, StartX - 45, StartY - 42, MainWidth + 130, MainHeight + 114, 0, 0, 1.0, 1.0, 1, 1, 0.0);
-			break;//listo
-		case 7:
-			RenderBitmap(550000, StartX, StartY - 20, MainWidth, MainHeight - 15, 0, 0, 1.0, 1.0, 1, 1, 0.0);
-			//RenderBitmap(31607, StartX - 45, StartY - 42, MainWidth + 130, MainHeight + 114, 0, 0, 1.0, 1.0, 1, 1, 0.0);
-			break;//listo
-		case 8:
-			RenderBitmap(550000, StartX, StartY - 20, MainWidth, MainHeight - 15, 0, 0, 1.0, 1.0, 1, 1, 0.0);
-			//RenderBitmap(31607, StartX - 45, StartY - 42, MainWidth + 130, MainHeight + 114, 0, 0, 1.0, 1.0, 1, 1, 0.0);
-			break;//listo
-		}
+		RenderBitmap(550000, StartX, StartY + 20.0f, MainWidth, 472.0f, 0, 0, 1.0, 1.0, 1, 1, 0.0);
 
 
 		for (int n = 0; n < 400; n++)
@@ -280,9 +242,6 @@ char CMinimap::MapRender(int a1)
 
 			XNPC = (float)(StartX + (spot->x * 1.8700005));
 			YNPC = (float)(StartY + ((255.0 - spot->y) * 1.85));
-
-			XNPC = XNPC;
-			YNPC = YNPC - 10;
 
 			float drawW = 22.0f;
 			float drawH = 22.0f;

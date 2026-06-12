@@ -1,0 +1,45 @@
+//===================================================================
+//- Update 4.2
+//=================================================================== 
+0.1 = Fixeado Custom Effect Dynamic Static Main.dll OK
+0.2 = Fixeado Custom Invasiones Rango Monster GameServer OK
+0.3 = Fixeado Command Spot Rango GameServer OK
+0.4 = Adicionado Custom MenuM Slider Interface Classic Main.dll OK
+0.5 = Fixeado Custom Ping All Resolution Main.dll OK
+0.6 = Fixeado OffStore Button Main.dll OK
+0.7 = Fixeado MenuM All Resolution Main.dll OK
+0.8 = Adicionado Custom MenuM Interface S8 Slider Main.dll OK
+0.9 = Fixeado MenuM All Resolution Main.dll OK
+1.0 = Adicionado System Registro InGame Main.dll, GameServer, JoinServer OK
+1.1 = Fixeado Button Custom Party Move Main.dll OK
+1.2 = Fixeado Armas en Blood Castle Evento Main.dll OK
+1.3 = Fixeado Save Pass Login Box Main.dll OK
+1.4 = Fixeado Chat Classic All Resolution Main.dll OK
+1.5 = Fixeado Chat S8 All Resolution Main.dll OK
+1.6 = Fixeado pet mas serca del pj Main.dll OK
+1.7 = Fixeado logo gens con 4 posiciones a agregar Main.dll OK
+1.8 = Adicionado Ranking slot 5 Main.dll OK
+1.9 = Opctimizacion de Fps Main.dll OK
+2.0 = Fixeado Dupe CashShop GameServer OK
+2.1 = Adicionado DeleteDupeItem GameServer OK
+2.2 = Adicionado Clearinv Main.dll OK
+2.3 = Fixeado SelectCharacter All Resolution Main.dll OK
+2.4 = Fixeado Status Advanced All Resolution Main.dll OK
+2.5 = Fixeado Create Character All Resolution Main.dll OK
+2.6 = Fixeado Botton Clearinv Interface S8 Main.dll OK
+2.7 = Adicionado EventTime Main.dll, GameServer OK
+2.8 = Adicionado Custom NameEventInvasion ServerDisplay GameServer OK
+2.9 = Adicionado UpdateKeyScape Main.dll OK
+3.0 = Adicionado MiniMap Brujula Main.dll OK
+3.1 = Adicionado Interface EventTime S8 Main.dll OK
+3.2 = Adicionado JewelBank Interface S6 & S8 All Resolucion Main.dll OK
+3.3 = Adicionado Lucky Wheel V2 Interface S6 & S8 All Resolucion Main.dll OK
+3.4 = Adicionado CustomXShop Interface S6 & S8 All Resolucion Main.dll OK
+3.5 = Adicionado CustomBuyVip Interface S6 & S8 All Resolucion Main.dll OK
+3.6 = Adicionado CustomAntilag Interface S6 & S8 All Resolucion Main.dll OK
+3.7 = Fixeado MiniMap Cursor S6 & S8 All Resolucion Main.dll OK
+3.8 = Fixeado Panel Antilag S6 & S8 All Resolucion Main.dll OK
+3.9 = Adicionado Custom Daily Reward S6 & S8 All Resolucion Main.dll, GameServer, DataServer OK
+4.0 = Fix Check Ventanas Abiertas Main.dll OK
+4.1 = Adicionado Custom Flag S6 & S8 All Resolucion Main.dll, GameServer, DataServer OK
+4.2 = Adicionado Custom Ranking S6 & S8 All Resolucion Main.dll, GameServer, DataServer OK

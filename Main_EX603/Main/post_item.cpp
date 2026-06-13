@@ -109,36 +109,64 @@ void __declspec (naked) CheckRenderNewChatType()
 		jmp		allAddr;
 	}
 }
+void SetRenderChatColor(int chatType)
+{
+}
+
 void __declspec (naked) RenderNewChatType()
 {
 	static DWORD Addr1 = 0x41FE10;
 	static DWORD Addr2 = 0x420040;
 	static DWORD Addr3 = 0x4200B0;
 
-	static DWORD jnzAddr = 0x00788F25;
-	static DWORD cntAddr = 0x00788EEC;
 	static DWORD alwAddr = 0x00788F29;
 	static DWORD denAddr = 0x007890F2;
 	_asm {
+		movzx eax, al;
+		
+		push eax;
+		push ecx;
+		push edx;
+		push eax;
+		call SetRenderChatColor;
+		add esp, 4;
+		pop edx;
+		pop ecx;
+		pop eax;
+
 		cmp eax, 0x9;
-		jnz cancel;
-		jmp cntAddr;
-	cancel:
-		mov ecx, [ebp - 0x90];
-		movzx eax, byte ptr[ecx + 0x100];
-		test eax, eax;
-		je deny;
-		push 0xC8; //mau chu cua post item Alpha
-		push 0x0;
-		push 0x0;
-		push 0x0;
+		je render_gold;
+		cmp eax, 0x0B;
+		jae render_post_item;
+		jmp deny;
+	render_gold:
+		push 0xC8; // Alpha (#D3B42E)
+		push 0x2E; // Blue
+		push 0xB4; // Green
+		push 0xD3; // Red
 		call Addr1;
 		mov ecx, eax;
 		call Addr2;
-		push 0xFF; //mau nen cua post item // dam nhat
-		push 0xC8; // blue
-		push 0xC8; //green
-		push 0xFF; //red
+		push 0x3F; // default transparent BG
+		push 0x00;
+		push 0x00;
+		push 0x00;
+		call Addr1;
+		mov ecx, eax;
+		call Addr3;
+		jmp alwAddr;
+	render_post_item:
+		push 0xC8; // Alpha
+		push 0x2E; // Blue
+		push 0xB4; // Green
+		push 0xD3; // Red
+		call Addr1;
+		mov ecx, eax;
+		call Addr2;
+		push 0xFF; // Solid white/light-blue BG
+		push 0xC8; // Blue
+		push 0xC8; // Green
+		push 0xFF; // Red
 		call Addr1;
 		mov ecx, eax;
 		call Addr3;

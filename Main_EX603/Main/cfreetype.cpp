@@ -144,7 +144,7 @@ void cBindTexture(int uiBitmapIndex)
 	}
 }
 
-void RenderGlyph(int Texture, float x,float y, int Width, int Height, float m_TextureU, float m_TextureV, float m_TextureUWidth, float m_TextureVHeight, GLfloat *m_TemColor, BOOL Active)
+void RenderGlyph(int Texture, float x,float y, int Width, int Height, float m_TextureU, float m_TextureV, float m_TextureUWidth, float m_TextureVHeight, GLfloat *m_TemColor, BOOL Active, DWORD textColor)
 {
 	cBindTexture(Texture);
 
@@ -167,8 +167,8 @@ void RenderGlyph(int Texture, float x,float y, int Width, int Height, float m_Te
 			{
 				pos[0] = x;
 				pos[1] = y;
-				if (!(__Red(CURRENT_COLOR1) == 0xFF && __Green(CURRENT_COLOR1) == 0xFF && __Blue(CURRENT_COLOR1) == 0xFF && __Alpha(CURRENT_COLOR1) == 0xFF))
-					glColor4ub(__Red(CURRENT_COLOR1), __Green(CURRENT_COLOR1), __Blue(CURRENT_COLOR1), __Alpha(CURRENT_COLOR1));
+				if (!(__Red(textColor) == 0xFF && __Green(textColor) == 0xFF && __Blue(textColor) == 0xFF && __Alpha(textColor) == 0xFF))
+					glColor4ub(__Red(textColor), __Green(textColor), __Blue(textColor), __Alpha(textColor));
 				else
 					glColor4fv(m_TemColor);
 			}
@@ -176,19 +176,19 @@ void RenderGlyph(int Texture, float x,float y, int Width, int Height, float m_Te
 			{
 				pos[0] = x;
 				pos[1] = y;
-				if (__Alpha(CURRENT_COLOR1) > 100)
+				if (__Alpha(textColor) > 100)
 					glColor4ub(0, 0, 0, 255);
 				else
-					glColor4ub(0, 0, 0, __Alpha(CURRENT_COLOR1));
+					glColor4ub(0, 0, 0, __Alpha(textColor));
 			}
 			else
 			{
 				pos[0] = x + 1.0;
 				pos[1] = y - 1.0;
-				if (__Alpha(CURRENT_COLOR1) > 100)
+				if (__Alpha(textColor) > 100)
 					glColor4ub(0, 0, 0, 255);
 				else
-					glColor4ub(0, 0, 0, __Alpha(CURRENT_COLOR1));
+					glColor4ub(0, 0, 0, __Alpha(textColor));
 			}
 			p[0][0] = pos[0]        ; p[0][1] = pos[1];
 			p[1][0] = pos[0]        ; p[1][1] = pos[1] - Height;
@@ -212,8 +212,8 @@ void RenderGlyph(int Texture, float x,float y, int Width, int Height, float m_Te
 	}
 	else
 	{
-		if (!(__Red(CURRENT_COLOR1) == 0xFF && __Green(CURRENT_COLOR1) == 0xFF && __Blue(CURRENT_COLOR1) == 0xFF && __Alpha(CURRENT_COLOR1) == 0xFF))
-			glColor4ub(__Red(CURRENT_COLOR1), __Green(CURRENT_COLOR1), __Blue(CURRENT_COLOR1), __Alpha(CURRENT_COLOR1));
+		if (!(__Red(textColor) == 0xFF && __Green(textColor) == 0xFF && __Blue(textColor) == 0xFF && __Alpha(textColor) == 0xFF))
+			glColor4ub(__Red(textColor), __Green(textColor), __Blue(textColor), __Alpha(textColor));
 		else
 			glColor4fv(m_TemColor);
 
@@ -397,7 +397,7 @@ int ConvertCharToWideStr(std::wstring& wstrDest, LPCSTR szText)
 
 	if (gMultiLanguage->GetCodePage() != CHINESE_CP)
 	{
-		if (strcmp(szText, "¸ÖÆ¼ ·Î±ä ¹öÁ¯") == 0)
+		if (strcmp(szText, "Â¸Ã–Ã†Â¼ Â·ÃŽÂ±Ã¤ Â¹Ã¶ÃÂ¯") == 0)
 			iConversionType = (IsCharUTF8(szText)) ? CP_UTF8 : 949;
 		else
 			iConversionType = (IsCharUTF8(szText)) ? CP_UTF8 : gMultiLanguage->GetCodePage();
@@ -423,6 +423,8 @@ void cfreetype::RenderText(int iPos_x, int iPos_y, const char* pszText, int iBox
 	if (pszText == NULL || (pszText[0] == '\0' && iBoxWidth == 0)) return;
 
 	if (strlen(pszText) <= 0 && iBoxWidth == 0) return;
+
+
 
 	std::wstring wstr = L"";
 
@@ -517,6 +519,10 @@ void cfreetype::RenderText(int iPos_x, int iPos_y, const char* pszText, int iBox
 	glGetFloatv(GL_CURRENT_COLOR, m_TemColor);
 
 	DWORD m_ColoText1 = CURRENT_COLOR1;
+	if (pszText && strstr(pszText, ": [POST]:") != NULL)
+	{
+		m_ColoText1 = 0xFF2EB4D3; // Gold color in ABGR format (#D3B42E)
+	}
 	DWORD m_ColoText2 = CURRENT_COLOR2;
 
 	if (back && __Alpha(m_ColoText2) > 0)
@@ -556,7 +562,7 @@ void cfreetype::RenderText(int iPos_x, int iPos_y, const char* pszText, int iBox
 			{*/
 				Next_y += b->m_TextureV;
 				Next_x += b->m_TextureU;
-				RenderGlyph(b->BitmapIndex, Next_x, Next_y, b->m_TextureUWidth, b->m_TextureVHeight, 0.0, 0.0, 1.0, 1.0, m_TemColor, color);
+				RenderGlyph(b->BitmapIndex, Next_x, Next_y, b->m_TextureUWidth, b->m_TextureVHeight, 0.0, 0.0, 1.0, 1.0, m_TemColor, color, m_ColoText1);
 			//}
 		}
 		TextureWidth += b->m_Width;
@@ -575,6 +581,8 @@ void cfreetype::RenderTextReal(int iPos_x, int iPos_y, const char* pszText, int 
 	if (pszText == NULL || (pszText[0] == '\0' && iBoxWidth == 0)) return;
 
 	if (strlen(pszText) <= 0 && iBoxWidth == 0) return;
+
+
 
 	std::wstring wstr = L"";
 
@@ -669,6 +677,10 @@ void cfreetype::RenderTextReal(int iPos_x, int iPos_y, const char* pszText, int 
 	glGetFloatv(GL_CURRENT_COLOR, m_TemColor);
 
 	DWORD m_ColoText1 = CURRENT_COLOR1;
+	if (pszText && strstr(pszText, ": [POST]:") != NULL)
+	{
+		m_ColoText1 = 0xFF2EB4D3; // Gold color in ABGR format (#D3B42E)
+	}
 
 	int TextureWidth = 0;
 	auto Key = wstr.begin();
@@ -699,7 +711,7 @@ void cfreetype::RenderTextReal(int iPos_x, int iPos_y, const char* pszText, int 
 			{*/
 				Next_y += b->m_TextureV;
 				Next_x += b->m_TextureU;
-				RenderGlyph(b->BitmapIndex, Next_x, Next_y, b->m_TextureUWidth, b->m_TextureVHeight, 0.0, 0.0, 1.0, 1.0, m_TemColor, color);
+				RenderGlyph(b->BitmapIndex, Next_x, Next_y, b->m_TextureUWidth, b->m_TextureVHeight, 0.0, 0.0, 1.0, 1.0, m_TemColor, color, m_ColoText1);
 			//}
 		}
 		TextureWidth += b->m_Width;

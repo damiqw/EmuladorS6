@@ -334,6 +334,7 @@ enum eMapNumber
 	SantaTown = 62,
 	Vulcanus = 63,
 	Collosseum = 64,
+	Mundioca = 75,
 	Karutan1 = 80,
 	Karutan2 = 81,
 };

@@ -2213,6 +2213,12 @@ bool Interface::CheckMap()
 	case eMapNumber::Karutan2:
 		return false;
 		break;
+	case eMapNumber::Stadium:
+		return false;
+		break;
+	case eMapNumber::Mundioca:
+		return false;
+		break;
 	default:
 		return true;
 		break;

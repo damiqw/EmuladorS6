@@ -205,8 +205,9 @@ char CMinimap::MapRender(int a1)
 		Coord.x = Bx / 1.8700005;
 		Coord.y = 256.0 - (By / 1.85);
 		WORD* TerrainWall = (WORD*)0x82C6AA0;
-		int iTerrainIndex = TERRAIN_INDEX(Coord.x, Coord.y);
-		RenderBitmap(550000, StartX - 4.0f, StartY + 20.0f, MainWidth, 472.0f, 0, 0, 1.0, 1.0, 1, 1, 0.0);
+		RenderBitmap(32447, StartX - 4.0f, StartY + 20.0f, MainWidth, 472.0f, 0, 0, 1.0, 1.0, 1, 1, 0.0);
+
+
 
 
 		for (int n = 0; n < 400; n++)
@@ -513,34 +514,38 @@ bool JCFileMapCheck(int map) // OK
 {
 	if (map - 1 == 30) { return 1; }
 
-	char Path[64];
+	char Path[128];
 
-	wsprintf(Path, "Data\\Custom\\Maps\\World%d.ozt", map);
-
-	FILE* file;
-
-	if (fopen_s(&file, Path, "r") != 0)
+	// Check .ozt first
+	wsprintf(Path, "Data\\Interface\\NaviMap\\Navimap%02d.ozt", map);
+	DWORD attr = GetFileAttributesA(Path);
+	if (attr != INVALID_FILE_ATTRIBUTES && !(attr & FILE_ATTRIBUTE_DIRECTORY))
 	{
-		return 0;
-	}
-	else
-	{
-		fclose(file);
 		return 1;
 	}
+
+	// Check .tga second
+	wsprintf(Path, "Data\\Interface\\NaviMap\\Navimap%02d.tga", map);
+	attr = GetFileAttributesA(Path);
+	if (attr != INVALID_FILE_ATTRIBUTES && !(attr & FILE_ATTRIBUTE_DIRECTORY))
+	{
+		return 1;
+	}
+
+	return 0;
 }
 
 void MiniMapLoad() // OK
 {
 	if (pMapNumber < 100 && pMapNumber != 30)
 	{
-		char buff1[32];
+		char buff1[64];
 
-		wsprintf(buff1, "Custom\\Maps\\World%d.tga", (pMapNumber + 1));
+		wsprintf(buff1, "Interface\\NaviMap\\Navimap%02d.tga", (pMapNumber + 1));
 
 		if (JCFileMapCheck((pMapNumber + 1)) != 0)
 		{
-			pLoadImage(buff1, 550000, 0x2601, 0x2900, 1, 0);
+			pLoadImage(buff1, 32447, 0x2601, 0x2900, 1, 0);
 		}
 	}
 }
@@ -585,12 +590,31 @@ void LoadObjectMapCore() // OK
 	MiniMapLoad();
 }
 
-void LoadImages(char* a1, int a2, int a3, int a4, int a5, int a6)
+void __fastcall CustomLoadImages(void* This, void* EDX, const char* Filename)
 {
+	((void(__thiscall*)(void*, const char*))0x0082B400)(This, Filename);
 
-	pLoadImage(a1, a2, a3, a4, a5, a6);
+	MiniMapLoad();
 }
 
+int __cdecl CustomMapFileCheck(char* FilePath, char* Mode)
+{
+	int result = ((int(__cdecl*)(char*, char*))0x009D0040)(FilePath, Mode);
+	if (result != 0)
+	{
+		return result;
+	}
+
+	if (pMapNumber < 100 && pMapNumber != 30)
+	{
+		if (JCFileMapCheck(pMapNumber + 1))
+		{
+			return 1;
+		}
+	}
+
+	return 0;
+}
 
 void CMinimap::MiniMapload()
 {
@@ -600,4 +624,8 @@ void CMinimap::MiniMapload()
 
 	//SetCompleteHook(0xE9, 0x0062F870, &LoadTexture); //ok
 	SetCompleteHook(0xE9, 0x0082ABA0, &CMinimap::MapRender);
+
+	SetCompleteHook(0xE8, 0x0082B43A, &CustomMapFileCheck);
+
+	SetCompleteHook(0xE8, 0x0062F8A1, &CustomLoadImages);
 }

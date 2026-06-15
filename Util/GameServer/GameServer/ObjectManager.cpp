@@ -737,10 +737,10 @@ bool CObjectManager::CharacterGameClose(int aIndex) // OK
 		{
 			gChaosBox.ChaosBoxItemSave(lpObj);
 		}
-		else
-		{
-			gObjInventoryRollback(aIndex);
-		}
+		//else
+		//{
+		//	gObjInventoryRollback(aIndex);
+		//}
 	}
 
 	if(gServerInfo.m_DuelBet != 0)

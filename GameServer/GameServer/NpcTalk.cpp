@@ -1628,23 +1628,49 @@ void CNpcTalk::CGNpcTalkCloseRecv(int aIndex) // OK
 		return;
 	}
 
-	if(lpObj->Interface.use == 0 || lpObj->Interface.type == INTERFACE_NONE || lpObj->Interface.type == INTERFACE_CHAOS_BOX)
+	//if(lpObj->Interface.use == 0 || lpObj->Interface.type == INTERFACE_NONE || lpObj->Interface.type == INTERFACE_CHAOS_BOX)
+	if (lpObj->Interface.use == 0 || lpObj->Interface.type == INTERFACE_NONE || lpObj->Interface.type == INTERFACE_CHAOS_BOX || lpObj->Interface.type == INTERFACE_TRADE)
 	{
 		return;
 	}
 
+	// switch(lpObj->Interface.type)
+	// {
+	// 	case INTERFACE_TRADE:
+	// 		gTrade.CGTradeCancelButtonRecv(aIndex);
+	// 		break;
+	// 	case INTERFACE_SHOP:
+	// 		if(((lpObj->Interface.state==1)?(lpObj->Interface.state=0):1)==0){return;}
+	// 		lpObj->TargetShopNumber = -1;
+	// 		break;
+	// 	case INTERFACE_WAREHOUSE:
+	// 		gWarehouse.CGWarehouseClose(aIndex);
+	// 		break;
+	// 	case INTERFACE_TRAINER:
+	// 		gChaosBox.ChaosBoxInit(lpObj);
+	// 		gObjInventoryCommit(aIndex);
+	// 		break;
+	// 	case INTERFACE_QUEST_WORLD:
+	// 		lpObj->QuestWorldMonsterClass = -1;
+	// 		break;
+	// }
+	
 	switch(lpObj->Interface.type)
 	{
-		case INTERFACE_TRADE:
+		/*case INTERFACE_TRADE:
 			gTrade.CGTradeCancelButtonRecv(aIndex);
-			break;
+			break;*/
 		case INTERFACE_SHOP:
 			if(((lpObj->Interface.state==1)?(lpObj->Interface.state=0):1)==0){return;}
 			lpObj->TargetShopNumber = -1;
 			break;
 		case INTERFACE_WAREHOUSE:
+			//-----------------
+			//->Guild Bank Fix
+			//-----------------
 			gWarehouse.CGWarehouseClose(aIndex);
 			break;
+			//-----------------
 		case INTERFACE_TRAINER:
 			gChaosBox.ChaosBoxInit(lpObj);
 			gObjInventoryCommit(aIndex);
@@ -1653,6 +1679,8 @@ void CNpcTalk::CGNpcTalkCloseRecv(int aIndex) // OK
 			lpObj->QuestWorldMonsterClass = -1;
 			break;
 	}
+
+
 
 	lpObj->Interface.use = 0;
 	lpObj->Interface.type = INTERFACE_NONE;

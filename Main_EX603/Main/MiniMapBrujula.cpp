@@ -910,25 +910,9 @@ bool MiniMapFileCheck1ProTecno(int Map) // OK
 	return 0;
 }
 
-void LogToFile(const char* format, ...)
-{
-	char buff[1024];
-	va_list args;
-	va_start(args, format);
-	vsprintf_s(buff, format, args);
-	va_end(args);
-
-	FILE* f;
-	if (fopen_s(&f, "custom_map_debug.log", "a") == 0)
-	{
-		fprintf(f, "%s\n", buff);
-		fclose(f);
-	}
-}
 
 void MiniMaploadB() // OK
 {
-	LogToFile("[MiniMaploadB] pMapNumber: %d", pMapNumber);
 	if (pMapNumber < 100 && pMapNumber != 30)
 	{
 		char buff[64];
@@ -937,32 +921,27 @@ void MiniMaploadB() // OK
 
 		wsprintf(Path, "Data\\Custom\\Maps\\World%d.ozj", Map);
 		int File = rFileOpen(Path, "rb");
-		LogToFile("  Trying %s -> rFileOpen returns: %d", Path, File);
 		if (File)
 		{
 			rFileClose(File);
 			wsprintf(buff, "Custom\\Maps\\World%d.jpg", Map);
 			gRenderMapB.DataMap.ModelID = 31462;
-			LogToFile("  pLoadImage(%s, 31462)", buff);
 			pLoadImage(buff, 31462, 0x2601, 0x2900, 1, 0);
 			return;
 		}
 
 		wsprintf(Path, "Data\\Custom\\Maps\\World%d.ozt", Map);
 		File = rFileOpen(Path, "rb");
-		LogToFile("  Trying %s -> rFileOpen returns: %d", Path, File);
 		if (File)
 		{
 			rFileClose(File);
 			wsprintf(buff, "Custom\\Maps\\World%d.tga", Map);
 			gRenderMapB.DataMap.ModelID = 31462;
-			LogToFile("  pLoadImage(%s, 31462)", buff);
 			pLoadImage(buff, 31462, 0x2601, 0x2900, 1, 0);
 			return;
 		}
 
 		gRenderMapB.DataMap.ModelID = -1;
-		LogToFile("  No map texture found. ModelID set to -1");
 	}
 }
 

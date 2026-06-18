@@ -142,6 +142,8 @@ void CCustomJewel::Load(char* path) // OK
 
 					info.Level = lpMemScript->GetAsNumber();
 
+					info.MaxLevelUP = lpMemScript->GetAsNumber(); // Read MaxLevelUP field
+
 					info.Option1 = lpMemScript->GetAsNumber();
 
 					info.Option2 = lpMemScript->GetAsNumber();
@@ -170,6 +172,8 @@ void CCustomJewel::Load(char* path) // OK
 					info.Index = lpMemScript->GetNumber();
 
 					info.Level = lpMemScript->GetAsNumber();
+
+					info.MaxLevelUP = lpMemScript->GetAsNumber(); // Read MaxLevelUP field
 
 					info.Option1 = lpMemScript->GetAsNumber();
 
@@ -669,7 +673,23 @@ bool CCustomJewel::CharacterUseCustomJewel(LPOBJ lpObj,int SourceSlot,int Target
 			}
 		}
 
-		lpItem->m_Level = (((lpItem->m_Level+lpInfo->Level)>15)?15:(lpItem->m_Level+lpInfo->Level));
+		int maxLevelToAdd = lpInfo->Level;
+		
+		// Apply MaxLevelUP limit if specified in success info
+		if (lpInfo->MaxLevelUP > 0)
+		{
+			int currentLevel = lpItem->m_Level;
+			int maxAllowedLevel = lpInfo->MaxLevelUP;
+			
+			// If adding the full level would exceed the max allowed, reduce it
+			if (currentLevel + lpInfo->Level > maxAllowedLevel)
+			{
+				maxLevelToAdd = maxAllowedLevel - currentLevel;
+				if (maxLevelToAdd < 0) maxLevelToAdd = 0;
+			}
+		}
+		
+		lpItem->m_Level = (((lpItem->m_Level+maxLevelToAdd)>15)?15:(lpItem->m_Level+maxLevelToAdd));
 
 		lpItem->m_Option1 = (((lpItem->m_Option1+lpInfo->Option1)>1)?1:(lpItem->m_Option1+lpInfo->Option1));
 
@@ -701,7 +721,23 @@ bool CCustomJewel::CharacterUseCustomJewel(LPOBJ lpObj,int SourceSlot,int Target
 	{
 		CUSTOM_JEWEL_FAILURE_INFO* lpInfo = gCustomJewel.GetFailureInfo(lpObj->Inventory[SourceSlot].m_Index);
 
-		lpItem->m_Level = (((lpItem->m_Level-lpInfo->Level)<0)?0:(lpItem->m_Level-lpInfo->Level));
+		int maxLevelToSubtract = lpInfo->Level;
+		
+		// Apply MaxLevelUP limit if specified in failure info
+		if (lpInfo->MaxLevelUP > 0)
+		{
+			int currentLevel = lpItem->m_Level;
+			int minAllowedLevel = lpInfo->MaxLevelUP; // In failure, MaxLevelUP acts as a floor limit
+			
+			// If subtracting the full level would go below minimum allowed, reduce it
+			if (currentLevel - lpInfo->Level < minAllowedLevel)
+			{
+				maxLevelToSubtract = currentLevel - minAllowedLevel;
+				if (maxLevelToSubtract < 0) maxLevelToSubtract = 0;
+			}
+		}
+		
+		lpItem->m_Level = (((lpItem->m_Level-maxLevelToSubtract)<0)?0:(lpItem->m_Level-maxLevelToSubtract));
 
 		lpItem->m_Option1 = (((lpItem->m_Option1-lpInfo->Option1)<0)?0:(lpItem->m_Option1-lpInfo->Option1));
 

@@ -133,6 +133,8 @@ bool CCustomJewel::Load(char* path) // OK
 
 					info.Level = lpMemScript->GetAsNumber();
 
+					info.MaxLevelUP = lpMemScript->GetAsNumber(); // Read MaxLevelUP field
+
 					info.Option1 = lpMemScript->GetAsNumber();
 
 					info.Option2 = lpMemScript->GetAsNumber();
@@ -159,6 +161,8 @@ bool CCustomJewel::Load(char* path) // OK
 					info.Index = lpMemScript->GetNumber();
 
 					info.Level = lpMemScript->GetAsNumber();
+
+					info.MaxLevelUP = lpMemScript->GetAsNumber(); // Read MaxLevelUP field
 
 					info.Option1 = lpMemScript->GetAsNumber();
 

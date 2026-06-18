@@ -8,6 +8,7 @@ struct CUSTOM_JEWEL_SUCCESS_INFO
 {
 	int Index;
 	int Level;
+	int MaxLevelUP;
 	int Option1;
 	int Option2;
 	int Option3;
@@ -20,6 +21,7 @@ struct CUSTOM_JEWEL_FAILURE_INFO
 {
 	int Index;
 	int Level;
+	int MaxLevelUP;
 	int Option1;
 	int Option2;
 	int Option3;

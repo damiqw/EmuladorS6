@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "OfflineMode.h"
 #include "User.h"
 #include "380ItemOption.h"
 #include "Attack.h"
@@ -571,6 +572,7 @@ void gObjAllLogOut() // OK
 		{
 			CloseClient(n);
 
+			g_OfflineMode.OnHelperpAlreadyConnected(&gObj[n]);
 			gCustomAttack.OnAttackAlreadyConnected(&gObj[n]);
 			
 #if USE_FAKE_ONLINE == TRUE
@@ -592,6 +594,7 @@ void gObjAllDisconnect() // OK
 		{
 			CloseClient(n);
 
+			g_OfflineMode.OnHelperpAlreadyConnected(&gObj[n]);
 			gCustomAttack.OnAttackAlreadyConnected(&gObj[n]);
 
 #if USE_FAKE_ONLINE == TRUE
@@ -739,6 +742,7 @@ void gObjCharZeroSet(int aIndex) // OK
 	lpObj->GuildUnionTimeStamp = 0;
 	lpObj->SummonIndex = -1;
 	lpObj->Change = -1;
+	g_OfflineMode.OnHelperpAlreadyConnected(lpObj);
 	lpObj->TargetNumber = -1;
 	lpObj->TargetShopNumber = -1;
 	lpObj->LastAttackerID = -1;
@@ -892,6 +896,13 @@ void gObjCharZeroSet(int aIndex) // OK
 	lpObj->AttackCustomZoneMap = 0;
 	lpObj->AttackCustomOffline = 0;
 	lpObj->AttackCustomOfflineTime = 0;
+	// Offline Helper fields
+	lpObj->m_OfflineMode = 0;
+	lpObj->m_OfflineSocket = false;
+	lpObj->MuOffHelperTime = 0;
+	lpObj->m_OfflineCoordX = 0;
+	lpObj->m_OfflineCoordY = 0;
+	lpObj->m_OfflineTimeResetMove = 0;
 //	lpObj->AttackCustomOfflineMoneyDelay = 0;
 	lpObj->AttackCustomAutoBuff = 0;
 	lpObj->AttackCustomAutoBuffDelay = 0;
@@ -3511,6 +3522,7 @@ void gObjSecondProc()
 #endif
 
 				gCustomAttack.OnAttackSecondProc(lpObj);
+				g_OfflineMode.OnAttackSecondProcHelper(lpObj);
 
 				gCustomStore.OnPShopSecondProc(lpObj);
 

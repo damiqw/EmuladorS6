@@ -562,7 +562,10 @@ void CSocketManager::Disconnect(int index) // OK
 
 	gObj[index].Socket = INVALID_SOCKET;
 
-	gObjDel(index);
+	if(gObj[index].m_OfflineSocket == false)
+	{
+		gObjDel(index);
+	}
 
 	this->m_critical.unlock();
 }

@@ -3,6 +3,7 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
+#include "OfflineMode.h"
 #include "ObjectManager.h"
 #include "Log.h"
 #include "Attack.h"
@@ -677,8 +678,7 @@ void CObjectManager::ObjectMonsterAndMsgProc() // OK
 #if USE_FAKE_ONLINE == TRUE
 				s_FakeOnline.Attack(gObj[n].Index); // Add
 #endif
-
-			
+				g_OfflineMode.Attack(gObj[n].Index);
 			}
 
 			for(int i=0;i < MAX_MONSTER_SEND_ATTACK_MSG;i++)

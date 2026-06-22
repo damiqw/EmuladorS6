@@ -14,6 +14,7 @@
 #include "Util.h"
 #include "ConnectMember.h"
 #include "FakeOnline.h"
+#include "OfflineMode.h"
 
 void JoinServerProtocolCore(BYTE head,BYTE* lpMsg,int size) // OK
 {
@@ -134,6 +135,8 @@ void JGDisconnectAccountRecv(SDHP_DISCONNECT_ACCOUNT_RECV* lpMsg) // OK
 {
 	if(gObjIsAccountValid(lpMsg->index,lpMsg->account) != 0)
 	{
+		g_OfflineMode.OnHelperpAlreadyConnected(&gObj[lpMsg->index]);
+		gCustomAttack.OnAttackAlreadyConnected(&gObj[lpMsg->index]);
 		CloseClient(lpMsg->index);
 	}
 }

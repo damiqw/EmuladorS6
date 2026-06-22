@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "MuHelper.h"
 #include "Protocol.h"
 #include "Common.h"
 #include "CustomPing.h"
@@ -301,6 +302,9 @@ BOOL ProtocolCoreEx(BYTE head,BYTE* lpMsg,int size,int key) // OK
 		case 0xFB:
 			switch(((lpMsg[0]==0xC1)?lpMsg[3]:lpMsg[4]))
 			{
+				case 0x3E:
+					gMuHelper.RunningOffHelper();
+					break;
 #if(DAILY)
 				case 0x03:
 					DailyReward.GCRecvUserInfo(lpMsg);

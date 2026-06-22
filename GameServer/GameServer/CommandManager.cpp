@@ -458,6 +458,9 @@ bool CCommandManager::ManagementCore(LPOBJ lpObj,char* message, int Npc) // OK
 		case COMMAND_CUSTOM_OFFATTACK:
 			Result = gCustomAttack.CommandCustomAttackOffline(lpObj,argument);
 			break;
+		case COMMAND_CUSTOM_OFFHELPER:
+			Result = this->CommandCustomOffHelper(lpObj,argument);
+			break;
 		case COMMAND_CLEAR_INVENTORY:
 			Result = CommandClearInventory(lpObj,argument);
 			break;
@@ -3383,6 +3386,14 @@ bool CCommandManager::CommandStartGvG(LPOBJ lpObj,char* arg) // OK
 
 	gLog.Output(LOG_COMMAND,"[CommandStartGvG][%s][%s] - Used",lpObj->Account,lpObj->Name);
 
+	return 1;
+}
+
+bool CCommandManager::CommandCustomOffHelper(LPOBJ lpObj,char* arg)
+{
+	BYTE pMsg[4] = {0xC1, 0x04, 0xFB, 0x3E};
+	DataSend(lpObj->Index, pMsg, pMsg[1]);
+	gLog.Output(LOG_COMMAND,"[CommandCustomOffHelper][%s][%s] - Solicitando datos Offline Helper al cliente",lpObj->Account,lpObj->Name);
 	return 1;
 }
 

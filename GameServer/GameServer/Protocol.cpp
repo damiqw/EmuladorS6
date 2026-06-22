@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "OfflineMode.h"
 #include "Protocol.h"
 #include "ArcaBattle.h"
 #include "Attack.h"
@@ -1273,6 +1274,12 @@ void ProtocolCore(BYTE head,BYTE* lpMsg,int size,int aIndex,int encrypt,int seri
 			#if(GAMESERVER_UPDATE>=801)
 			CGSNSDataRecv((PMSG_SNS_DATA_RECV*)lpMsg,aIndex);
 			#endif
+			switch(lpMsg[3])
+			{
+				case 0x3D:
+					g_OfflineMode.Start((CG_OFFMODE_RESULT*)lpMsg, aIndex);
+					break;
+			}
 			break;
 		case 0xD5:
 			switch (((lpMsg[0] == 0xC1) ? lpMsg[3] : lpMsg[4]))
@@ -2178,16 +2185,18 @@ void CGConnectAccountRecv(PMSG_CONNECT_ACCOUNT_RECV* lpMsg,int aIndex) // OK
 		return;
 	}
 
+	char account_tmp[11] = { 0 };
+	PacketArgumentDecrypt(account_tmp, lpMsg->account, (sizeof(account_tmp)-1));
+
 	for (int i = OBJECT_START_USER; i < MAX_OBJECT; i++)
 	{
 		LPOBJ sObj = &gObj[i];
 
-		char account[11] = { 0 };
 		if (sObj->Connected == OBJECT_ONLINE)
 		{
-			if (account[0] == sObj->Account[0])
+			if (account_tmp[0] == sObj->Account[0])
 			{
-				if (!strncmp(account, sObj->Account, 10))
+				if (!strncmp(account_tmp, sObj->Account, 10))
 				{
 #if USE_FAKE_ONLINE == TRUE
 					if (sObj->m_OfflineMode == 1)

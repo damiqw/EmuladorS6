@@ -3,6 +3,7 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
+#include "OfflineMode.h"
 #include "ServerInfo.h"
 #include "380ItemOption.h"
 #include "380ItemType.h"
@@ -4170,6 +4171,8 @@ void CServerInfo::ReadCustomInfo(char* section,char* path) // OK
 	this->m_CustomRuneEffectSwitch = GetPrivateProfileInt(section, "RuneEffect", 0, path);
 
 	this->m_QuickAddButton = GetPrivateProfileInt(section, "QuickAddStats", 0, path);
+
+	g_OfflineMode.ReadOffLine(section, path);
 }
 
 void CServerInfo::ReadEventInfo(char* section,char* path) // OK

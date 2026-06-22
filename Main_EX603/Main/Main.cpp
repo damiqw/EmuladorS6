@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "MuHelper.h"
 #include "resource.h"
 #include "Main.h"
 #include "..\\..\\Util\\CCRC32.H"
@@ -548,6 +549,7 @@ extern "C" _declspec(dllexport) void EntryProc() // OK
 	}
 
 	gController.Load();
+	gMuHelper.Load();
 
 	SetByte(0x00E61144,0xA0); // Accent
 	SetByte(0x004D1E69,0xEB); // Crack (mu.exe)

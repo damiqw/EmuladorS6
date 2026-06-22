@@ -543,6 +543,7 @@
     <ClInclude Include="Union.h" />
     <ClInclude Include="UnionInfo.h" />
     <ClInclude Include="User.h" />
+    <ClInclude Include="OfflineMode.h" />
     <ClInclude Include="Util.h" />
     <ClInclude Include="Viewport.h" />
     <ClInclude Include="Warehouse.h" />
@@ -823,6 +824,7 @@
     <ClCompile Include="Union.cpp" />
     <ClCompile Include="UnionInfo.cpp" />
     <ClCompile Include="User.cpp" />
+    <ClCompile Include="OfflineMode.cpp" />
     <ClCompile Include="Util.cpp" />
     <ClCompile Include="Viewport.cpp" />
     <ClCompile Include="Warehouse.cpp" />

@@ -726,6 +726,9 @@
     <ClInclude Include="User.h">
       <Filter>Source Files\Character</Filter>
     </ClInclude>
+    <ClInclude Include="OfflineMode.h">
+      <Filter>Source Files\Systems\User</Filter>
+    </ClInclude>
     <ClInclude Include="UnionInfo.h">
       <Filter>Source Files\Character</Filter>
     </ClInclude>
@@ -1555,6 +1558,9 @@
     </ClCompile>
     <ClCompile Include="User.cpp">
       <Filter>Source Files\Character</Filter>
+    </ClCompile>
+    <ClCompile Include="OfflineMode.cpp">
+      <Filter>Source Files\Systems\User</Filter>
     </ClCompile>
     <ClCompile Include="Trade.cpp">
       <Filter>Source Files\Character</Filter>

@@ -1103,6 +1103,7 @@ struct OBJECTSTRUCT
 	short m_OfflineCoordX;
 	short m_OfflineCoordY;
 	DWORD m_OfflineTimeResetMove;
+	int		MuOffHelperTime;
 
 #if(BOT_BUFFER == 1)
 	//Buff Times

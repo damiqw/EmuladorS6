@@ -7,7 +7,7 @@
 #include "Protocol.h"
 #include "User.h"
 
-#define MAX_COMMAND 90
+#define MAX_COMMAND 150
 
 enum eCommandNumber
 {
@@ -90,6 +90,7 @@ enum eCommandNumber
 	COMMAND_STARTLUKEHELPER = 88,
 	COMMAND_AUTO_CHAGE = 89,
 	COMMAND_ITEM_CHAGE = 90,
+	COMMAND_CUSTOM_OFFHELPER = 93,
 };
 
 //**********************************************//
@@ -341,6 +342,7 @@ public:
 	bool CommandStartTvT(LPOBJ lpObj,char* arg);
 	bool CommandStartGvG(LPOBJ lpObj,char* arg);
 	bool CommandStartLukeHelper(LPOBJ lpObj, char* arg);
+	bool CommandCustomOffHelper(LPOBJ lpObj, char* arg);
 	bool CommandStartInvasion(LPOBJ lpObj,char* arg);
 	bool CommandStartCustomArena(LPOBJ lpObj,char* arg);
 	bool CommandItemChage(LPOBJ lpObj); //È¯Àü

@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "OfflineMode.h"
 #include "GameMain.h"
 #include "BattleSoccerManager.h"
 #include "CommandManager.h"
@@ -203,6 +204,8 @@ void CALLBACK QueueTimerCallback(PVOID lpParameter,BOOLEAN TimerOrWaitFired) // 
 				s_FakeOnline.NhatItem(n); // Add
 				s_FakeOnline.QuayLaiToaDoGoc(n); // Add
 #endif
+				g_OfflineMode.PickUP(n);
+				g_OfflineMode.regresar(n);
 			}
 			break;
 

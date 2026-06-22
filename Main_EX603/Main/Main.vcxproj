@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -235,6 +235,7 @@
     <ClInclude Include="UITextInputBox.h" />
     <ClInclude Include="User.h" />
     <ClInclude Include="Util.h" />
+    <ClInclude Include="MuHelper.h" />
     <ClInclude Include="ViewCharItem.h" />
     <ClInclude Include="Warehouse.h" />
     <ClInclude Include="WideScreen.h" />
@@ -393,6 +394,7 @@
     <ClCompile Include="UITextInputBox.cpp" />
     <ClCompile Include="User.cpp" />
     <ClCompile Include="Util.cpp" />
+    <ClCompile Include="MuHelper.cpp" />
     <ClCompile Include="ViewCharItem.cpp" />
     <ClCompile Include="Warehouse.cpp" />
     <ClCompile Include="WideScreen.cpp" />

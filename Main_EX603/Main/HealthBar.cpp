@@ -250,6 +250,7 @@ void DrawNewHealthBar() // OK
 
 				pDrawBarForm((float)(PosX), (float)(PosY), BarWidth, Height2, 0.0, 0);
 
+				glColor4f(1.0f, 1.0f, 1.0f, 1.0f); // Reset color to white for the text
 				gCustomRankUser.DrawFormat(eWhite, PosX-41+PosXName, PosY-10.0, 120, 3, "%s", name);
 
 				//gCustomRankUser.DrawFormat(eWhite, PosX, PosY-0.05, 41, 3, "%d%%", PercentLifeMonster);

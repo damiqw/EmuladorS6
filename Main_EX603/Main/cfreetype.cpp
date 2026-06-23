@@ -424,8 +424,6 @@ void cfreetype::RenderText(int iPos_x, int iPos_y, const char* pszText, int iBox
 
 	if (strlen(pszText) <= 0 && iBoxWidth == 0) return;
 
-
-
 	std::wstring wstr = L"";
 
 	ConvertCharToWideStr(wstr, pszText);
@@ -518,12 +516,81 @@ void cfreetype::RenderText(int iPos_x, int iPos_y, const char* pszText, int iBox
 	GLfloat m_TemColor[4];
 	glGetFloatv(GL_CURRENT_COLOR, m_TemColor);
 
-	DWORD m_ColoText1 = CURRENT_COLOR1;
-	if (pszText && strstr(pszText, ": [POST]:") != NULL)
+	extern DWORD g_dwCurrentFontThis;
+	DWORD m_ColoText1 = g_dwCurrentFontThis ? (*(DWORD *)((*(DWORD *)(g_dwCurrentFontThis + 4)) + 16)) : CURRENT_COLOR1;
+	DWORD m_ColoText2 = g_dwCurrentFontThis ? (*(DWORD *)((*(DWORD *)(g_dwCurrentFontThis + 4)) + 20)) : CURRENT_COLOR2;
+	
+	if (g_dwCurrentFontThis)
 	{
-		m_ColoText1 = 0xFF2EB4D3; // Gold color in ABGR format (#D3B42E)
+		HDC hdc = (HDC)*(DWORD*)(*(DWORD*)(g_dwCurrentFontThis + 4));
+		if (hdc)
+		{
+			COLORREF hdcColor = GetTextColor(hdc);
+			
+			if (hdcColor == 0x00E6D28C) m_ColoText1 = 0xFFDBB012; // Party Custom
+			else if (hdcColor == 0x008CFF8C) m_ColoText1 = 0xFF0ADA0A; // Guild Custom
+			else if (m_ColoText1 == 0xFF000000 && hdcColor != CLR_INVALID && hdcColor != 0x00000000)
+			{
+				m_ColoText1 = hdcColor | 0xFF000000;
+			}
+		}
 	}
-	DWORD m_ColoText2 = CURRENT_COLOR2;
+
+	if (m_ColoText1 == 0xFFE6D28C) // Original Client Party Color
+		m_ColoText1 = 0xFFDBB012; // Custom Party Color
+	else if (m_ColoText1 == 0xFF8CFF8C) // Original Client Guild Color
+		m_ColoText1 = 0xFF0ADA0A; // Custom Guild Color
+
+	extern DWORD g_CurrentChatType;
+	if (m_ColoText1 == 0xFFFFFFFF || m_ColoText1 == 0xFF000000)
+	{
+		if (g_CurrentChatType == 5) // Party
+		{
+			m_ColoText1 = 0xFFDBB012; // Light Blue (ABGR: #12b0dbff)
+		}
+		else if (g_CurrentChatType == 6) // Guild
+		{
+			m_ColoText1 = 0xFF0ADA0A; // Light Green (ABGR: #0ada0aff)
+		}
+		else if (g_CurrentChatType == 2) // Whisper
+		{
+			m_ColoText1 = 0xFFFF8CFF; // Pink/Purple (ABGR: #FFff8cff)
+		}
+	}
+
+	if (m_ColoText1 == 0xFF000000)
+	{
+		m_ColoText1 = 0xFFFFFFFF; // Force fallback to OpenGL color (m_TemColor)
+	}
+
+	if (pszText)
+	{
+		if (strstr(pszText, ": [POST]:") != NULL)
+		{
+			m_ColoText1 = 0xFF2EB4D3; // Gold color in ABGR format (#D3B42E)
+		}
+		else if (strstr(pszText, ": ~") != NULL || strstr(pszText, "]~") != NULL) // Party Chat
+		{
+			m_ColoText1 = 0xFFDBB012; // Light Blue (ABGR: #12b0dbff)
+		}
+		else if (strstr(pszText, ": @@") != NULL || strstr(pszText, "]@@") != NULL) // Alliance Chat
+		{
+			m_ColoText1 = 0xFF00FFFF; // Yellow (ABGR: #FFFF00)
+		}
+		else if (strstr(pszText, ": @>") != NULL || strstr(pszText, "]@>") != NULL) // Guild Notice
+		{
+			m_ColoText1 = 0xFF00FFCC; // Yellowish Green
+		}
+		else if (strstr(pszText, ": @") != NULL || strstr(pszText, "]@") != NULL) // Guild Chat
+		{
+			m_ColoText1 = 0xFF0ADA0A; // Light Green (ABGR: #0ada0aff)
+		}
+		else if (strstr(pszText, ": $") != NULL || strstr(pszText, "]$") != NULL) // Gens Chat
+		{
+			m_ColoText1 = 0xFF7070FF; // Reddish
+		}
+	}
+	// DWORD m_ColoText2 = CURRENT_COLOR2; (Ya definido arriba)
 
 	if (back && __Alpha(m_ColoText2) > 0)
 	{
@@ -581,8 +648,6 @@ void cfreetype::RenderTextReal(int iPos_x, int iPos_y, const char* pszText, int 
 	if (pszText == NULL || (pszText[0] == '\0' && iBoxWidth == 0)) return;
 
 	if (strlen(pszText) <= 0 && iBoxWidth == 0) return;
-
-
 
 	std::wstring wstr = L"";
 
@@ -676,10 +741,79 @@ void cfreetype::RenderTextReal(int iPos_x, int iPos_y, const char* pszText, int 
 	GLfloat m_TemColor[4];
 	glGetFloatv(GL_CURRENT_COLOR, m_TemColor);
 
-	DWORD m_ColoText1 = CURRENT_COLOR1;
-	if (pszText && strstr(pszText, ": [POST]:") != NULL)
+	extern DWORD g_dwCurrentFontThis;
+	DWORD m_ColoText1 = g_dwCurrentFontThis ? (*(DWORD *)((*(DWORD *)(g_dwCurrentFontThis + 4)) + 16)) : CURRENT_COLOR1;
+	DWORD m_ColoText2 = g_dwCurrentFontThis ? (*(DWORD *)((*(DWORD *)(g_dwCurrentFontThis + 4)) + 20)) : CURRENT_COLOR2;
+
+	if (g_dwCurrentFontThis)
 	{
-		m_ColoText1 = 0xFF2EB4D3; // Gold color in ABGR format (#D3B42E)
+		HDC hdc = (HDC)*(DWORD*)(*(DWORD*)(g_dwCurrentFontThis + 4));
+		if (hdc)
+		{
+			COLORREF hdcColor = GetTextColor(hdc);
+			
+			if (hdcColor == 0x00E6D28C) m_ColoText1 = 0xFFDBB012; // Party Custom
+			else if (hdcColor == 0x008CFF8C) m_ColoText1 = 0xFF0ADA0A; // Guild Custom
+			else if (m_ColoText1 == 0xFF000000 && hdcColor != CLR_INVALID && hdcColor != 0x00000000)
+			{
+				m_ColoText1 = hdcColor | 0xFF000000;
+			}
+		}
+	}
+
+	if (m_ColoText1 == 0xFFE6D28C) // Original Client Party Color
+		m_ColoText1 = 0xFFDBB012; // Custom Party Color
+	else if (m_ColoText1 == 0xFF8CFF8C) // Original Client Guild Color
+		m_ColoText1 = 0xFF0ADA0A; // Custom Guild Color
+
+	extern DWORD g_CurrentChatType;
+	if (m_ColoText1 == 0xFFFFFFFF || m_ColoText1 == 0xFF000000)
+	{
+		if (g_CurrentChatType == 5) // Party
+		{
+			m_ColoText1 = 0xFFDBB012; // Light Blue (ABGR: #12b0dbff)
+		}
+		else if (g_CurrentChatType == 6) // Guild
+		{
+			m_ColoText1 = 0xFF0ADA0A; // Light Green (ABGR: #0ada0aff)
+		}
+		else if (g_CurrentChatType == 2) // Whisper
+		{
+			m_ColoText1 = 0xFFFF8CFF; // Pink/Purple (ABGR: #FFff8cff)
+		}
+	}
+
+	if (m_ColoText1 == 0xFF000000)
+	{
+		m_ColoText1 = 0xFFFFFFFF; // Force fallback to OpenGL color (m_TemColor)
+	}
+
+	if (pszText)
+	{
+		if (strstr(pszText, ": [POST]:") != NULL)
+		{
+			m_ColoText1 = 0xFF2EB4D3; // Gold color in ABGR format (#D3B42E)
+		}
+		else if (strstr(pszText, ": ~") != NULL || strstr(pszText, "]~") != NULL) // Party Chat
+		{
+			m_ColoText1 = 0xFFDBB012; // Light Blue (ABGR: #12b0dbff)
+		}
+		else if (strstr(pszText, ": @@") != NULL || strstr(pszText, "]@@") != NULL) // Alliance Chat
+		{
+			m_ColoText1 = 0xFF00FFFF; // Yellow (ABGR: #FFFF00)
+		}
+		else if (strstr(pszText, ": @>") != NULL || strstr(pszText, "]@>") != NULL) // Guild Notice
+		{
+			m_ColoText1 = 0xFF00FFCC; // Yellowish Green
+		}
+		else if (strstr(pszText, ": @") != NULL || strstr(pszText, "]@") != NULL) // Guild Chat
+		{
+			m_ColoText1 = 0xFF0ADA0A; // Light Green (ABGR: #0ada0aff)
+		}
+		else if (strstr(pszText, ": $") != NULL || strstr(pszText, "]$") != NULL) // Gens Chat
+		{
+			m_ColoText1 = 0xFF7070FF; // Reddish
+		}
 	}
 
 	int TextureWidth = 0;
@@ -805,10 +939,13 @@ void cfreetype::CWinMain(int This)
 	((void(__thiscall*)(int)) 0x00859F90)(This);
 }
 
+DWORD g_dwCurrentFontThis = 0;
+
 void cfreetype::FT_RenderTextOriginal(int This, int iPos_x, int iPos_y, LPCSTR pszText, int iBoxWidth, int iBoxHeight, int iSort, OUT SIZE* lpTextSize)
 {
 	if ( *(DWORD *)(This + 4) )
 	{
+		g_dwCurrentFontThis = This;
 		cfreetype::Instance()->RenderText(iPos_x, iPos_y, pszText, iBoxWidth, iBoxHeight, iSort, lpTextSize, TRUE);
 	}
 }
@@ -817,6 +954,7 @@ void cfreetype::RenderTextBackground(int This, int iPos_x, int iPos_y, LPCSTR ps
 {
 	if ( *(DWORD *)(This + 4) )
 	{
+		g_dwCurrentFontThis = This;
 		cfreetype::Instance()->RenderText(iPos_x, iPos_y, pszText, iBoxWidth, iBoxHeight, iSort, lpTextSize, false, true);
 	}
 }
@@ -825,6 +963,7 @@ void cfreetype::RenderTextOriginal(int This, int iPos_x, int iPos_y, LPCSTR pszT
 {
 	if ( *(DWORD *)(This + 4) )
 	{
+		g_dwCurrentFontThis = This;
 		if ( SceneFlag == LOG_IN_SCENE || SceneFlag == CHARACTER_SCENE)
 		{
 			rendertextOriginal(This, iPos_x, iPos_y, (int)pszText, iBoxWidth, iBoxHeight, iSort, (int)lpTextSize);

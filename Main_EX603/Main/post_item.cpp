@@ -30,15 +30,29 @@ PostItem::PostItem()
 PostItem::~PostItem()
 {
 }
+DWORD g_CurrentChatType = 0xFFFFFFFF;
+
 void __declspec (naked) HookRenderNewChat()
 {
 	static DWORD sub_420150 = 0x00420150;
 	static DWORD sub_78C050 = 0x0078C050;
 	static DWORD cntAddr = 0x007890A9;
-	static DWORD width = 0;
 	_asm {
-		lea		ecx, JCItemPublic;
-		call[PostItem::RenderText];
+		// Get chat type
+		mov ecx, [ebp - 0x2C];
+		call sub_78C050;
+		mov g_CurrentChatType, eax;
+
+		// Call RenderText
+		lea ecx, JCItemPublic;
+		call [PostItem::RenderText];
+
+		// Reset global chat type while preserving EAX (return value)
+		push eax;
+		mov g_CurrentChatType, 0xFFFFFFFF;
+		pop eax;
+
+		// Continue original HookRenderNewChat logic
 		push	eax;
 		mov     ecx, [ebp - 0x2C];
 		call	sub_78C050;
@@ -109,10 +123,6 @@ void __declspec (naked) CheckRenderNewChatType()
 		jmp		allAddr;
 	}
 }
-void SetRenderChatColor(int chatType)
-{
-}
-
 void __declspec (naked) RenderNewChatType()
 {
 	static DWORD Addr1 = 0x41FE10;
@@ -123,16 +133,6 @@ void __declspec (naked) RenderNewChatType()
 	static DWORD denAddr = 0x007890F2;
 	_asm {
 		movzx eax, al;
-		
-		push eax;
-		push ecx;
-		push edx;
-		push eax;
-		call SetRenderChatColor;
-		add esp, 4;
-		pop edx;
-		pop ecx;
-		pop eax;
 
 		cmp eax, 0x9;
 		je render_gold;
@@ -173,34 +173,6 @@ void __declspec (naked) RenderNewChatType()
 		jmp alwAddr;
 	deny:
 		jmp denAddr;
-	}
-}
-void __declspec (naked) HookNewChatType()
-{
-	static DWORD OutRangeAddr = 0x0078B839;
-	static DWORD chatType;
-	static DWORD Addr1 = 0x0078B7E7;
-	static DWORD Addr2 = 0x0078B82F;
-	static DWORD Addr3 = 0x0078B7D5;
-	_asm {
-		mov ecx, dword ptr[ebp - 0x08];
-		mov chatType, ecx;
-	}
-	if (chatType == 9) {
-		_asm {
-			jmp Addr2;
-		}
-	}
-	else if (chatType > 10 && chatType < 0xFFFFFFFF)
-	{
-		_asm {
-			jmp Addr2;
-		}
-	}
-	else {
-		_asm {
-			jmp Addr3;
-		}
 	}
 }
 void __declspec (naked) HookNewChatSelectType()
@@ -796,7 +768,6 @@ void PostItem::Hook()
 	SetCompleteHook(0xE9, 0x00788EE7, &RenderNewChatType);
 	SetCompleteHook(0xE9, 0x00788C3F, &CheckRenderNewChatType);
 	SetCompleteHook(0xE9, 0x0078BA89, &CheckGetNewChatType);
-	SetCompleteHook(0xE9, 0x0078B7CF, &HookNewChatType);
 	SetCompleteHook(0xE9, 0x00788FF2, &HookNewChatTaget);
 	SetCompleteHook(0xE9, 0x007890A4, &HookRenderNewChat);
 	SetCompleteHook(0xE8, 0x0078B0CF, &HookRenderFrame);

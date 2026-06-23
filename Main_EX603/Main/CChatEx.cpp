@@ -492,7 +492,7 @@ _declspec(naked) void WisperBarSizeMove()
 		JMP[WhisperTxt_buf2f]
 	}
 }
-//-- (00787BA0) //-- ChatInput
+
 double sub_787BA0()
 {
 	return 15.199999809;

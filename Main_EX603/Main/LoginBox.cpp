@@ -16,6 +16,7 @@ cAutoLogin::cAutoLogin()
 	this->selectedAccount = 0;
 	this->totalSavedAcc = 0;
 	this->TickCount = 0;
+	this->isHoveringDropdown = false;
 }
 
 cAutoLogin::~cAutoLogin()
@@ -119,6 +120,7 @@ void cAutoLogin::SaveAccount(char* ID, char* PW, bool Save)
 }
 void cAutoLogin::DoRequestLogin()
 {
+	if (AutoLogin.isHoveringDropdown) return;
 	int Struct = _Instance() + 16968;
 
 	InputBox_GetText(*(DWORD*)(Struct + 848), AutoLogin.iUser, 11);
@@ -213,6 +215,29 @@ inline int GetPosShowLogin()
 	return Ret;
 }
 
+void cAutoLogin::CheckHover()
+{
+	float startX;
+	float startY;
+	int JCResto = (pWinWidth / pWinHeightReal / 2) - 320;
+	startX = JCResto + (640.0 - getX(329)) / 2;
+
+	if (pGameResolutionMode == 0) startY = Fix_DisplayHeightExt + (470.0 - getY(245)) * 2.0 / 3.0;
+	else if (pGameResolutionMode == 1) startY = Fix_DisplayHeightExt + (480.0 - getY(320)) * 2.0 / 3.0;
+	else startY = Fix_DisplayHeightExt + (470.0 - getY(375)) * 2.0 / 3.0;
+
+	AutoLogin.isHoveringDropdown = false;
+	if (AutoLogin.GetShowListAccount(false))
+	{
+		if (IsCursorInZone(startX + getX(109), startY + getY(128) + GetPosShowLogin(), getX(155.0), getY(104.5)))
+		{
+			pSetCursorFocus = true;
+			AutoLogin.isHoveringDropdown = true;
+			ResetMouseLButton();
+		}
+	}
+}
+
 void CButtonAutoLogin(int This, int a2)
 {
 	CUIRenderText_SetFont((int)pTextThis(), *(int*)0xE8C594);
@@ -267,6 +292,7 @@ void CButtonAutoLogin(int This, int a2)
 	{
 		if (IsCursorInZone(startX + getX(250.0), startY + getY(135) + GetPosLogin(), getX(15), getY(15)))
 		{
+			pSetCursorFocus = true;
 			if (pIsKeyRelease(VK_LBUTTON))
 			{
 				RenderBitmap(0x7B69, startX + getX(250.0), startY + getY(135) + GetPosLogin(), 15.0, 15.0, 0.0, 0.0, 15.0 / 16.0, 15.0 / 32.0, 0, 1, 0.0);
@@ -434,6 +460,7 @@ void cAutoLogin::DrawButton(int IMGcode, float x, float y, float w, float h, flo
 {
 	if (IsCursorInZone(x, y, getX(w), getY(h)))
 	{
+		pSetCursorFocus = true;
 		if (GetKeyState(VK_LBUTTON) & 0x8000)
 		{
 			RenderBitmap(IMGcode, x, y, w, h, 0.0, uh / a9 * 2.0, uw / a8, uh / a9, 0, 1, 0.0);
@@ -460,6 +487,7 @@ void cAutoLogin::DrawButton(int IMGcode, float x, float y, float w, float h, flo
 {
 	if (IsCursorInZone(x, y, getX(w), getY(h))) 
 	{
+		pSetCursorFocus = true;
 		RenderBitmap(IMGcode, x, y, w, h, 0.0, uh / a9, uw / a8, uh / a9, 0, 1, 0.0);
 		if (pIsKeyRelease(VK_LBUTTON) || (a11 && GetKeyState(VK_LBUTTON) & 0x8000))
 		{

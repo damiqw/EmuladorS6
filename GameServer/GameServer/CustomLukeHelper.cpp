@@ -245,7 +245,7 @@ void CCustomLukeHelper::ProcState_EMPTY() // OK
 		{
 			this->m_MinutesLeft = minutes;
 
-			gNotice.GCNoticeSendToAll(0,0,0,0,0,0,gMessage.GetMessage(540),(this->m_MinutesLeft+1));
+			gNotice.GCNoticeSendToAll(0,0,0,0,0,0,gMessage.GetMessage(530),(this->m_MinutesLeft+1));
 		}
 
 	}

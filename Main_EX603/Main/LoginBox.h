@@ -39,6 +39,7 @@ public:
 
 	static void TongleAccount(LPVOID pClass);
 	static void RemoveAccount(LPVOID pClass);
+	static void CheckHover();
 	bool GetShowListAccount(bool checkTick = true);
 	void SetShowListAccount(bool show);
 	void SetTickCount(DWORD tick);
@@ -51,6 +52,7 @@ public:
 
 	void DrawButton(int IMGcode, float x, float y, float w, float h, float uw, float uh, float a8, float a9, PUSHEVENT_CALLBACK_LPVOID pCallbackFunc);
 	void DrawButton(int IMGcode, float x, float y, float w, float h, float uw, float uh, float a8, float a9, PUSHEVENT_CALLBACK_LPVOID pCallbackFunc, bool a11);
+	bool isHoveringDropdown;
 private:
 	bool showListAccount;
 	DWORD TickCount;

@@ -3391,6 +3391,18 @@ bool CCommandManager::CommandStartGvG(LPOBJ lpObj,char* arg) // OK
 
 bool CCommandManager::CommandCustomOffHelper(LPOBJ lpObj,char* arg)
 {
+	if(lpObj->HelperDelayTime == 0)
+	{
+		gNotice.GCNoticeSend(lpObj->Index,1,0,0,0,0,0,gMessage.GetMessage(950));
+		return 0;
+	}
+
+	if(lpObj->AttackCustom != 0)
+	{
+		gNotice.GCNoticeSend(lpObj->Index,1,0,0,0,0,0,gMessage.GetMessage(951));
+		return 0;
+	}
+
 	BYTE pMsg[4] = {0xC1, 0x04, 0xFB, 0x3E};
 	DataSend(lpObj->Index, pMsg, pMsg[1]);
 	gLog.Output(LOG_COMMAND,"[CommandCustomOffHelper][%s][%s] - Solicitando datos Offline Helper al cliente",lpObj->Account,lpObj->Name);

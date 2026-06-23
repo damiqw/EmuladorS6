@@ -6,6 +6,7 @@
 #include "LoginMainWin.h"
 #include "Object.h"
 #include "Protect.h"
+#include "LoginBox.h"
 
 CLoginMainWin g_pLoginMainWin;
 
@@ -72,9 +73,9 @@ void CLoginMainWin::ShowProTecno(BYTE* thisa, bool bShow)
 
 bool CLoginMainWin::OpenFormRegister(BYTE* thisa)
 {
-	//if (AutoLogin.GetShowListAccount()) {
-	//	return false;
-	//}
+	if (AutoLogin.isHoveringDropdown) {
+		return false;
+	}
 	if (CButtonIsPress(m_Register))
 	{
 		FormReg->GiveFocus(1, TRUE);
@@ -87,15 +88,16 @@ bool CLoginMainWin::OpenFormRegister(BYTE* thisa)
 
 void CLoginMainWin::RenderButtonControls(BYTE* thisa)
 {
+	cAutoLogin::CheckHover();
 	CSysMenuWin_Render(thisa);
 	CButtonRender(m_Register);
 }
 
 void CLoginMainWin::CancelLogin(void* thisa)
 {
-	//if (AutoLogin.GetShowListAccount()) {
-	//	return;
-	//}
+	if (AutoLogin.isHoveringDropdown) {
+		return;
+	}
 
 	FormReg->Show(false);
 	((void(__thiscall*)(void*)) 0x0040BBC0)(thisa);
@@ -103,6 +105,9 @@ void CLoginMainWin::CancelLogin(void* thisa)
 
 void CLoginMainWin::ManageOKClick(void* thisa)
 {
+	if (AutoLogin.isHoveringDropdown) {
+		return;
+	}
 	((void(__thiscall*)(void*)) 0x0040D020)(thisa);
 	int v10 = (int)thisa; // [sp+Ch] [bp-8h]@1
 

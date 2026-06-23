@@ -35,5 +35,6 @@ public:
 
 private:
 
-}; extern QuickAddStats gQuickAddStats;
+}; 
+extern QuickAddStats gQuickAddStats;
 #endif

@@ -72,6 +72,7 @@
 #include "LuckyItem.h"
 #include "MapManager.h"
 #include "MapServerManager.h"
+#include "PartySearch.h"
 #include "MasterSkillTree.h"
 #include "Message.h"
 #include "MiniMap.h"
@@ -333,6 +334,8 @@ void CServerInfo::ReadCustomInfo() // OK
 	this->ReadCustomInfo("GameServerInfo",".\\Data\\GameServerInfo - Custom.dat");
 
 	gCustomArena.ReadCustomArenaInfo("GameServerInfo",".\\Data\\GameServerInfo - Custom.dat");
+
+	gPartySearch.Load("PartySearch", gPath.GetFullPath("Custom\\PartySearch.ini"));
 
 	gCustomAttack.ReadCustomAttackInfo("GameServerInfo",".\\Data\\GameServerInfo - Custom.dat");
 

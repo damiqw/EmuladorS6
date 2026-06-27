@@ -42,6 +42,7 @@
 #include "CustomLukeHelper.h"
 #include "CustomMarriage.h"
 #include "RuudTokenSellTemplate.h"
+#include "PartySearch.h"
 
 CNpcTalk gNpcTalk;
 //////////////////////////////////////////////////////////////////////
@@ -119,6 +120,11 @@ void CNpcTalk::Load(char* path) // OK
 bool CNpcTalk::NpcTalk(LPOBJ lpNpc,LPOBJ lpObj) // OK
 {
 	if(lpObj->Interface.use != 0)
+	{
+		return 0;
+	}
+
+	if (gPartySearch.Dialog(lpObj, lpNpc))
 	{
 		return 1;
 	}

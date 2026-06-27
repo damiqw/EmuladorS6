@@ -14,6 +14,9 @@
 #define CS_GET_PANTS(x, y, z)		( (32 * (z & 0xF)) + 16 * ((x >> 5) & 1) + (y >> 4) )
 #define CS_GET_GLOVES(x, y, z)		( (32 * ((z >> 4) & 0xF)) + 16 * ((x >> 4) & 1) + (y & 0xF) )
 #define CS_GET_BOOTS(x, y, z)		( (32 * (z & 0xF)) + 16 * ((x >> 3) & 1) + (y >> 4) )
+#define MAX_ITEM_PRICE	100
+#define MAX_ACCOUNT_LEVEL 4
+#define SET_NUMBERHB(x) (WORD)((BYTE)((x)&0xFF)|((BYTE)((x)&0xFF)<<8))
 #define MAX_ITEMOPT_BIT				0x3F
 #define GET_ITEMOPT_LEVEL(x)		((x >> 3) & 0xF)
 #define SET_ITEMOPT_LEVEL(x)		(x << 3)

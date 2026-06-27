@@ -79,6 +79,11 @@
 #include "CustomStatsAdvance.h"
 #include "Controller.h"
 #include "CustomQuickAddStats.h"
+#include "ItemManager.h"
+#include "NewUIMyInventory.h"
+#include "InterfaceS8AdvancedUI.h"
+#include "PartySearch.h"
+#include "PartySearchSettings.h"
 #include "Widescreen.h"
 #include "SocketManager.h"
 #include "InterfaceMacroUI.h"
@@ -240,6 +245,9 @@ LRESULT CALLBACK MouseProc(int nCode,WPARAM wParam,LPARAM lParam) // OK
 					break;
 				case WM_LBUTTONUP:
 				case WM_LBUTTONDOWN:
+					gPartySearchSettings.event_party_search_settings_window(wParam);
+					gPartySearch.event_party_search_window(wParam);
+					gPartySearch.event_party_search_password_window(wParam);
 					gInterface.EventConfirm_CANCEL(wParam);
 					gInterface.EventConfirm_OK(wParam);
 					gInterface.EventDrawMenuTrash_Open(wParam);

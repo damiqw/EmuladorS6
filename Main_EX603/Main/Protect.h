@@ -158,6 +158,8 @@ struct MAIN_FILE_INFO
 	DWORD EnableEventTimeButton;
 	DWORD JewelBankSwitch;
 	DWORD EnableLuckySpinV2Button;
+	WORD MaxClassTypes;
+	DWORD EnablePartySearch;
 	DWORD EnableCustomXShopButton;
 	DWORD EnableVipShop;
 	DWORD VipTypes;

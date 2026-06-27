@@ -12,6 +12,11 @@
 #include "PrintPlayer.h"
 #include "User.h"
 #include "Util.h"
+#include "Controller.h"
+#include "NewUIMyInventory.h"
+#include "InterfaceS8AdvancedUI.h"
+#include "PartySearch.h"
+#include "PartySearchSettings.h"
 #include "Offset.h"
 #include "EventInvasion.h"
 #include "InterfaceElemental.h"
@@ -358,6 +363,47 @@ void Interface::Load()
 
 	this->BindObject(eMAIN_ThueFlag, 0x7A5A, 445, 364, 205, -1);
 
+	this->BindObject(OBJECT_PARTYSETTINGS_MAIN, 0x7A5A, 222, 345 + 30, -1, -1);
+	this->BindObject(OBJECT_PARTYSETTINGS_TITLE, 0x7A63, 230, 67, -1, -1);
+	this->BindObject(OBJECT_PARTYSETTINGS_FRAME, 0x7A58, 230, 15, -1, -1);
+	this->BindObject(OBJECT_PARTYSETTINGS_FOOTER, 0x7A59, 230, 50, -1, -1);
+	this->BindObject(OBJECT_PARTYSETTINGS_DIV, 0x7A62, 223, 21, -1, -1);
+	this->BindObject(OBJECT_PARTYSETTINGS_CLOSE, 0x7EC5, 36, 29, -1, -1);
+	this->BindObject(OBJECT_PARTYSETTINGS_SYSTEM_ACTIVE, 0x7BAE, 15, 15, -1, -1);
+	this->BindObject(OBJECT_PARTYSETTINGS_ONLY_GUILD, 0x7BAE, 15, 15, -1, -1);
+	this->BindObject(OBJECT_PARTYSETTINGS_ONLY_ALLIANCE, 0x7BAE, 15, 15, -1, -1);
+	this->BindObject(OBJECT_PARTYSETTINGS_ONE_CLASS, 0x7BAE, 15, 15, -1, -1);
+	this->BindObject(OBJECT_PARTYSETTINGS_DARK_WIZARD, 0x7BAE, 15, 15, -1, -1);
+	this->BindObject(OBJECT_PARTYSETTINGS_DARK_KNIGHT, 0x7BAE, 15, 15, -1, -1);
+	this->BindObject(OBJECT_PARTYSETTINGS_ELF, 0x7BAE, 15, 15, -1, -1);
+	this->BindObject(OBJECT_PARTYSETTINGS_MAGIC_GLADIATOR, 0x7BAE, 15, 15, -1, -1);
+	this->BindObject(OBJECT_PARTYSETTINGS_DARK_LORD, 0x7BAE, 15, 15, -1, -1);
+	this->BindObject(OBJECT_PARTYSETTINGS_SUMMONER, 0x7BAE, 15, 15, -1, -1);
+	this->BindObject(OBJECT_PARTYSETTINGS_RAGE_FIGHTER, 0x7BAE, 15, 15, -1, -1);
+	this->BindObject(OBJECT_PARTYSETTINGS_LEVEL_MINUS, 0x7C0D, 16, 15, -1, -1);
+	this->BindObject(OBJECT_PARTYSETTINGS_LEVEL_PLUS, 0x7AA4, 16, 15, -1, -1);
+	this->BindObject(OBJECT_PARTYSETTINGS_PASSWORD, 0x7AA3, 170, 21, -1, -1);
+	this->BindObject(OBJECT_PARTYSETTINGS_OK, 0x7A5B, 54, 30, -1, -1);
+
+	this->BindObject(OBJECT_PARTYSEARCH_MAIN, 0x7A5A, 222, 345, -1, -1);
+	this->BindObject(OBJECT_PARTYSEARCH_TITLE, 0x7A63, 230, 67, -1, -1);
+	this->BindObject(OBJECT_PARTYSEARCH_FRAME, 0x7A58, 230, 15, -1, -1);
+	this->BindObject(OBJECT_PARTYSEARCH_FOOTER, 0x7A59, 230, 50, -1, -1);
+	this->BindObject(OBJECT_PARTYSEARCH_DIV, 0x7A62, 223, 21, -1, -1);
+	this->BindObject(OBJECT_PARTYSEARCH_CLOSE, 0x7EC5, 36, 29, -1, -1);
+	this->BindObject(OBJECT_PARTYSEARCH_LEFT, 0x7E56, 20, 23, -1, -1);
+	this->BindObject(OBJECT_PARTYSEARCH_RIGHT, 0x7E57, 20, 23, -1, -1);
+
+	this->BindObject(OBJECT_PARTYPASSWORD_MAIN, 0x7A5A, 222, 122, -1, -1);
+	this->BindObject(OBJECT_PARTYPASSWORD_TITLE, 0x7A63, 230, 67, -1, -1);
+	this->BindObject(OBJECT_PARTYPASSWORD_FRAME, 0x7A58, 230, 15, -1, -1);
+	this->BindObject(OBJECT_PARTYPASSWORD_FOOTER, 0x7A59, 230, 50, -1, -1);
+	this->BindObject(OBJECT_PARTYPASSWORD_CLOSE, 0x7EC5, 36, 29, -1, -1);
+	this->BindObject(OBJECT_PARTYPASSWORD_TEXTBOX, 0x7AA3, 170, 21, -1, -1);
+	this->BindObject(OBJECT_PARTYPASSWORD_OK, 0x7A5B, 54, 30, -1, -1);
+	this->BindObject(OBJECT_PARTYSEARCH_IMAGE1, 0x7898, -1, -1, -1, -1);
+	this->BindObject(OBJECT_PARTYSEARCH_IMAGE2, 0x7899, -1, -1, -1, -1);
+
 	SetOp((LPVOID)oLoadSomeForm_Call, this->LoadImages, ASM::CALL);
 
 	SetOp((LPVOID)oDrawInterface_Call, this->Work, ASM::CALL);
@@ -445,6 +491,9 @@ void Interface::LoadImages()
 	pLoadImage("Interface\\newui_number1.tga", 31337, 9729, 10496, 1, 0);
 
 	pLoadImage("Custom\\Interface\\Button.tga", 0x7908, 0x2601, 0x2900, 1, 0);
+
+	pLoadImage("Custom\\Interface\\PartySearch_Title.tga", 0x7898, GL_LINEAR, GL_REPEAT, 1, 0);
+	pLoadImage("Custom\\Interface\\Info_Block.tga", 0x7899, GL_LINEAR, GL_REPEAT, 1, 0);
 
 	if (gProtect.m_MainInfo.CustomMenuType == 1)
 	{
@@ -818,6 +867,10 @@ void Interface::Work()
 
 	gPKNotice.DrawNoticePKSystem();
 
+	gPartySearchSettings.draw_party_settings_window();
+	gPartySearch.draw_party_search();
+	gPartySearch.draw_party_password();
+
 	if (GetKeyState(VK_SNAPSHOT) < 0)
 	{
 		gInterface.DrawLogo(1);
@@ -1000,6 +1053,24 @@ bool Interface::UpdateKey(DWORD Class)
 			return false;
 		}
 
+		if (gInterface.Data[OBJECT_PARTYSETTINGS_MAIN].OnShow)
+		{
+			gInterface.Data[OBJECT_PARTYSETTINGS_MAIN].Close();
+			return false;
+		}
+
+		if (gInterface.Data[OBJECT_PARTYSEARCH_MAIN].OnShow)
+		{
+			gInterface.Data[OBJECT_PARTYSEARCH_MAIN].Close();
+			return false;
+		}
+
+		if (gInterface.Data[OBJECT_PARTYPASSWORD_MAIN].OnShow)
+		{
+			gInterface.Data[OBJECT_PARTYPASSWORD_MAIN].Close();
+			return false;
+		}
+
 #if(LuckyWheelV2)
 		if (gInterface.Data[eWindowVongQuay].OnShow)
 		{
@@ -1058,6 +1129,11 @@ bool Interface::UpdateKey(DWORD Class)
 			return false;
 		}
 	}
+		if (pIsKeyPress(VK_F3) && gProtect.m_MainInfo.EnablePartySearch == 1)
+		{
+			gPartySearchSettings.party_search_settings_switch_state();
+		}
+
 	return ((bool(__thiscall*)(DWORD))0x815B50)(*(DWORD*)Class);
 }
 
@@ -2809,6 +2885,27 @@ int Interface::DrawToolTipEx(DWORD Color, int PosX, int PosY, int Width, int Hei
 
 	pSetBlend(0);
 	return 0;
+}
+
+void Interface::DrawText(DWORD Color, int PosX, int PosY, int Width, int Align, LPCSTR Text, ...) // OK
+{
+	char Buff[2048];
+	const int BuffLen = sizeof(Buff) - 1;
+	ZeroMemory(Buff, BuffLen);
+
+	va_list args;
+	va_start(args, Text);
+	vsprintf_s(Buff, BuffLen, Text, args);
+	va_end(args);
+
+	char * Line = strtok(Buff, "\n");
+
+	while (Line != nullptr)
+	{
+		DrawInterfaceText(Line, PosX, PosY, Width, 0, Color, 0, Align);
+		PosY += 10;
+		Line = strtok(NULL, "\n");
+	}
 }
 
 void Interface::DrawColoredButton(short ObjectID, float PosX, float PosY, float ScaleX, float ScaleY, DWORD Color)

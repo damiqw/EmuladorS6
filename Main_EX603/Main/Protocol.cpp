@@ -13,6 +13,7 @@
 #include "Protect.h"
 #include "Reconnect.h"
 #include "Util.h"
+#include "PartySearch.h"
 #include "post_item.h"
 #include "CustomBuffIcon.h"
 #include "PetProtocol.h"
@@ -250,6 +251,9 @@ BOOL ProtocolCoreEx(BYTE head,BYTE* lpMsg,int size,int key) // OK
 					SetChaosBoxState((PMSG_SET_CHAOSBOX_STATE*)lpMsg);
 					return 1;
 #endif
+				case 0xF0:
+					GCPartyListRecv((PMSG_RECV_PARTYLIST*)lpMsg);
+					return 1;
 				case 0xEF:
 					gRuneEffect.GCRuneEffect((PMSG_CUSTOM_RUNEEFFECT*)lpMsg);
 					break;
@@ -951,4 +955,18 @@ void GCItemMoveRecv(PMSG_ITEM_MOVE_RECV* lpMsg) // OK
 	LastMixCode = -1;
 
 	RightClickDeleteItem(lpMsg->result);
+}
+
+void GCPartyListRecv(PMSG_RECV_PARTYLIST* lpMsg)
+{
+	gPartySearch.ClearPartyList();
+
+	for (int n = 0; n < lpMsg->Count; n++)
+	{
+		PMSG_PARTYSEARCH_PARTYLIST* lpInfo = (PMSG_PARTYSEARCH_PARTYLIST*)(((BYTE*)lpMsg) + sizeof(PMSG_RECV_PARTYLIST) + (sizeof(PMSG_PARTYSEARCH_PARTYLIST) * n));
+
+		gPartySearch.InsertPartyList(lpInfo);
+	}
+
+	gPartySearch.party_search_switch_state();
 }

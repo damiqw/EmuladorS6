@@ -15,6 +15,7 @@
 #include "CustomExchangeCoin.h"
 #include "CustomMove.h"
 #include "CustomStore.h"
+#include "PartySearch.h"
 #include "Crywolf.h"
 #include "CSProtocol.h"
 #include "DarkSpirit.h"
@@ -1311,6 +1312,15 @@ void ProtocolCore(BYTE head,BYTE* lpMsg,int size,int aIndex,int encrypt,int seri
 				ThueFlag.CGRequestRecv(lpMsg, aIndex);
 				break;
 #endif
+			case 0x04:
+				gPartySearch.PartySearchAddToList((PMSG_RECV_PARTYSEARCH_ADD*)lpMsg, aIndex);
+				break;
+			case 0x05:
+				gPartySearch.RequestParty((PMSG_PARTY_REQ_REQ*)lpMsg, aIndex);
+				break;
+			case 0x13:
+				gPartySearch.RequestParty((PMSG_PARTY_REQ_REQ*)lpMsg, aIndex);
+				break;
 			}
 			break;
 		case 0xFC:

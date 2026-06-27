@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -109,6 +109,10 @@
     <ClInclude Include="Common.h" />
     <ClInclude Include="Config.h" />
     <ClInclude Include="Controller.h" />
+    <ClInclude Include="Console.h" />
+    <ClInclude Include="ControllerTextBox.h" />
+    <ClInclude Include="PartySearch.h" />
+    <ClInclude Include="PartySearchSettings.h" />
     <ClInclude Include="CreateAccount.h" />
     <ClInclude Include="CriticalSection.h" />
     <ClInclude Include="CustomCommandInfo.h" />
@@ -264,6 +268,10 @@
     <ClCompile Include="Common.cpp" />
     <ClCompile Include="Config.cpp" />
     <ClCompile Include="Controller.cpp" />
+    <ClCompile Include="Console.cpp" />
+    <ClCompile Include="ControllerTextBox.cpp" />
+    <ClCompile Include="PartySearch.cpp" />
+    <ClCompile Include="PartySearchSettings.cpp" />
     <ClCompile Include="CreateAccount.cpp" />
     <ClCompile Include="CriticalSection.cpp" />
     <ClCompile Include="CTimCheck.cpp" />

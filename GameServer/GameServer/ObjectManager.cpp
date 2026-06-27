@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "OfflineMode.h"
+#include "PartySearch.h"
 #include "ObjectManager.h"
 #include "Log.h"
 #include "Attack.h"
@@ -841,6 +842,8 @@ bool CObjectManager::CharacterGameClose(int aIndex) // OK
 	gObjFixInventoryPointer(aIndex);
 
 	gObjFixEventInventoryPointer(aIndex);
+
+	gPartySearch.PartySearchDelFromList(lpObj->Name);
 
 	GDCharacterInfoSaveSend(aIndex);
 

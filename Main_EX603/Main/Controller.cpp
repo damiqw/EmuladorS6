@@ -5,6 +5,7 @@
 #include "Util.h"
 #include "Protect.h"
 #include "resource.h"
+#include "ControllerTextBox.h"
 // ----------------------------------------------------------------------------------------------
 Controller	gController;
 // ----------------------------------------------------------------------------------------------
@@ -38,6 +39,10 @@ LRESULT Controller::Keyboard(int Code, WPARAM wParam, LPARAM lParam)
 		if( GetForegroundWindow() == *(HWND*)(MAIN_WINDOW) )
 		{
 			if (gInterface.ControlTextBox(Hook))
+			{
+				return 1;
+			}
+			if (gTextBoxController.ControlTextBox(Hook))
 			{
 				return 1;
 			}

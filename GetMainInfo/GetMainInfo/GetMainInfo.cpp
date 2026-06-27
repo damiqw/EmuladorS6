@@ -156,6 +156,8 @@ struct MAIN_FILE_INFO
 	DWORD EnableEventTimeButton;
 	DWORD JewelBankSwitch;
 	DWORD EnableLuckySpinV2Button;
+	WORD MaxClassTypes;
+	DWORD EnablePartySearch;
 	DWORD EnableCustomXShopButton;
 	DWORD EnableVipShop;
 	DWORD VipTypes;
@@ -370,8 +372,9 @@ int _tmain(int argc,_TCHAR* argv[]) // OK
 	info.EnableEventTimeButton = GetPrivateProfileInt("Custom", "EnableEventTimeButton", 0, ".\\MainInfo.ini");
 
 	info.JewelBankSwitch = GetPrivateProfileInt("Custom", "EnableJewelBankButton", 0, ".\\MainInfo.ini");
-
 	info.EnableLuckySpinV2Button = GetPrivateProfileInt("Custom", "EnableLuckySpinButton", 0, ".\\MainInfo.ini");
+	info.MaxClassTypes = GetPrivateProfileInt("Custom", "MaxClassTypes", 7, ".\\MainInfo.ini");
+	info.EnablePartySearch = GetPrivateProfileInt("Custom", "EnablePartySearch", 1, ".\\MainInfo.ini");
 
 	info.EnableCustomXShopButton = GetPrivateProfileInt("Custom", "EnableCustomXShopButton", 0, ".\\MainInfo.ini");
 

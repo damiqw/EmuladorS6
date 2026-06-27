@@ -974,6 +974,39 @@ void GCItemMoveRecv(PMSG_ITEM_MOVE_RECV* lpMsg);
 void ExtraCpanelGetInfo(EXTRA_CPANEL_SENDINFO* lpMsg);
 void CGSendStatsAdd(PMSG_UPDATE_STATS_SEND pMsg);
 void GCBuyVipRecv(PMSG_BUYVIP_LIST__RECV* lpMsg);
+
+void GCBuyVipRecv(PMSG_BUYVIP_LIST__RECV* lpMsg);
+
+struct PMSG_RECV_PARTYLIST
+{
+	PSWMSG_HEAD header;
+	int Count;
+};
+
+struct PMSG_PARTYSEARCH_PARTYLIST
+{
+	char Name[11];
+	int Map;
+	int X;
+	int Y;
+	int Level;
+	bool DarkWizard;
+	bool DarkKnight;
+	bool Elf;
+	bool MagicGladiator;
+	bool DarkLord;
+	bool Summoner;
+	bool RageFighter;
+	bool OnlyGuild;
+	bool OnlyAliiance;
+	bool IsSameGuild;
+	bool IsSameAlliance;
+	bool RequirePassword;
+	int Count;
+};
+
+void GCPartyListRecv(PMSG_RECV_PARTYLIST* lpMsg);
+
 #if(MAP_USAGE)
 extern MAPUSAGETIM_CLIENT mMapUsageData;
 #endif

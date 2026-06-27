@@ -607,9 +607,12 @@ int __cdecl CustomMapFileCheck(char* FilePath, char* Mode)
 
 	if (pMapNumber < 100 && pMapNumber != 30)
 	{
+		// We shouldn't return 1 here because the caller expects a FILE* pointer.
+		// Returning 1 causes an Access Violation when the client tries to read from address 0x00000001.
+		// MiniMapLoad() will handle loading the custom Navimap on its own, so we can just let this fail gracefully.
 		if (JCFileMapCheck(pMapNumber + 1))
 		{
-			return 1;
+			return 0; // Fixed: Returning 0 (NULL) instead of 1 to avoid crash
 		}
 	}
 

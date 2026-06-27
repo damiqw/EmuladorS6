@@ -588,6 +588,7 @@ extern "C" _declspec(dllexport) void EntryProc() // OK
 	SetByte(0x0052100D,0xEB); // Ctrl Fix
 	SetByte(0x0052101B,0x02); // Ctrl Fix
 	SetByte(0x009543C4,0x00); // Move Vulcanu
+	SetCompleteHook(0xE9, 0x005DB322, 0x5DB408);    //Fix Map 62 camera 3D (santa town)
 	SetCompleteHook(0xE8, 0x005DB3BE, 0x005DB490);  //fix map vucanus 
 	SetByte(0x0064CBD1,((gProtect.m_MainInfo.HelperActiveAlert==0)?0xEB:0x75)); // Helper Message Box
 	SetByte(0x0064CBD0,(BYTE)gProtect.m_MainInfo.HelperActiveLevel); // Helper Active Level
@@ -1167,8 +1168,8 @@ extern "C" _declspec(dllexport) void EntryProc() // OK
 
 		if(gProtect.m_MainInfo.DisableButtonVaultExt == 1)
 		{
-	   		SetCompleteHook(0xE9, 0x00856FAA, 0x00856FD2); // Remove (H) Baú Aberto
-		    SetCompleteHook(0xE9, 0x007D371E, 0x007D3725); // Remove botão (H)
+	   		SetCompleteHook(0xE9, 0x00856FAA, 0x00856FD2); // Remove (H) Baï¿½ Aberto
+		    SetCompleteHook(0xE9, 0x007D371E, 0x007D3725); // Remove botï¿½o (H)
 		}
 
 		if (gProtect.m_MainInfo.DisableBlueEyeEffect == 1)

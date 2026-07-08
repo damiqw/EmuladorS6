@@ -14,6 +14,8 @@
 #include "User.h"
 #include "Util.h"
 #include "Viewport.h"
+#include "Notice.h"
+#include "CashShop.h"
 #if(HAISLOTRING)
 #include "NewUIMyInventory.h"
 #endif
@@ -403,11 +405,37 @@ void CPersonalShop::CGPShopOpenRecv(PMSG_PSHOP_OPEN_RECV* lpMsg,int aIndex) // O
 	if(lpObj->PShopOpen == 0)
 	{
 		lpObj->PShopOpen = 1;
+		memset(lpObj->PShopText, 0, sizeof(lpObj->PShopText));
 		memcpy(lpObj->PShopText,lpMsg->text,sizeof(lpMsg->text));
+		lpObj->PShopText[35] = 0;
+		for(int i = 34; i >= 0; i--)
+		{
+			if(lpObj->PShopText[i] == ' ' || lpObj->PShopText[i] == 0)
+			{
+				lpObj->PShopText[i] = 0;
+			}
+			else
+			{
+				break;
+			}
+		}
 	}
 	else
 	{
+		memset(lpObj->PShopText, 0, sizeof(lpObj->PShopText));
 		memcpy(lpObj->PShopText,lpMsg->text,sizeof(lpMsg->text));
+		lpObj->PShopText[35] = 0;
+		for(int i = 34; i >= 0; i--)
+		{
+			if(lpObj->PShopText[i] == ' ' || lpObj->PShopText[i] == 0)
+			{
+				lpObj->PShopText[i] = 0;
+			}
+			else
+			{
+				break;
+			}
+		}
 		this->GCPShopTextChangeSend(aIndex);
 	}
 
@@ -469,6 +497,42 @@ void CPersonalShop::CGPShopItemListRecv(PMSG_PSHOP_ITEM_LIST_RECV* lpMsg,int aIn
 	}
 
 	gCustomStore.GCOffTradeSend(lpObj->Index,lpTarget->Index);
+
+	if (lpTarget->IsBot == 4)
+	{
+		char sbuf[100]={0};
+		if (lpTarget->BotDefense == 1 && lpObj->AccountLevel == 0) // check for VIP if needed (assuming AccountLevel for VIP)
+		{
+			gNotice.GCNoticeSend(lpObj->Index, 1, 0, 0, 0, 0, 0, "This Personal Shop is only for VIP Users");
+			this->GCPShopItemListSend(aIndex, -1, 3, 0);
+			return;
+		}
+
+		wsprintf(sbuf, "Welcome to %s BotStore", lpTarget->Name);
+		gNotice.GCNoticeSend(lpObj->Index, 1, 0, 0, 0, 0, 0, sbuf);
+		
+		switch (lpTarget->BotPower)
+		{
+			case 0:
+				gNotice.GCNoticeSend(lpObj->Index, 1, 0, 0, 0, 0, 0, "This Personal Shop uses Zen");
+				break;
+			case 1:
+				wsprintf(sbuf, "WCC = %d", lpObj->Coin1); // assuming Coin1 is WCoinC / PCPoint
+				gNotice.GCNoticeSend(lpObj->Index, 1, 0, 0, 0, 0, 0, sbuf);
+				gNotice.GCNoticeSend(lpObj->Index, 1, 0, 0, 0, 0, 0, "This Personal Shop uses WCoinC");
+				break;
+			case 2:
+				wsprintf(sbuf, "WCP = %d", lpObj->Coin2); // assuming Coin2 is WCoinP / VipMoney
+				gNotice.GCNoticeSend(lpObj->Index, 1, 0, 0, 0, 0, 0, sbuf);
+				gNotice.GCNoticeSend(lpObj->Index, 1, 0, 0, 0, 0, 0, "This Personal Shop uses WCoinP");
+				break;
+			case 3:
+				wsprintf(sbuf, "GoblinPoint = %d", lpObj->Coin3); // assuming Coin3 is GoblinPoint
+				gNotice.GCNoticeSend(lpObj->Index, 1, 0, 0, 0, 0, 0, sbuf);
+				gNotice.GCNoticeSend(lpObj->Index, 1, 0, 0, 0, 0, 0, "This Personal Shop uses GoblinPoint");
+				break;
+		}
+	}
 
 	lpObj->PShopWantDeal = 1;
 	lpObj->PShopDealerIndex = bIndex;
@@ -563,10 +627,32 @@ void CPersonalShop::CGPShopBuyItemRecv(PMSG_PSHOP_BUY_ITEM_RECV* lpMsg,int aInde
 
 	#endif
 
-	if(lpObj->Money < ((DWORD)lpTarget->Inventory[lpMsg->slot].m_PShopValue))
+	if (lpTarget->IsBot == 4)
 	{
-		this->GCPShopBuyItemSend(aIndex,bIndex,0,7);
-		return;
+		int price = lpTarget->Inventory[lpMsg->slot].m_PShopValue;
+		switch(lpTarget->BotPower)
+		{
+			case 0:
+				if (lpObj->Money < price) { this->GCPShopBuyItemSend(aIndex,bIndex,0,7); return; }
+				break;
+			case 1:
+				if (lpObj->Coin1 < price) { this->GCPShopBuyItemSend(aIndex,bIndex,0,7); return; }
+				break;
+			case 2:
+				if (lpObj->Coin2 < price) { this->GCPShopBuyItemSend(aIndex,bIndex,0,7); return; }
+				break;
+			case 3:
+				if (lpObj->Coin3 < price) { this->GCPShopBuyItemSend(aIndex,bIndex,0,7); return; }
+				break;
+		}
+	}
+	else
+	{
+		if(lpObj->Money < ((DWORD)lpTarget->Inventory[lpMsg->slot].m_PShopValue))
+		{
+			this->GCPShopBuyItemSend(aIndex,bIndex,0,7);
+			return;
+		}
 	}
 
 	if(gObjCheckMaxMoney(bIndex,lpTarget->Inventory[lpMsg->slot].m_PShopValue) == 0)
@@ -677,74 +763,107 @@ void CPersonalShop::CGPShopBuyItemRecv(PMSG_PSHOP_BUY_ITEM_RECV* lpMsg,int aInde
 
 	#endif
 
-	lpObj->Money -= lpTarget->Inventory[lpMsg->slot].m_PShopValue;
-
-	GCMoneySend(aIndex,lpObj->Money);
-
-	#if(GAMESERVER_UPDATE>=802)
-
-	this->SetRequireJewelCount(lpObj,RequireJewelTable[0],0);
-
-	this->SetRequireJewelCount(lpObj,RequireJewelTable[1],1);
-
-	this->SetRequireJewelCount(lpObj,RequireJewelTable[2],2);
-
-	#endif
-
-	#if(GAMESERVER_UPDATE>=701)
-
-	gPentagramSystem.ExchangePentagramItem(lpTarget,lpObj,&lpObj->Inventory[result]);
-
-	#endif
-
-	this->GCPShopBuyItemSend(aIndex,bIndex,result,1);
-
-	GDCharacterInfoSaveSend(aIndex);
-
-	#if(GAMESERVER_UPDATE>=802)
-
-	lpTarget->Money += (int)GetRoundValue((((float)lpTarget->Inventory[lpMsg->slot].m_PShopValue*(100-gServerInfo.m_PersonalShopMoneyCommisionRate))/100));
-
-	#else
-
-	lpTarget->Money += lpTarget->Inventory[lpMsg->slot].m_PShopValue;
-
-	#endif
-
-	GCMoneySend(bIndex,lpTarget->Money);
-
-	#if(GAMESERVER_UPDATE>=802)
-
-	this->SetPaymentJewelCount(lpTarget,PaymentJewelTable[0],0);
-
-	this->SetPaymentJewelCount(lpTarget,PaymentJewelTable[1],1);
-
-	this->SetPaymentJewelCount(lpTarget,PaymentJewelTable[2],2);
-
-	this->GDPShopItemValueDeleteSaveSend(bIndex,lpMsg->slot);
-
-	#endif
-
-	this->GCPShopSellItemSend(bIndex,aIndex,lpMsg->slot);
-
-	gItemManager.InventoryDelItem(bIndex,lpMsg->slot);
-	gItemManager.GCItemDeleteSend(bIndex,lpMsg->slot,1);
-
-	GDCharacterInfoSaveSend(bIndex);
-
-	if(this->CheckPersonalShop(bIndex) == 0)
+	if (lpTarget->IsBot == 4)
 	{
-		lpTarget->PShopItemChange = 1;
+		int price = lpTarget->Inventory[lpMsg->slot].m_PShopValue;
+		switch(lpTarget->BotPower)
+		{
+			case 0:
+				lpObj->Money -= price;
+				GCMoneySend(aIndex, lpObj->Money);
+				break;
+			case 1:
+				gCashShop.GDCashShopSubPointSaveSend(aIndex, 0, price, 0, 0, 0);
+				gCashShop.CGCashShopPointRecv(aIndex);
+				break;
+			case 2:
+				gCashShop.GDCashShopSubPointSaveSend(aIndex, 0, 0, price, 0, 0);
+				gCashShop.CGCashShopPointRecv(aIndex);
+				break;
+			case 3:
+				gCashShop.GDCashShopSubPointSaveSend(aIndex, 0, 0, 0, price, 0);
+				gCashShop.CGCashShopPointRecv(aIndex);
+				break;
+		}
+
+		this->GCPShopBuyItemSend(aIndex, bIndex, result, 1);
+		GDCharacterInfoSaveSend(aIndex);
+		
+		// DO NOT delete the item from the Bot! (Infinite inventory fix)
+		lpTarget->PShopTransaction = 0;
+		return;
 	}
 	else
 	{
-		lpTarget->PShopOpen = 0;
-		memset(lpTarget->PShopText,0,sizeof(lpTarget->PShopText));
-		this->GCPShopCloseSend(bIndex,1);
-		gCustomStore.OnPShopClose(lpTarget);
-	}
+		lpObj->Money -= lpTarget->Inventory[lpMsg->slot].m_PShopValue;
 
-	lpTarget->PShopTransaction = 0;
+		GCMoneySend(aIndex,lpObj->Money);
+
+		#if(GAMESERVER_UPDATE>=802)
+
+		this->SetRequireJewelCount(lpObj,RequireJewelTable[0],0);
+
+		this->SetRequireJewelCount(lpObj,RequireJewelTable[1],1);
+
+		this->SetRequireJewelCount(lpObj,RequireJewelTable[2],2);
+
+		#endif
+
+		#if(GAMESERVER_UPDATE>=701)
+
+		gPentagramSystem.ExchangePentagramItem(lpTarget,lpObj,&lpObj->Inventory[result]);
+
+		#endif
+
+		this->GCPShopBuyItemSend(aIndex,bIndex,result,1);
+
+		GDCharacterInfoSaveSend(aIndex);
+
+		#if(GAMESERVER_UPDATE>=802)
+
+		lpTarget->Money += (int)GetRoundValue((((float)lpTarget->Inventory[lpMsg->slot].m_PShopValue*(100-gServerInfo.m_PersonalShopMoneyCommisionRate))/100));
+
+		#else
+
+		lpTarget->Money += lpTarget->Inventory[lpMsg->slot].m_PShopValue;
+
+		#endif
+
+		GCMoneySend(bIndex,lpTarget->Money);
+
+		#if(GAMESERVER_UPDATE>=802)
+
+		this->SetPaymentJewelCount(lpTarget,PaymentJewelTable[0],0);
+
+		this->SetPaymentJewelCount(lpTarget,PaymentJewelTable[1],1);
+
+		this->SetPaymentJewelCount(lpTarget,PaymentJewelTable[2],2);
+
+		this->GDPShopItemValueDeleteSaveSend(bIndex,lpMsg->slot);
+
+		#endif
+
+		this->GCPShopSellItemSend(bIndex,aIndex,lpMsg->slot);
+
+		gItemManager.InventoryDelItem(bIndex,lpMsg->slot);
+		gItemManager.GCItemDeleteSend(bIndex,lpMsg->slot,1);
+
+		GDCharacterInfoSaveSend(bIndex);
+
+		if(this->CheckPersonalShop(bIndex) == 0)
+		{
+			lpTarget->PShopItemChange = 1;
+		}
+		else
+		{
+			lpTarget->PShopOpen = 0;
+			memset(lpTarget->PShopText,0,sizeof(lpTarget->PShopText));
+			this->GCPShopCloseSend(bIndex,1);
+			gCustomStore.OnPShopClose(lpTarget);
+		}
+
+		lpTarget->PShopTransaction = 0;
+	}
 }
 
 void CPersonalShop::CGPShopLeaveRecv(PMSG_PSHOP_LEAVE_RECV* lpMsg,int aIndex) // OK
@@ -904,7 +1023,7 @@ void CPersonalShop::GCPShopViewportSend(int aIndex) // OK
 			continue;
 		}
 
-		if(lpObj->VpPlayer[n].type != OBJECT_USER)
+		if(lpObj->VpPlayer[n].type != OBJECT_USER && lpObj->VpPlayer[n].type != OBJECT_BOTS)
 		{
 			continue;
 		}

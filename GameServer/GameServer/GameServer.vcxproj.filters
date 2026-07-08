@@ -729,9 +729,6 @@
     <ClInclude Include="User.h">
       <Filter>Source Files\Character</Filter>
     </ClInclude>
-    <ClInclude Include="OfflineMode.h">
-      <Filter>Source Files\Systems\User</Filter>
-    </ClInclude>
     <ClInclude Include="UnionInfo.h">
       <Filter>Source Files\Character</Filter>
     </ClInclude>
@@ -1079,6 +1076,15 @@
     </ClInclude>
     <ClInclude Include="CustomRanking.h">
       <Filter>Source Files\CustomRanking</Filter>
+    </ClInclude>
+    <ClInclude Include="OfflineMode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BotStore.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="readscript.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1565,9 +1571,6 @@
     <ClCompile Include="User.cpp">
       <Filter>Source Files\Character</Filter>
     </ClCompile>
-    <ClCompile Include="OfflineMode.cpp">
-      <Filter>Source Files\Systems\User</Filter>
-    </ClCompile>
     <ClCompile Include="Trade.cpp">
       <Filter>Source Files\Character</Filter>
     </ClCompile>
@@ -1897,6 +1900,12 @@
     </ClCompile>
     <ClCompile Include="CustomRanking.cpp">
       <Filter>Source Files\CustomRanking</Filter>
+    </ClCompile>
+    <ClCompile Include="OfflineMode.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BotStore.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

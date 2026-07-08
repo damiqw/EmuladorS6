@@ -117,6 +117,7 @@
 #include "CustomVongQuay.h"
 //MC bot
 #include "BotBuffer.h"
+#include "BotStore.h"
 #include "CBMapUsageTime.h"
 #include "CustomMonsterSkill.h"
 #include "CustomPKFree.h"
@@ -839,7 +840,14 @@ void CServerInfo::ReloadBotInfo() // OK
 	ObjBotBuff.Read(gPath.GetFullPath("Custom\\BotSystem\\BotBuffer.txt"));
 	ObjBotBuff.MakeBot();
 #endif
-		LogAdd(LOG_GREEN,"[ReadBotInfo] BotSystem loaded successfully");
+
+#if(BOT_STORE == 1)
+	BotStore.Read(gPath.GetFullPath("Custom\\BotSystem\\BotStore.txt"));
+	BotStore.MakeBot();
+	LogAdd(LOG_GREEN,"[ReadBotInfo] BotSystem loaded successfully");
+#endif
+
+
 
 }
 //MC bot

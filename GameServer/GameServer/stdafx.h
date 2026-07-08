@@ -88,6 +88,7 @@
 #define ACHERON_GUARDIAN	 2
 
 #define BOT_BUFFER			 1
+#define BOT_STORE			 1
 
 #define ARCA_WAR			 2	// Mix nomas!!
 #define GOLDEN_ARCHER		 2	// 

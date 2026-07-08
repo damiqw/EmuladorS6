@@ -286,6 +286,7 @@
     <ClInclude Include="BotBuffer.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release_EX401CS|Win32'">true</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="BotStore.h" />
     <ClInclude Include="CannonTower.h" />
     <ClInclude Include="CashShop.h" />
     <ClInclude Include="CastleDeep.h" />
@@ -509,6 +510,7 @@
     <ClInclude Include="RaklionSelupan.h" />
     <ClInclude Include="RaklionUtil.h" />
     <ClInclude Include="RandomManager.h" />
+    <ClInclude Include="readscript.h" />
     <ClInclude Include="ReadScript2.h" />
     <ClInclude Include="Reconnect.h" />
     <ClInclude Include="ResetTable.h" />
@@ -566,6 +568,7 @@
     <ClCompile Include="BloodCastle.cpp" />
     <ClCompile Include="BonusManager.cpp" />
     <ClCompile Include="BotBuffer.cpp" />
+    <ClCompile Include="BotStore.cpp" />
     <ClCompile Include="CannonTower.cpp" />
     <ClCompile Include="CashShop.cpp" />
     <ClCompile Include="CastleDeep.cpp" />

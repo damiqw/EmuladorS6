@@ -553,22 +553,11 @@ void ObjBotStore::MakeBot()
 						if(gObj[result].PShopText[i] == ' ')
 						{
 							gObj[result].PShopText[i] = 0;
-							p = i;
 						}
 						else
 						{
 							break;
 						}
-					}
-					
-					// Anti-Widescreen-Wrap Fix: Pad short names with spaces
-					if (p > 0 && p < 12)
-					{
-						for (int i = p; i < 12; i++)
-						{
-							gObj[result].PShopText[i] = ' ';
-						}
-						gObj[result].PShopText[12] = 0;
 					}
 
 					GCChatTargetSend(&gObj[result], result, "NEW SELLER!");

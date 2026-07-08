@@ -1251,7 +1251,7 @@ void Interface::WindowedModeName()
 
 	if (gProtect.m_MainInfo.ShowInfoWindowedModeType == 1)
 	{
-		sprintf_s(interaltas, sizeof(interaltas), "%s [Player: %s]", gProtect.m_MainInfo.WindowName, gObjUser.lpPlayer->Name, gCustomPing.PingDelayRecv, gCustomPing.m_fps);
+		sprintf_s(interaltas, sizeof(interaltas), "%s [Player: %s] [Ping: %d] [FPS: %d]", gProtect.m_MainInfo.WindowName, gObjUser.lpPlayer->Name, gCustomPing.PingDelayRecv, gCustomPing.m_fps);
 	}
 	else if (gProtect.m_MainInfo.ShowInfoWindowedModeType == 2)
 	{
@@ -1259,6 +1259,11 @@ void Interface::WindowedModeName()
 	}
 
 	SetWindowText(pGameWindow, interaltas);
+	
+	// Draw it on screen so it's visible in all resolutions (including borderless/fullscreen)
+	pSetBlend(1);
+	gInterface.DrawFormat(eWhite, 0, 0, 640, 3, interaltas);
+	pGLSwitchBlend();
 
 }
 
@@ -1288,126 +1293,14 @@ void Interface::DrawTimeUI()
 	// -----
 	char LocalTimeName[25] = "Local:";
 
-	switch (pGameResolutionMode) 
-	{
-	case 0:
-		this->DrawGUI(eTIME, this->Data[eTIME].X - 9, this->Data[eTIME].Y); //27
+	// Use standard 640x480 scaled coordinates for all resolutions
+	this->DrawGUI(eTIME, this->Data[eTIME].X - 9, this->Data[eTIME].Y); 
 
-		gInterface.DrawFormat(eGold, this->Data[eTIME].X - 77, this->Data[eTIME].Y + 54, 210, 3, "Server:");
+	gInterface.DrawFormat(eGold, this->Data[eTIME].X - 77, this->Data[eTIME].Y + 54, 210, 3, "Server:");
+	gInterface.DrawFormat(eWhite, this->Data[eTIME].X + 65, this->Data[eTIME].Y + 54, 100, 1, "%2d:%02d:%02d", (ServerT->tm_hour + GMT) % 24, ServerT->tm_min, ServerT->tm_sec);
 
-		gInterface.DrawFormat(eWhite, this->Data[eTIME].X + 65, this->Data[eTIME].Y + 54, 100, 1, "%2d:%02d:%02d", (ServerT->tm_hour + GMT) % 24, ServerT->tm_min, ServerT->tm_sec);
-
-
-		gInterface.DrawFormat(eGold, this->Data[eTIME].X - 78, this->Data[eTIME].Y + 30, 210, 3, "Local :");
-
-		gInterface.DrawFormat(eWhite, this->Data[eTIME].X + 65, this->Data[eTIME].Y + 30, 100, 1, "%2d:%02d:%02d", LocalT->tm_hour, LocalT->tm_min, LocalT->tm_sec);
-
-		break;//TIEMPO DE SERVIDOR LOCAL Y SERVER
-	case 1:
-		this->DrawGUI(eTIME, this->Data[eTIME].X - 9, this->Data[eTIME].Y); //27
-
-		gInterface.DrawFormat(eGold, this->Data[eTIME].X - 77, this->Data[eTIME].Y + 54, 210, 3, "Server:");
-
-		gInterface.DrawFormat(eWhite, this->Data[eTIME].X + 58, this->Data[eTIME].Y + 54, 100, 1, "%2d:%02d:%02d", (ServerT->tm_hour + GMT) % 24, ServerT->tm_min, ServerT->tm_sec);
-
-
-		gInterface.DrawFormat(eGold, this->Data[eTIME].X - 78, this->Data[eTIME].Y + 30, 210, 3, "Local :");
-
-		gInterface.DrawFormat(eWhite, this->Data[eTIME].X + 58, this->Data[eTIME].Y + 30, 100, 1, "%2d:%02d:%02d", LocalT->tm_hour, LocalT->tm_min, LocalT->tm_sec);
-
-		break;//listo
-	case 2:
-		this->DrawGUI(eTIME, this->Data[eTIME].X - 9, this->Data[eTIME].Y + 97); //27
-
-		gInterface.DrawFormat(eGold, this->Data[eTIME].X - 77, this->Data[eTIME].Y + 150, 210, 3, "Server:");
-
-		gInterface.DrawFormat(eWhite, this->Data[eTIME].X + 65, this->Data[eTIME].Y + 150, 100, 1, "%2d:%02d:%02d", (ServerT->tm_hour + GMT) % 24, ServerT->tm_min, ServerT->tm_sec);
-
-
-		gInterface.DrawFormat(eGold, this->Data[eTIME].X - 78, this->Data[eTIME].Y + 127, 210, 3, "Local :");
-
-		gInterface.DrawFormat(eWhite, this->Data[eTIME].X + 65, this->Data[eTIME].Y + 127, 100, 1, "%2d:%02d:%02d", LocalT->tm_hour, LocalT->tm_min, LocalT->tm_sec);
-
-		break;//listo
-	case 3:
-		this->DrawGUI(eTIME, this->Data[eTIME].X - 9, this->Data[eTIME].Y + 97); //27
-
-		gInterface.DrawFormat(eGold, this->Data[eTIME].X - 77, this->Data[eTIME].Y + 150, 210, 3, "Server:");
-
-		gInterface.DrawFormat(eWhite, this->Data[eTIME].X + 65, this->Data[eTIME].Y + 150, 100, 1, "%2d:%02d:%02d", (ServerT->tm_hour + GMT) % 24, ServerT->tm_min, ServerT->tm_sec);
-
-
-		gInterface.DrawFormat(eGold, this->Data[eTIME].X - 78, this->Data[eTIME].Y + 127, 210, 3, "Local :");
-
-		gInterface.DrawFormat(eWhite, this->Data[eTIME].X + 65, this->Data[eTIME].Y + 127, 100, 1, "%2d:%02d:%02d", LocalT->tm_hour, LocalT->tm_min, LocalT->tm_sec);
-
-		break;//listo
-	case 4:
-		this->DrawGUI(eTIME, this->Data[eTIME].X - 9, this->Data[eTIME].Y + 207); //27
-
-		gInterface.DrawFormat(eGold, this->Data[eTIME].X - 77, this->Data[eTIME].Y + 260, 210, 3, "Server:");
-
-		gInterface.DrawFormat(eWhite, this->Data[eTIME].X + 65, this->Data[eTIME].Y + 260, 100, 1, "%2d:%02d:%02d", (ServerT->tm_hour + GMT) % 24, ServerT->tm_min, ServerT->tm_sec);
-
-
-		gInterface.DrawFormat(eGold, this->Data[eTIME].X - 78, this->Data[eTIME].Y + 237, 210, 3, "Local :");
-
-		gInterface.DrawFormat(eWhite, this->Data[eTIME].X + 65, this->Data[eTIME].Y + 237, 100, 1, "%2d:%02d:%02d", LocalT->tm_hour, LocalT->tm_min, LocalT->tm_sec);
-
-		break;//listo
-	case 5:
-		this->DrawGUI(eTIME, this->Data[eTIME].X - 9, this->Data[eTIME].Y + 177); //27
-
-		gInterface.DrawFormat(eGold, this->Data[eTIME].X - 77, this->Data[eTIME].Y + 230, 210, 3, "Server:");
-
-		gInterface.DrawFormat(eWhite, this->Data[eTIME].X + 65, this->Data[eTIME].Y + 230, 100, 1, "%2d:%02d:%02d", (ServerT->tm_hour + GMT) % 24, ServerT->tm_min, ServerT->tm_sec);
-
-
-		gInterface.DrawFormat(eGold, this->Data[eTIME].X - 78, this->Data[eTIME].Y + 207, 210, 3, "Local :");
-
-		gInterface.DrawFormat(eWhite, this->Data[eTIME].X + 65, this->Data[eTIME].Y + 207, 100, 1, "%2d:%02d:%02d", LocalT->tm_hour, LocalT->tm_min, LocalT->tm_sec);
-
-		break;//listo
-	case 6:
-		this->DrawGUI(eTIME, this->Data[eTIME].X - 9, this->Data[eTIME].Y + 217); //27
-
-		gInterface.DrawFormat(eGold, this->Data[eTIME].X - 77, this->Data[eTIME].Y + 270, 210, 3, "Server:");
-
-		gInterface.DrawFormat(eWhite, this->Data[eTIME].X + 65, this->Data[eTIME].Y + 270, 100, 1, "%2d:%02d:%02d", (ServerT->tm_hour + GMT) % 24, ServerT->tm_min, ServerT->tm_sec);
-
-
-		gInterface.DrawFormat(eGold, this->Data[eTIME].X - 78, this->Data[eTIME].Y + 247, 210, 3, "Local :");
-
-		gInterface.DrawFormat(eWhite, this->Data[eTIME].X + 65, this->Data[eTIME].Y + 247, 100, 1, "%2d:%02d:%02d", LocalT->tm_hour, LocalT->tm_min, LocalT->tm_sec);
-
-		break;//listo
-	case 7:
-		this->DrawGUI(eTIME, this->Data[eTIME].X - 9, this->Data[eTIME].Y + 187); //27
-
-		gInterface.DrawFormat(eGold, this->Data[eTIME].X - 77, this->Data[eTIME].Y + 240, 210, 3, "Server:");
-
-		gInterface.DrawFormat(eWhite, this->Data[eTIME].X + 65, this->Data[eTIME].Y + 240, 100, 1, "%2d:%02d:%02d", (ServerT->tm_hour + GMT) % 24, ServerT->tm_min, ServerT->tm_sec);
-
-
-		gInterface.DrawFormat(eGold, this->Data[eTIME].X - 78, this->Data[eTIME].Y + 217, 210, 3, "Local :");
-
-		gInterface.DrawFormat(eWhite, this->Data[eTIME].X + 65, this->Data[eTIME].Y + 217, 100, 1, "%2d:%02d:%02d", LocalT->tm_hour, LocalT->tm_min, LocalT->tm_sec);
-
-		break;//listo
-	case 8:
-		this->DrawGUI(eTIME, this->Data[eTIME].X - 9, this->Data[eTIME].Y + 217); //27
-
-		gInterface.DrawFormat(eGold, this->Data[eTIME].X - 77, this->Data[eTIME].Y + 270, 210, 3, "Server:");
-
-		gInterface.DrawFormat(eWhite, this->Data[eTIME].X + 65, this->Data[eTIME].Y + 270, 100, 1, "%2d:%02d:%02d", (ServerT->tm_hour + GMT) % 24, ServerT->tm_min, ServerT->tm_sec);
-
-
-		gInterface.DrawFormat(eGold, this->Data[eTIME].X - 78, this->Data[eTIME].Y + 247, 210, 3, "Local :");
-
-		gInterface.DrawFormat(eWhite, this->Data[eTIME].X + 65, this->Data[eTIME].Y + 247, 100, 1, "%2d:%02d:%02d", LocalT->tm_hour, LocalT->tm_min, LocalT->tm_sec);
-
-		break;//listo
-	}
+	gInterface.DrawFormat(eGold, this->Data[eTIME].X - 78, this->Data[eTIME].Y + 30, 210, 3, "Local :");
+	gInterface.DrawFormat(eWhite, this->Data[eTIME].X + 65, this->Data[eTIME].Y + 30, 100, 1, "%2d:%02d:%02d", LocalT->tm_hour, LocalT->tm_min, LocalT->tm_sec);
 }
 
 

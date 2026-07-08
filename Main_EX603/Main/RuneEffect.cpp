@@ -143,7 +143,7 @@ void RenderCharacter(ObjectPreview* a4, OBJECT* a5, int Select)
 
 								if (!pCheckEffectPlayer((DWORD*)(ViewportAddress + 0x4EC), 28))
 								{
-									if (pPlayerState > 4)
+									if (pPlayerState > 4 && gRuneEffect.m_RuneEffect[index].m_Level > 0)
 									{
 										for (std::vector<RuneEffectType>::iterator it = gRuneEffect.m_RuneEffectInfo.begin(); it != gRuneEffect.m_RuneEffectInfo.end(); it++)
 										{

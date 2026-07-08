@@ -665,19 +665,20 @@ void GLCreateWindowEx( )
 	SetDword((0x0085B3B1 + 1), (320 + QTFrame.DisplayWinExt / 2 + 150)); //-- ChaosCastleTimer
 	SetDword((0x0085BB11+1), (0x1E6+FrameWinCDepthBox));				//-- CastleSiege
 	//-- General 0x280
-	SetDword((0x004D7D6F+2), (0x280+FrameWinCDepthBox));				//-- Texto Server copy
-	SetDword((0x004D7D8B+2), (0x280+FrameWinCDepthBox));				//-- Texto copy
-	SetDword((0x004D7E04+2), (0x280+FrameWinCDepthBox));				//-- Texto copy
-	SetDword((0x004D7E8A+2), (0x280+FrameWinCDepthBox));				//-- Texto copy
-	SetDword((0x004D06F4+4), (0x280+FrameWinCDepthBox));				//-- Cursor Limite
-	SetDword((0x004D0700+4), (0x280+FrameWinCDepthBox));				//-- Cursor Limite
+	SetDword((0x004D7D6F+2), (QTFrame.DisplayWin));				//-- Texto Server copy
+	SetDword((0x004D7D8B+2), (QTFrame.DisplayWin));				//-- Texto copy
+	SetDword((0x004D7E04+2), (QTFrame.DisplayWin));				//-- Texto copy
+	SetDword((0x004D7E8A+2), (QTFrame.DisplayWin));				//-- Texto copy
+	SetDword((0x004D06F4+4), (QTFrame.DisplayWin));				//-- Cursor Limite
+	SetDword((0x004D0700+4), (QTFrame.DisplayWin));				//-- Cursor Limite
 	//==
 	SetDword((0x004D071D+4), ((0x1E0+ QTFrame.DisplayHeightExt) - 50));				//-- Cursor Limite Y
 	SetDword((0x004D0729+4), ((0x1E0 + QTFrame.DisplayHeightExt) - 50));				//-- Cursor Limite Y
-	SetDword((0x00779CCD+3), (0x280+FrameWinCDepthBox));				//-- Tooltip Limite
-	SetDword((0x00635B5A+2), (0x280+FrameWinCDepthBox));				//-- PlayerDialog
-	SetDword((0x006359C2+1), (0x280+FrameWinCDepthBox));				//-- ItemModel
-	SetDword((0x0040F7B7+1), (0x280+FrameWinCDepthBox));				//-- Store Dialog
+	SetDword((0x00779CCD+3), (QTFrame.DisplayWin));				//-- Tooltip Limite
+	SetDword((0x00635B5A+2), (QTFrame.DisplayWin));				//-- PlayerDialog
+	SetDword((0x006359C2+1), (QTFrame.DisplayWin));				//-- ItemModel
+	SetDword((0x0040F7B7+1), (QTFrame.DisplayWin));				//-- Store Dialog X
+	SetDword((0x0040F7DC+1), (QTFrame.DisplayHeight));			//-- Store Dialog Y
 	//==
 	SetDword((0x0085ECA6 + 1), (0x186 + FrameWinExt));							//-- WindowsFriends X Open
 	SetDword((0x0085ECA1 + 1), (0x103 + QTFrame.DisplayHeightExt));				//-- WindowsFriends Y Open
@@ -698,9 +699,9 @@ void GLCreateWindowEx( )
 	//SetDword((0x0048BE77 + 1), (0x1E0 + Fix_DisplayHeightExt) - 50);				//-- friend listY
 
 	//==
-	SetDword(0x004D7D7D + 1, (Fix_DisplayHeight)); //Fix Y Text CoppytRi
-	SetDword(0x004D7E12 + 1, (Fix_DisplayHeight)); //Fix Y Text CoppytRi
-	SetDword(0x004D7E98 + 1, (Fix_DisplayHeight)); //Fix Y Text CoppytRi
+	SetDword(0x004D7D7D + 1, (QTFrame.DisplayHeight)); //Fix Y Text CoppytRi
+	SetDword(0x004D7E12 + 1, (QTFrame.DisplayHeight)); //Fix Y Text CoppytRi
+	SetDword(0x004D7E98 + 1, (QTFrame.DisplayHeight)); //Fix Y Text CoppytRi
 
 	SetDword((DWORD)(0x0085A426), QTFrame.DisplayHeightExt + 382); // Y ChatInput
 	//SetByte((DWORD)(0x0085A42B), 0);	 // X 

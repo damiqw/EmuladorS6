@@ -38,7 +38,7 @@ struct botStoreStruct
 	int OnlyVip;
 	int UseVipMoney;
 	char Name[11];
-	char StoreName[11];
+	char StoreName[36];
 	BYTE Map;
 	BYTE X;
 	BYTE Y;

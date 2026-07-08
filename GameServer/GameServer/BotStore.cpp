@@ -534,18 +534,41 @@ void ObjBotStore::MakeBot()
 					
 					gObj[result].PShopOpen = true;
 					memset(gObj[result].PShopText, 0, sizeof(gObj[result].PShopText));
-					memcpy(gObj[result].PShopText, this->bot[botNum].StoreName, sizeof(gObj[result].PShopText));
-					gObj[result].PShopText[35] = 0;
-					for(int i = 34; i >= 0; i--)
+					int p = 0;
+					for(int i = 0; i < 35; i++)
 					{
-						if(gObj[result].PShopText[i] == ' ' || gObj[result].PShopText[i] == 0)
+						char c = this->bot[botNum].StoreName[i];
+						if(c == 0) break;
+						// Solo copiar caracteres imprimibles, ignorar saltos de linea (0x0A, 0x0D) o basura binaria
+						if((unsigned char)c >= 0x20 && (unsigned char)c != 0x7F)
+						{
+							gObj[result].PShopText[p++] = c;
+						}
+					}
+					gObj[result].PShopText[p] = 0;
+					
+					// Trim trailing spaces
+					for(int i = p - 1; i >= 0; i--)
+					{
+						if(gObj[result].PShopText[i] == ' ')
 						{
 							gObj[result].PShopText[i] = 0;
+							p = i;
 						}
 						else
 						{
 							break;
 						}
+					}
+					
+					// Anti-Widescreen-Wrap Fix: Pad short names with spaces
+					if (p > 0 && p < 12)
+					{
+						for (int i = p; i < 12; i++)
+						{
+							gObj[result].PShopText[i] = ' ';
+						}
+						gObj[result].PShopText[12] = 0;
 					}
 
 					GCChatTargetSend(&gObj[result], result, "NEW SELLER!");

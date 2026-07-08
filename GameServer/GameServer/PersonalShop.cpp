@@ -408,16 +408,24 @@ void CPersonalShop::CGPShopOpenRecv(PMSG_PSHOP_OPEN_RECV* lpMsg,int aIndex) // O
 		memset(lpObj->PShopText, 0, sizeof(lpObj->PShopText));
 		memcpy(lpObj->PShopText,lpMsg->text,sizeof(lpMsg->text));
 		lpObj->PShopText[35] = 0;
+		int p = 35;
 		for(int i = 34; i >= 0; i--)
 		{
 			if(lpObj->PShopText[i] == ' ' || lpObj->PShopText[i] == 0)
 			{
 				lpObj->PShopText[i] = 0;
+				p = i;
 			}
 			else
 			{
 				break;
 			}
+		}
+		if(p > 0 && p < 12) {
+			for(int i = p; i < 12; i++) {
+				lpObj->PShopText[i] = ' ';
+			}
+			lpObj->PShopText[12] = 0;
 		}
 	}
 	else
@@ -425,16 +433,24 @@ void CPersonalShop::CGPShopOpenRecv(PMSG_PSHOP_OPEN_RECV* lpMsg,int aIndex) // O
 		memset(lpObj->PShopText, 0, sizeof(lpObj->PShopText));
 		memcpy(lpObj->PShopText,lpMsg->text,sizeof(lpMsg->text));
 		lpObj->PShopText[35] = 0;
+		int p = 35;
 		for(int i = 34; i >= 0; i--)
 		{
 			if(lpObj->PShopText[i] == ' ' || lpObj->PShopText[i] == 0)
 			{
 				lpObj->PShopText[i] = 0;
+				p = i;
 			}
 			else
 			{
 				break;
 			}
+		}
+		if(p > 0 && p < 12) {
+			for(int i = p; i < 12; i++) {
+				lpObj->PShopText[i] = ' ';
+			}
+			lpObj->PShopText[12] = 0;
 		}
 		this->GCPShopTextChangeSend(aIndex);
 	}

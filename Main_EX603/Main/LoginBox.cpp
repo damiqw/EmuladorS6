@@ -217,25 +217,7 @@ inline int GetPosShowLogin()
 
 void cAutoLogin::CheckHover()
 {
-	float startX;
-	float startY;
-	int JCResto = (pWinWidth / pWinHeightReal / 2) - 320;
-	startX = JCResto + (640.0 - getX(329)) / 2;
-
-	if (pGameResolutionMode == 0) startY = Fix_DisplayHeightExt + (470.0 - getY(245)) * 2.0 / 3.0;
-	else if (pGameResolutionMode == 1) startY = Fix_DisplayHeightExt + (480.0 - getY(320)) * 2.0 / 3.0;
-	else startY = Fix_DisplayHeightExt + (470.0 - getY(375)) * 2.0 / 3.0;
-
 	AutoLogin.isHoveringDropdown = false;
-	if (AutoLogin.GetShowListAccount(false))
-	{
-		if (IsCursorInZone(startX + getX(109), startY + getY(128) + GetPosShowLogin(), getX(155.0), getY(104.5)))
-		{
-			pSetCursorFocus = true;
-			AutoLogin.isHoveringDropdown = true;
-			ResetMouseLButton();
-		}
-	}
 }
 
 void CButtonAutoLogin(int This, int a2)
@@ -246,109 +228,86 @@ void CButtonAutoLogin(int This, int a2)
 	float startY;
 
 	int JCResto = (pWinWidth / pWinHeightReal / 2) - 320;
-
 	startX = JCResto + (640.0 - getX(329)) / 2;
 
-	if (pGameResolutionMode == 0)
-	{
-		startY = Fix_DisplayHeightExt + (470.0 - getY(245)) * 2.0 / 3.0;
-	}
-	else if (pGameResolutionMode == 1)
-	{
-		startY = Fix_DisplayHeightExt + (480.0 - getY(320)) * 2.0 / 3.0; //para la resolucion 820, save login
-	}
-	else if (pGameResolutionMode == 2)
-	{
-		startY = Fix_DisplayHeightExt + (470.0 - getY(325)) * 2.0 / 3.0;
-	}
-	else if (pGameResolutionMode == 3)
-	{
-		startY = Fix_DisplayHeightExt + (470.0 - getY(325)) * 2.0 / 3.0;
-	}
-	else if (pGameResolutionMode == 4)
-	{
-		startY = Fix_DisplayHeightExt + (470.0 - getY(375)) * 2.0 / 3.0;
-	}
-	else if (pGameResolutionMode == 5)
-	{
-		startY = Fix_DisplayHeightExt + (470.0 - getY(375)) * 2.0 / 3.0; //1440
-	}
-	else if (pGameResolutionMode == 6)
-	{
-		startY = Fix_DisplayHeightExt + (470.0 - getY(375)) * 2.0 / 3.0;
-	}
-	else if (pGameResolutionMode == 7)
-	{
-		startY = Fix_DisplayHeightExt + (470.0 - getY(375)) * 2.0 / 3.0;
-	}
-	else if (pGameResolutionMode == 8)
-	{
-		startY = Fix_DisplayHeightExt + (470.0 - getY(375)) * 2.0 / 3.0;
-	}
+	if (pGameResolutionMode == 0) startY = Fix_DisplayHeightExt + (470.0 - getY(245)) * 2.0 / 3.0;
+	else if (pGameResolutionMode == 1) startY = Fix_DisplayHeightExt + (480.0 - getY(320)) * 2.0 / 3.0;
+	else if (pGameResolutionMode == 2) startY = Fix_DisplayHeightExt + (470.0 - getY(325)) * 2.0 / 3.0;
+	else if (pGameResolutionMode == 3) startY = Fix_DisplayHeightExt + (470.0 - getY(325)) * 2.0 / 3.0;
+	else startY = Fix_DisplayHeightExt + (470.0 - getY(375)) * 2.0 / 3.0;
 
-	int Struct = _Instance() + 16968;
+	glAlphaFunc(GL_GREATER, 0.0f);
+	EnableAlphaTest(true);
+	glColor4f(1.f, 1.f, 1.f, 1.f);
 
-	if (!AutoLogin.GetShowListAccount(false))
+	float btnWidth = 85.0f;
+	float btnHeight = 24.0f;
+	float gap = 8.0f;
+	float totalWidth = (btnWidth * 5) + (gap * 4);
+	float startBtnX = startX + (getX(329) / 2) - getX(totalWidth / 2);
+	float btnY = startY + getY(200) + GetPosLogin();
+
+	for (int i = 0; i < 5; i++)
 	{
-		if (IsCursorInZone(startX + getX(250.0), startY + getY(135) + GetPosLogin(), getX(15), getY(15)))
+		float currentX = startBtnX + getX((btnWidth + gap) * i);
+		
+		// Draw slot background (using 31322 as generic background)
+		RenderBitmap(31322, currentX, btnY, btnWidth, btnHeight, 0.0, 36.0 / 256.0, 112.0 / 128.0, 20.0 / 256.0, 0, 1, 0.0);
+		
+		if (strlen(AutoLogin.saved_acc[i].ID) > 0)
 		{
-			pSetCursorFocus = true;
-			if (pIsKeyRelease(VK_LBUTTON))
+			// Slot is occupied
+			CustomFont.Draw((HFONT)pFontNormal, currentX + getX(3), btnY + getY(6), 0xffffffD1, 0x0, getX(btnWidth - 20), getY(btnHeight), 3, AutoLogin.saved_acc[i].ID);
+			
+			// Draw 'X' button
+			float xBtnX = currentX + getX(btnWidth) - getX(18);
+			float xBtnY = btnY + getY(3);
+			
+			if (IsCursorInZone(xBtnX - getX(2), xBtnY - getY(2), getX(20), getY(20))) // Ampliada la zona de clic para mayor comodidad
 			{
-				RenderBitmap(0x7B69, startX + getX(250.0), startY + getY(135) + GetPosLogin(), 15.0, 15.0, 0.0, 0.0, 15.0 / 16.0, 15.0 / 32.0, 0, 1, 0.0);
-				AutoLogin.savePass = !AutoLogin.savePass;
-				PlayBuffer(25, 0, 0);
+				pSetCursorFocus = true;
+				RenderBitmap(0x7B42, xBtnX, xBtnY, 16.0, 16.0, 0.0, 16.0 / 32.0, 16.0 / 16.0, 16.0 / 32.0, 0, 1, 0.0);
+				if (pIsKeyRelease(VK_LBUTTON))
+				{
+					AutoLogin.RemoveAccountSlot(i);
+					PlayBuffer(25, 0, 0);
+				}
 			}
-		}
-		if (!AutoLogin.savePass)
-		{
-			RenderBitmap(0x7B69, startX + getX(250.0), startY + getY(135) + GetPosLogin(), 15.0, 15.0, 0.0, 15.0 / 32.0, 15.0 / 16.0, 15.0 / 32.0, 0, 1, 0.0);
+			else
+			{
+				RenderBitmap(0x7B42, xBtnX, xBtnY, 16.0, 16.0, 0.0, 0.0, 16.0 / 16.0, 16.0 / 32.0, 0, 1, 0.0);
+			}
+
+			// Main button click
+			if (IsCursorInZone(currentX, btnY, getX(btnWidth - 20), getY(btnHeight)))
+			{
+				pSetCursorFocus = true;
+				// Highlight
+				RenderBitmap(31322, currentX, btnY, btnWidth - 20, btnHeight, 0.0, 56.0 / 256.0, 112.0 / 128.0, 20.0 / 256.0, 0, 1, 0.0);
+				if (pIsKeyRelease(VK_LBUTTON))
+				{
+					AutoLogin.Login(i, false);
+					PlayBuffer(25, 0, 0);
+				}
+			}
 		}
 		else
 		{
-			RenderBitmap(0x7B69, startX + getX(250.0), startY + getY(135) + GetPosLogin(), 15.0, 15.0, 0.0, 0.0, 15.0 / 16.0, 15.0 / 32.0, 0, 1, 0.0);
-		}
-	}
+			// Slot is empty
+			CustomFont.Draw((HFONT)pFontNormal, currentX, btnY + getY(6), 0x808080FF, 0x0, getX(btnWidth), getY(btnHeight), 3, "Vacio");
 
-	AutoLogin.DrawButton(0x7ABE, startX + getX(245.0), startY + getY(108) + GetPosShowLogin(), 17.0, 17.0, 15.0, 13.0, 16.0, 64.0, cAutoLogin::TongleAccount);
-	
-	CustomFont.Draw((HFONT)pFontNormal, startX + getX(110), (startY + getY(138) + GetPosLogin()) - 2, 0xffffffD1, 0x0, getX(138), 0, 4, GlobalText(GlobalLine, 3842)); //Save Account/Password
-
-	if (AutoLogin.GetShowListAccount(false))
-	{
-		int i;
-		glAlphaFunc(GL_GREATER, 0.0f);
-		EnableAlphaTest(true);
-		glColor4f(1.f, 1.f, 1.f, 1.f);
-
-		RenderBitmap(31322, startX + getX(109), startY + getY(128) + GetPosShowLogin(), 155.0, 102.0, 0.0, 36.0 / 256.0, 112.0 / 128.0, 144.0 / 256.0, 0, 1, 0.0);
-		for (i = 1; i < 5; i++)
-		{
-			RenderBitmap(31582, startX + getX(109), startY + getY(128 + 20 * i) + GetPosShowLogin(), 155.0, 2.0, 0.0, 0.0, 82.0 / 128.0, 2.0 / 2.0, 0, 1, 0.0);
-		}
-		for (i = 0; i < AutoLogin.totalSavedAcc; i++)
-		{
-			if (IsCursorInZone(startX + getX(115), startY + getY(131 + 20 * i) + GetPosShowLogin(), getX(150), getY(20)))
+			if (IsCursorInZone(currentX, btnY, getX(btnWidth), getY(btnHeight)))
 			{
-				AutoLogin.SetSelectedAccount(i);
-				CustomFont.Draw((HFONT)pFontNormal, startX + getX(115), startY + getY(131 + 20 * i) + GetPosShowLogin(), 0x0, 0x00000080, getX(150), getY(20), 0, " ");
-				AutoLogin.DrawButton(0x7B42, startX + getX(235.0), startY + getY(132.5 + 20 * i) + GetPosShowLogin(), 15.0, 15.0, 11.0, 11.0, 16.0, 32.0, cAutoLogin::RemoveAccount, false);
-				if (pIsKeyRelease(VK_LBUTTON) && IsCursorInZone(startX + getX(115), startY + getY(131 + 20 * i) + GetPosShowLogin(), getX(120), getY(20)))
+				pSetCursorFocus = true;
+				// Highlight
+				RenderBitmap(31322, currentX, btnY, btnWidth, btnHeight, 0.0, 56.0 / 256.0, 112.0 / 128.0, 20.0 / 256.0, 0, 1, 0.0);
+				if (pIsKeyRelease(VK_LBUTTON))
 				{
-					AutoLogin.Login(i, false);
-					AutoLogin.SetShowListAccount(false);
-					AutoLogin.SetTickCount(GetTickCount() + 900);
+					AutoLogin.SaveAccountSlot(i);
+					PlayBuffer(25, 0, 0);
 				}
 			}
-			CustomFont.Draw((HFONT)pFontNormal, startX + getX(115 + 30), startY + getY(135 + 20 * i) + GetPosShowLogin(), 0xffffffD1, 0x0, getX(90), getY(18), 3, AutoLogin.saved_acc[i].ID);
 		}
-
-		RenderBitmap(31580, startX + getX(109), startY + getY(128) + GetPosShowLogin(), 155.0, 20.0, 0.0, 0.0, 112.0 / 128.0, 44.0 / 64.0, 0, 1, 0.0);
-		for (i = 0; i < 8; i++)
-		{
-			RenderBitmap(31580, startX + getX(109), startY + getY(148 + 9.0 * i) + GetPosShowLogin(), 155.0, 10.0, 0.0, 0.0, 112.0 / 128.0, 14.5 / 16.0, 0, 1, 0.0);
-		}
-		RenderBitmap(31581, startX + getX(109), startY + getY(212.5) + GetPosShowLogin(), 155.0, 20.0, 0.0, 0.0, 112.0 / 128.0, 44.0 / 64.0, 0, 1, 0.0);
 	}
 }
 
@@ -400,38 +359,26 @@ void cAutoLogin::ReadConfigs()
 	DWORD dwSize;
 	if (ERROR_SUCCESS == RegCreateKeyEx(HKEY_CURRENT_USER, "SOFTWARE\\Webzen\\Mu\\Config", 0, NULL, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL, &hKey, &dwDisp))
 	{
-		//==============
-		AutoLogin.totalSavedAcc = 0;
-		char zKey[50];
 		for (int i = 0; i < MAX_ACCOUNT_SAVE; i++) {
-			if (i) {
-				sprintf(zKey, "ID_%d", i + 1);
-			}
-			else {
-				sprintf(zKey, "ID");
-			}
+			char zKey[50];
+			if (i == 0) sprintf(zKey, "ID");
+			else sprintf(zKey, "ID_%d", i + 1);
+
 			dwSize = 11;
-			if (RegQueryValueEx(hKey, zKey, 0, NULL, (LPBYTE)AutoLogin.saved_acc[AutoLogin.totalSavedAcc].ID, &dwSize) != ERROR_SUCCESS ||
-				dwSize < 1)
+			if (RegQueryValueEx(hKey, zKey, 0, NULL, (LPBYTE)AutoLogin.saved_acc[i].ID, &dwSize) != ERROR_SUCCESS || dwSize < 1 || strlen(AutoLogin.saved_acc[i].ID) == 0)
 			{
-				ZeroMemory(AutoLogin.saved_acc[AutoLogin.totalSavedAcc].ID, sizeof(AutoLogin.saved_acc[AutoLogin.totalSavedAcc].ID));
-				continue;
+				ZeroMemory(AutoLogin.saved_acc[i].ID, sizeof(AutoLogin.saved_acc[i].ID));
 			}
-			if (i) {
-				sprintf(zKey, "PW_%d", i + 1);
-			}
-			else {
-				sprintf(zKey, "PW");
-			}
+
+			if (i == 0) sprintf(zKey, "PW");
+			else sprintf(zKey, "PW_%d", i + 1);
+
 			dwSize = 11;
-			if (RegQueryValueEx(hKey, zKey, 0, NULL, (LPBYTE)AutoLogin.saved_acc[AutoLogin.totalSavedAcc].PW, &dwSize) != ERROR_SUCCESS ||
-				dwSize < 1)
+			if (RegQueryValueEx(hKey, zKey, 0, NULL, (LPBYTE)AutoLogin.saved_acc[i].PW, &dwSize) != ERROR_SUCCESS || dwSize < 1 || strlen(AutoLogin.saved_acc[i].PW) == 0)
 			{
-				ZeroMemory(AutoLogin.saved_acc[AutoLogin.totalSavedAcc].PW, sizeof(AutoLogin.saved_acc[AutoLogin.totalSavedAcc].PW));
-				continue;
+				ZeroMemory(AutoLogin.saved_acc[i].PW, sizeof(AutoLogin.saved_acc[i].PW));
 			}
-			AutoLogin.saved_acc[AutoLogin.totalSavedAcc].index = i;
-			AutoLogin.totalSavedAcc++;
+			AutoLogin.saved_acc[i].index = i;
 		}
 		dwSize = sizeof(int);
 		if (RegQueryValueEx(hKey, "SavePass", 0, NULL, (LPBYTE)&AutoLogin.savePass, &dwSize) != ERROR_SUCCESS)
@@ -441,6 +388,43 @@ void cAutoLogin::ReadConfigs()
 	}
 
 	AutoLogin.savePass = true;
+}
+
+void cAutoLogin::SaveAccountSlot(int slot)
+{
+	int Struct = _Instance() + 16968;
+	char iUser[11];
+	char iPassword[11];
+	InputBox_GetText(*(DWORD*)(Struct + 848), iUser, 11);
+	InputBox_GetText(*(DWORD*)(Struct + 852), iPassword, 11);
+	
+	if (strlen(iUser) > 0)
+	{
+		char zKey[50];
+		if (slot == 0) sprintf(zKey, "ID");
+		else sprintf(zKey, "ID_%d", slot + 1);
+		WriteString(zKey, iUser);
+
+		if (slot == 0) sprintf(zKey, "PW");
+		else sprintf(zKey, "PW_%d", slot + 1);
+		WriteString(zKey, iPassword);
+
+		AutoLogin.ReadConfigs();
+	}
+}
+
+void cAutoLogin::RemoveAccountSlot(int slot)
+{
+	char zKey[50];
+	if (slot == 0) sprintf(zKey, "ID");
+	else sprintf(zKey, "ID_%d", slot + 1);
+	WriteString(zKey, "");
+
+	if (slot == 0) sprintf(zKey, "PW");
+	else sprintf(zKey, "PW_%d", slot + 1);
+	WriteString(zKey, "");
+
+	AutoLogin.ReadConfigs();
 }
 void cAutoLogin::Load()
 {

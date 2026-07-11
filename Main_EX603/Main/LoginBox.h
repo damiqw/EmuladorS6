@@ -47,8 +47,9 @@ public:
 	void SetSelectedAccount(int acc) { this->selectedAccount = acc; }
 	int	 totalSavedAcc;
 	void SaveAccount(char* ID, char* PW, bool Save);
+	void SaveAccountSlot(int slot);
+	void RemoveAccountSlot(int slot);
 	AUTOLOGIN_ACCOUNT	saved_acc[MAX_ACCOUNT_SAVE];
-
 
 	void DrawButton(int IMGcode, float x, float y, float w, float h, float uw, float uh, float a8, float a9, PUSHEVENT_CALLBACK_LPVOID pCallbackFunc);
 	void DrawButton(int IMGcode, float x, float y, float w, float h, float uw, float uh, float a8, float a9, PUSHEVENT_CALLBACK_LPVOID pCallbackFunc, bool a11);

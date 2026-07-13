@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "ItemMove.h"
 #include "Offset.h"
 #include "Protect.h"
@@ -300,7 +300,7 @@ BYTE GetInventoryWearSlot(int ItemIndex) // OK
 		}
 		else if(lpItemInfo->Slot == 0 && slot == 1)
 		{
-			if((Class == 1 || Class == 3) && lpItemInfo->TwoHand == 0)
+			if((Class == 1 || Class == 3 || Class == 6) && lpItemInfo->TwoHand == 0)
 			{
 				bEquipable = true;
 			}

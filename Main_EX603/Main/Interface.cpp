@@ -1134,6 +1134,25 @@ bool Interface::UpdateKey(DWORD Class)
 			gPartySearchSettings.party_search_settings_switch_state();
 		}
 
+		static DWORD HelperTickCount = 0;
+		if (pIsKeyPress(VK_MBUTTON) && GetTickCount() > HelperTickCount + 300)
+		{
+			DWORD pHelper = *(DWORD*)MAIN_HELPER_STRUCT;
+			if (pHelper != 0)
+			{
+				BYTE isHelperOn = *(BYTE*)(pHelper + 0x08);
+				if (isHelperOn == 0)
+				{
+					pMUHelperStart((LPVOID)pHelper);
+				}
+				else
+				{
+					pMUHelperClose((LPVOID)pHelper);
+				}
+			}
+			HelperTickCount = GetTickCount();
+		}
+
 	return ((bool(__thiscall*)(DWORD))0x815B50)(*(DWORD*)Class);
 }
 

@@ -1318,6 +1318,12 @@ void ProtocolCore(BYTE head,BYTE* lpMsg,int size,int aIndex,int encrypt,int seri
 			case 0x05:
 				gPartySearch.RequestParty((PMSG_PARTY_REQ_REQ*)lpMsg, aIndex);
 				break;
+			case 0x06:
+				gPartySearch.SendPartySettings(&gObj[aIndex]);
+				break;
+			case 0x07:
+				gPartySearch.GCPartyListSend(aIndex);
+				break;
 			case 0x13:
 				gPartySearch.RequestParty((PMSG_PARTY_REQ_REQ*)lpMsg, aIndex);
 				break;

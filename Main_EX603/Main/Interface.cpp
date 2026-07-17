@@ -92,6 +92,14 @@ void Interface::Load()
 		gInterface.BindObject(eADVANCE_STAT_INFO, 561020, 35, 30, -1, -1);	
 	}
 
+	this->BindObject(OBJECT_PARTYMENU_MAIN, 0x7A5A, 222, 140, -1, -1);
+	this->BindObject(OBJECT_PARTYMENU_TITLE, 0x7A63, 230, 67, -1, -1);
+	this->BindObject(OBJECT_PARTYMENU_FRAME, 0x7A58, 230, 15, -1, -1);
+	this->BindObject(OBJECT_PARTYMENU_FOOTER, 0x7A59, 230, 50, -1, -1);
+	this->BindObject(OBJECT_PARTYMENU_DIV, 0x7A62, 223, 21, -1, -1);
+	this->BindObject(OBJECT_PARTYMENU_BTN_PUBLICAR, 0x7A5E, 108, 29, -1, -1);
+	this->BindObject(OBJECT_PARTYMENU_BTN_BUSCAR, 0x7A5E, 108, 29, -1, -1);
+
 	this->BindObject(eFlag01, 0x7880, 78, 78, -1, -1);
 	this->BindObject(eFlag02, 0x7881, 78, 78, -1, -1);
 	this->BindObject(eFlag03, 0x7882, 78, 78, -1, -1);
@@ -870,6 +878,7 @@ void Interface::Work()
 	gPartySearchSettings.draw_party_settings_window();
 	gPartySearch.draw_party_search();
 	gPartySearch.draw_party_password();
+	gInterface.DrawPartyMenu();
 
 	if (GetKeyState(VK_SNAPSHOT) < 0)
 	{
@@ -1059,6 +1068,12 @@ bool Interface::UpdateKey(DWORD Class)
 			return false;
 		}
 
+		if (gInterface.Data[OBJECT_PARTYMENU_MAIN].OnShow)
+		{
+			gInterface.Data[OBJECT_PARTYMENU_MAIN].Close();
+			return false;
+		}
+
 		if (gInterface.Data[OBJECT_PARTYSEARCH_MAIN].OnShow)
 		{
 			gInterface.Data[OBJECT_PARTYSEARCH_MAIN].Close();
@@ -1143,7 +1158,15 @@ bool Interface::UpdateKey(DWORD Class)
 				BYTE isHelperOn = *(BYTE*)(pHelper + 0x08);
 				if (isHelperOn == 0)
 				{
-					pMUHelperStart((LPVOID)pHelper);
+					bool inSafeZone = *(bool*)(MAIN_CHARACTER_STRUCT + 0x0E);
+					if (inSafeZone)
+					{
+						pDrawMessage("No se puede activar el Helper en zona segura.", 1);
+					}
+					else
+					{
+						pMUHelperStart((LPVOID)pHelper);
+					}
 				}
 				else
 				{
@@ -4828,3 +4851,109 @@ void Interface::CheckWindowSProTecno(int type)
 	}
 }
 #endif
+
+void Interface::DrawPartyMenu()
+{
+	if (!gInterface.Data[OBJECT_PARTYMENU_MAIN].OnShow)
+	{
+		return;
+	}
+
+	float MainWidth = 230.0;
+	float StartY = 100.0;
+	float StartX = (MAX_WIN_WIDTH / 2) - (MainWidth / 2);
+	float ButtonX = StartX + (MainWidth / 2) - 54.0;
+
+	pSetCursorFocus = true;
+
+	// Draw the base object to maintain state/MaxX/MaxY
+	gInterface.DrawGUI(OBJECT_PARTYMENU_MAIN, StartX, StartY + 2);
+
+	// Overdraw with stretched background to fill the smaller frame
+	pDrawGUI(0x7A5A, StartX + 4, StartY + 2, 222.0f, 145.0f);
+
+	gInterface.DrawGUI(OBJECT_PARTYMENU_TITLE, StartX, StartY);
+	StartY = gInterface.DrawRepeatGUI(OBJECT_PARTYMENU_FRAME, StartX, StartY + 67.0, 2);
+	gInterface.DrawGUI(OBJECT_PARTYMENU_FOOTER, StartX, StartY);
+
+	// StartY is now offset. Restore it to original for drawing components
+	StartY = 100.0;
+
+	gInterface.DrawFormat(eGold, StartX + 10, StartY + 12, 210, 3, "Party Search");
+
+	gInterface.DrawButton(OBJECT_PARTYMENU_BTN_PUBLICAR, ButtonX, StartY + 50, 0, 0);
+	if (gInterface.IsWorkZone(OBJECT_PARTYMENU_BTN_PUBLICAR))
+	{
+		gInterface.DrawButton(OBJECT_PARTYMENU_BTN_PUBLICAR, ButtonX, StartY + 50, 0, 29);
+	}
+	gInterface.DrawFormat(eWhite, ButtonX, StartY + 59, 108, 3, "Publicar Party");
+
+	gInterface.DrawButton(OBJECT_PARTYMENU_BTN_BUSCAR, ButtonX, StartY + 90, 0, 0);
+	if (gInterface.IsWorkZone(OBJECT_PARTYMENU_BTN_BUSCAR))
+	{
+		gInterface.DrawButton(OBJECT_PARTYMENU_BTN_BUSCAR, ButtonX, StartY + 90, 0, 29);
+	}
+	gInterface.DrawFormat(eWhite, ButtonX, StartY + 99, 108, 3, "Buscar Party");
+}
+
+bool Interface::EventPartyMenu(DWORD Event)
+{
+	if (!gInterface.Data[OBJECT_PARTYMENU_MAIN].OnShow)
+	{
+		return false;
+	}
+
+	if (Event == WM_LBUTTONDOWN)
+	{
+		if (gInterface.IsWorkZone(OBJECT_PARTYMENU_BTN_PUBLICAR))
+		{
+			gInterface.Data[OBJECT_PARTYMENU_BTN_PUBLICAR].OnClick = true;
+			return true;
+		}
+
+		if (gInterface.IsWorkZone(OBJECT_PARTYMENU_BTN_BUSCAR))
+		{
+			gInterface.Data[OBJECT_PARTYMENU_BTN_BUSCAR].OnClick = true;
+			return true;
+		}
+	}
+
+	if (Event == WM_LBUTTONUP)
+	{
+		if (gInterface.Data[OBJECT_PARTYMENU_BTN_PUBLICAR].OnClick)
+		{
+			gInterface.Data[OBJECT_PARTYMENU_BTN_PUBLICAR].OnClick = false;
+			if (gInterface.IsWorkZone(OBJECT_PARTYMENU_BTN_PUBLICAR))
+			{
+				BYTE pMsg[4] = {0xC1, 0x04, 0xFF, 0x06};
+				DataSend(pMsg, 4);
+
+				gInterface.Data[OBJECT_PARTYMENU_MAIN].Close();
+				gInterface.Data[OBJECT_PARTYSETTINGS_MAIN].Open();
+			}
+			return true;
+		}
+
+		if (gInterface.Data[OBJECT_PARTYMENU_BTN_BUSCAR].OnClick)
+		{
+			gInterface.Data[OBJECT_PARTYMENU_BTN_BUSCAR].OnClick = false;
+			if (gInterface.IsWorkZone(OBJECT_PARTYMENU_BTN_BUSCAR))
+			{
+				BYTE pMsg[4] = {0xC1, 0x04, 0xFF, 0x07};
+				DataSend(pMsg, 4);
+
+				gInterface.Data[OBJECT_PARTYMENU_MAIN].Close();
+				gPartySearch.ClearPartyList();
+				gInterface.Data[OBJECT_PARTYSEARCH_MAIN].Open();
+			}
+			return true;
+		}
+	}
+
+	if (gInterface.IsWorkZone(OBJECT_PARTYMENU_MAIN))
+	{
+		return true;
+	}
+
+	return false;
+}

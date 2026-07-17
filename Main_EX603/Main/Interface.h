@@ -281,6 +281,15 @@ enum ObjectID
 	OBJECT_PARTYPASSWORD_TEXTBOX,
 	OBJECT_PARTYPASSWORD_OK,
 
+	OBJECT_PARTYMENU_MAIN,
+	OBJECT_PARTYMENU_TITLE,
+	OBJECT_PARTYMENU_FRAME,
+	OBJECT_PARTYMENU_FOOTER,
+	OBJECT_PARTYMENU_DIV,
+	OBJECT_PARTYMENU_BTN_PUBLICAR,
+	OBJECT_PARTYMENU_BTN_BUSCAR,
+	OBJECT_PARTYMENU_CLOSE,
+
 	OBJECT_MAX,
 };
 
@@ -567,6 +576,9 @@ public:
 	bool		IsWorkZone5(float X, float Y, float MaxX, float MaxY);
 	int			DrawToolTipEx(DWORD Color, int PosX, int PosY, int Width, int Height, int Align, LPCSTR Text, ...);
 	bool CheckMenuWindow();
+
+	void DrawPartyMenu();
+	bool EventPartyMenu(DWORD Event);
 
 	void DrawText(DWORD Color, int PosX, int PosY, int Width, int Align, LPCSTR Text, ...);
 	void		DrawColoredButton(short ObjectID, float PosX, float PosY, float ScaleX, float ScaleY, DWORD Color);

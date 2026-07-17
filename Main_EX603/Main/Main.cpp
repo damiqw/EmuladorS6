@@ -248,6 +248,7 @@ LRESULT CALLBACK MouseProc(int nCode,WPARAM wParam,LPARAM lParam) // OK
 					gPartySearchSettings.event_party_search_settings_window(wParam);
 					gPartySearch.event_party_search_window(wParam);
 					gPartySearch.event_party_search_password_window(wParam);
+					gInterface.EventPartyMenu(wParam);
 					gInterface.EventConfirm_CANCEL(wParam);
 					gInterface.EventConfirm_OK(wParam);
 					gInterface.EventDrawMenuTrash_Open(wParam);

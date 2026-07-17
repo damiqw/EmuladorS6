@@ -58,19 +58,19 @@ void cPartySearch::draw_party_search()
 
 	if (gPartySearchSettings.m_SystemActive == false)
 	{
-		gInterface.DrawText(eRed, StartX + 42, gInterface.Data[OBJECT_PARTYSEARCH_MAIN].Y + 34, 20, 1, "OFF");
+		gInterface.DrawText(eRed, StartX + 42, gInterface.Data[OBJECT_PARTYSEARCH_MAIN].Y + 34, 20, 1, "  OFF");
 	}
 	else
 	{
-		gInterface.DrawText(eShinyGreen, StartX + 42, gInterface.Data[OBJECT_PARTYSEARCH_MAIN].Y + 34, 20, 1, "ON");
+		gInterface.DrawText(eShinyGreen, StartX + 42, gInterface.Data[OBJECT_PARTYSEARCH_MAIN].Y + 34, 20, 1, "  ON");
 	}
 
 	// ----
-	gInterface.DrawGUI(OBJECT_PARTYSETTINGS_DIV, StartX, gInterface.Data[OBJECT_PARTYSEARCH_MAIN].Y + 40); // Делитель большой
+	gInterface.DrawGUI(OBJECT_PARTYSETTINGS_DIV, StartX, gInterface.Data[OBJECT_PARTYSEARCH_MAIN].Y + 40); //  
 	// ----
 	gInterface.DrawText(eWhite, StartX + 5, gInterface.Data[OBJECT_PARTYSEARCH_MAIN].Y + 56, 50, 3, "Player");
 	// ----
-	gInterface.DrawText(eWhite, StartX + 45, gInterface.Data[OBJECT_PARTYSEARCH_MAIN].Y + 56, 50, 3, "Map");
+	gInterface.DrawText(eWhite, StartX + 60, gInterface.Data[OBJECT_PARTYSEARCH_MAIN].Y + 56, 50, 3, "Map");
 	// ----
 	gInterface.DrawText(eWhite, StartX + 95, gInterface.Data[OBJECT_PARTYSEARCH_MAIN].Y + 56, 50, 3, "X");
 	// ----
@@ -80,7 +80,7 @@ void cPartySearch::draw_party_search()
 	// ----
 	gInterface.DrawText(eWhite, StartX + 170, gInterface.Data[OBJECT_PARTYSEARCH_MAIN].Y + 56, 50, 3, "Join");
 	// ----
-	gInterface.DrawGUI(OBJECT_PARTYSETTINGS_DIV, StartX, gInterface.Data[OBJECT_PARTYSEARCH_MAIN].Y + 60); // Делитель большой
+	gInterface.DrawGUI(OBJECT_PARTYSETTINGS_DIV, StartX, gInterface.Data[OBJECT_PARTYSEARCH_MAIN].Y + 60); // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	// ----
 	if (gPartySearch.CountPages > 1)
 	{
@@ -117,7 +117,7 @@ void cPartySearch::draw_party_search()
 
 		gInterface.DrawText(eYellow, StartX + 15, gInterface.Data[OBJECT_PARTYSEARCH_MAIN].Y + 86 + (20 * i), 50, 1, info->Name);
 
-		gInterface.DrawText(eWhite, StartX + 45, gInterface.Data[OBJECT_PARTYSEARCH_MAIN].Y + 86 + (20 * i), 50, 3, gObjUser.GetMapName(info->Map));
+		gInterface.DrawText(eWhite, StartX + 60, gInterface.Data[OBJECT_PARTYSEARCH_MAIN].Y + 86 + (20 * i), 50, 1, "%s", gObjUser.GetMapName(info->Map));
 
 		gInterface.DrawText(eWhite, StartX + 95, gInterface.Data[OBJECT_PARTYSEARCH_MAIN].Y + 86 + (20 * i), 50, 3, "%d", info->X);
 

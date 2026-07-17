@@ -6,6 +6,7 @@
 #include "Protect.h"
 #include "resource.h"
 #include "ControllerTextBox.h"
+#include "Defines.h"
 // ----------------------------------------------------------------------------------------------
 Controller	gController;
 // ----------------------------------------------------------------------------------------------
@@ -46,9 +47,25 @@ LRESULT Controller::Keyboard(int Code, WPARAM wParam, LPARAM lParam)
 			{
 				return 1;
 			}
+
+			if (Hook.vkCode == 0x4E) // VK_N
+			{
+				if (!gInterface.CheckWindow(ObjWindow::ChatWindow))
+				{
+					if (gInterface.Data[OBJECT_PARTYMENU_MAIN].OnShow)
+					{
+						gInterface.Data[OBJECT_PARTYMENU_MAIN].Close();
+					}
+					else
+					{
+						gInterface.Data[OBJECT_PARTYMENU_MAIN].Open();
+					}
+					return 1;
+				}
+			}
 		}
 	}
 	
-	return (LRESULT)NULL;
+	return CallNextHookEx(gController.KeyboardHook, Code, wParam, lParam);
 }
 // ----------------------------------------------------------------------------------------------

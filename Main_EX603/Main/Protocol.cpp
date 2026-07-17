@@ -14,6 +14,7 @@
 #include "Reconnect.h"
 #include "Util.h"
 #include "PartySearch.h"
+#include "PartySearchSettings.h"
 #include "post_item.h"
 #include "CustomBuffIcon.h"
 #include "PetProtocol.h"
@@ -308,6 +309,9 @@ BOOL ProtocolCoreEx(BYTE head,BYTE* lpMsg,int size,int key) // OK
 			{
 				case 0x3E:
 					gMuHelper.RunningOffHelper();
+					break;
+				case 0x06:
+					gPartySearchSettings.GCPartySettingsRecv((PMSG_PARTYSETTINGS_RECV*)lpMsg);
 					break;
 #if(DAILY)
 				case 0x03:
@@ -968,5 +972,8 @@ void GCPartyListRecv(PMSG_RECV_PARTYLIST* lpMsg)
 		gPartySearch.InsertPartyList(lpInfo);
 	}
 
-	gPartySearch.party_search_switch_state();
+	if (!gInterface.Data[OBJECT_PARTYSEARCH_MAIN].OnShow)
+	{
+		gPartySearch.party_search_switch_state();
+	}
 }

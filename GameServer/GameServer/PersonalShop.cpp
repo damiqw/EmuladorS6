@@ -633,16 +633,32 @@ void CPersonalShop::CGPShopBuyItemRecv(PMSG_PSHOP_BUY_ITEM_RECV* lpMsg,int aInde
 		switch(lpTarget->BotPower)
 		{
 			case 0:
-				if (lpObj->Money < price) { this->GCPShopBuyItemSend(aIndex,bIndex,0,7); return; }
+				if (lpObj->Money < price) { 
+					gNotice.GCNoticeSend(lpObj->Index, 1, 0, 0, 0, 0, 0, "You don't have enough Zen.");
+					this->GCPShopBuyItemSend(aIndex,bIndex,0,7); 
+					return; 
+				}
 				break;
 			case 1:
-				if (lpObj->Coin1 < price) { this->GCPShopBuyItemSend(aIndex,bIndex,0,7); return; }
+				if (lpObj->Coin1 < price) { 
+					gNotice.GCNoticeSend(lpObj->Index, 1, 0, 0, 0, 0, 0, "You don't have enough WCoinC.");
+					this->GCPShopBuyItemSend(aIndex,bIndex,0,7); 
+					return; 
+				}
 				break;
 			case 2:
-				if (lpObj->Coin2 < price) { this->GCPShopBuyItemSend(aIndex,bIndex,0,7); return; }
+				if (lpObj->Coin2 < price) { 
+					gNotice.GCNoticeSend(lpObj->Index, 1, 0, 0, 0, 0, 0, "You don't have enough WCoinP.");
+					this->GCPShopBuyItemSend(aIndex,bIndex,0,7); 
+					return; 
+				}
 				break;
 			case 3:
-				if (lpObj->Coin3 < price) { this->GCPShopBuyItemSend(aIndex,bIndex,0,7); return; }
+				if (lpObj->Coin3 < price) { 
+					gNotice.GCNoticeSend(lpObj->Index, 1, 0, 0, 0, 0, 0, "You don't have enough GoblinPoint.");
+					this->GCPShopBuyItemSend(aIndex,bIndex,0,7); 
+					return; 
+				}
 				break;
 		}
 	}
@@ -650,6 +666,7 @@ void CPersonalShop::CGPShopBuyItemRecv(PMSG_PSHOP_BUY_ITEM_RECV* lpMsg,int aInde
 	{
 		if(lpObj->Money < ((DWORD)lpTarget->Inventory[lpMsg->slot].m_PShopValue))
 		{
+			gNotice.GCNoticeSend(lpObj->Index, 1, 0, 0, 0, 0, 0, "You don't have enough Zen.");
 			this->GCPShopBuyItemSend(aIndex,bIndex,0,7);
 			return;
 		}

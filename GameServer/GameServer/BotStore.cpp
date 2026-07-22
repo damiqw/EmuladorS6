@@ -61,7 +61,7 @@ static void gObjTempPShopItemBoxSet(BYTE * TempMap, int itempos, int xl, int yl,
 	{
 		for(int x = 0; x < xl; x++)
 		{
-			*(BYTE*)(TempMap + (itemposy +y) * 8 + (itemposx + x)) = set_byte;
+			TempMap[(itemposy +y) * 8 + (itemposx + x)] = 1;
 		}
 	}
 }
@@ -295,56 +295,53 @@ void ObjBotStore::Read(char * FilePath)
 
 BYTE gObjTempPShopRectCheck(BYTE * TempMap, int sx, int sy, int width, int height)
 {
-	int x,y,blank = 0;
-
 	if(sx + width > 8)
 	{
-		return -1;
+		return 0xFF;
 	}
 	if(sy + height > 4)
 	{
-		return -2;
+		return 0xFE;
 	}
 
-	for(y = 0; y < height; y++)
+	for(int y = 0; y < height; y++)
 	{
-		for(x = 0; x < width; x++)
+		for(int x = 0; x < width; x++)
 		{
-			if(*(BYTE*)(TempMap + (sy+y)*8 + (sx+x))!= 255)
+			if(TempMap[(sy+y)*8 + (sx+x)] != 0xFF)
 			{
-				blank += 1;
-				return -1;
+				return 0xFF;
 			}
 		}
 	}
-	if(blank == 0)
-	{
-		return sx+sy*8+INVENTORY_EXT4_SIZE;
-	}
-	return -1;
+	return sx+sy*8+INVENTORY_EXT4_SIZE;
 }
 
 BYTE ObjBotStore::CheckSpace(LPOBJ lpObj, int type, BYTE * TempMap)
 {
-	int w,h,iwidth,iheight;
-	BYTE blank = 0;
-
-	iwidth=ItemAttribute[type].Width;
-	iheight=ItemAttribute[type].Height;
-
-	for(h = 0; h < 4; h++)
+	ITEM_INFO ItemInfo;
+	if (gItemManager.GetInfo(type, &ItemInfo) == 0)
 	{
-		for(w = 0; w < 8; w++)
+		return 0xFF;
+	}
+
+	int iwidth = ItemInfo.Width;
+	int iheight = ItemInfo.Height;
+	BYTE blank = 0xFF;
+
+	for(int h = 0; h < 4; h++)
+	{
+		for(int w = 0; w < 8; w++)
 		{
-			if(*(BYTE*)(TempMap + h * 8 + w) == 255)
+			if(TempMap[h * 8 + w] == 0xFF)
 			{
 				blank = gObjTempPShopRectCheck(TempMap,w,h,iwidth,iheight);
 
-				if(blank == 254)
+				if(blank == 0xFE)
 				{
 					goto GOTO_EndFunc;
 				}
-				if(blank != 255)
+				if(blank != 0xFF)
 				{
 					gObjTempPShopItemBoxSet(TempMap,blank,iwidth,iheight,type);
 					return blank;
@@ -353,7 +350,7 @@ BYTE ObjBotStore::CheckSpace(LPOBJ lpObj, int type, BYTE * TempMap)
 		}
 	}
 GOTO_EndFunc:
-	return -1;
+	return 0xFF;
 }
 
 void ObjBotStore::AddItem(int bIndex,int botNum)
@@ -362,7 +359,7 @@ void ObjBotStore::AddItem(int bIndex,int botNum)
 	{ 
 		int blank = this->CheckSpace(&gObj[bIndex],this->bot[botNum].storeItem[i].num,&gObj[bIndex].InventoryMap[INVENTORY_EXT4_SIZE]);
 		
-		if(blank != 255)
+		if(blank != 0xFF)
 		{
 			CItem item;
 			item.m_Level		   = this->bot[botNum].storeItem[i].Level;
@@ -370,32 +367,28 @@ void ObjBotStore::AddItem(int bIndex,int botNum)
 			item.m_Option2		   = this->bot[botNum].storeItem[i].Luck;
 			item.m_Option3		   = this->bot[botNum].storeItem[i].Opt;
 			item.m_Durability	   = this->bot[botNum].storeItem[i].Dur;
-			item.m_JewelOfHarmonyOption = 0;
+			item.m_JewelOfHarmonyOption = this->bot[botNum].storeItem[i].Anc;
+			item.m_ItemOptionEx	   = this->bot[botNum].storeItem[i].Exc;
 			item.m_NewOption	   = this->bot[botNum].storeItem[i].Exc;
-			item.m_ItemOptionEx	   = 0;
 			item.m_SetOption	   = this->bot[botNum].storeItem[i].Anc;
-			item.m_SocketOption[0] = this->bot[botNum].storeItem[i].Sock[0];	
-			item.m_SocketOption[1] = this->bot[botNum].storeItem[i].Sock[1];
-			item.m_SocketOption[2] = this->bot[botNum].storeItem[i].Sock[2];
-			item.m_SocketOption[3] = this->bot[botNum].storeItem[i].Sock[3];
-			item.m_SocketOption[4] = this->bot[botNum].storeItem[i].Sock[4];
+			item.m_SocketOption[1] = this->bot[botNum].storeItem[i].Sock[0];
+			item.m_SocketOption[2] = this->bot[botNum].storeItem[i].Sock[1];
+			item.m_SocketOption[3] = this->bot[botNum].storeItem[i].Sock[2];
+			item.m_SocketOption[4] = this->bot[botNum].storeItem[i].Sock[3];
+			item.m_SocketOption[5] = this->bot[botNum].storeItem[i].Sock[4];
 
 			item.Convert(this->bot[botNum].storeItem[i].num,item.m_Option1,item.m_Option2,item.m_Option3,item.m_NewOption,item.m_SetOption,item.m_JewelOfHarmonyOption,item.m_ItemOptionEx,item.m_SocketOption,item.m_SocketOptionBonus);
 			
-			item.m_PShopValue	   = this->bot[botNum].storeItem[i].ValueZen;
+			item.m_PShopValue = this->bot[botNum].storeItem[i].ValueZen;
+
 			#if(GAMESERVER_UPDATE>=802)
-			item.m_PShopJoSValue   = this->bot[botNum].storeItem[i].ValueSoul;
-			item.m_PShopJoBValue   = this->bot[botNum].storeItem[i].ValueBless;
-			item.m_PShopJoCValue   = this->bot[botNum].storeItem[i].ValueChaos;
+			item.m_PShopJoBValue = this->bot[botNum].storeItem[i].ValueBless;
+			item.m_PShopJoSValue = this->bot[botNum].storeItem[i].ValueSoul;
+			item.m_PShopJoCValue = this->bot[botNum].storeItem[i].ValueChaos;
 			#endif
 
-			gObj[bIndex].Inventory[blank].m_Option1 = item.m_Option1;
-			gObj[bIndex].Inventory[blank].m_Option2 = item.m_Option2;
-			gObj[bIndex].Inventory[blank].m_Option3 = item.m_Option3;
-			gObj[bIndex].Inventory[blank].m_JewelOfHarmonyOption = item.m_JewelOfHarmonyOption;
-			gObj[bIndex].Inventory[blank].m_ItemOptionEx = item.m_ItemOptionEx;
-
-			item.m_Number = 0;
+			item.m_Serial = (botNum + 1) * 1000 + i + 1;
+			item.m_Number = (botNum + 1) * 1000 + i + 1;
 
 			gObj[bIndex].Inventory[blank] = item;
 		}

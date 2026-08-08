@@ -710,7 +710,7 @@ void CServerInfo::ReadMonsterInfo() // OK
 
 	CMonsterAIUnit::LoadData(gPath.GetFullPath("Monster\\MonsterAI\\MonsterAIUnit.txt"));
 
-	gMonsterManager.Load(gPath.GetFullPath("Monster\\Monster.txt"));
+	gMonsterManager.Load(gPath.GetFullPath("Monster\\Monster.xml"));
 
 	gMonsterMove.Load(gPath.GetFullPath("Monster\\MonsterMove.txt"));
 

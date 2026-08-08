@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "MonsterManager.h"
+#include "pugixml.hpp"
 #include "380ItemType.h"
 #include "BloodCastle.h"
 #include "BonusManager.h"
@@ -66,18 +67,12 @@ void CMonsterManager::Init() // OK
 
 void CMonsterManager::Load(char* path) // OK
 {
-	CMemScript* lpMemScript = new CMemScript;
+	pugi::xml_document file;
+	pugi::xml_parse_result res = file.load_file(path);
 
-	if(lpMemScript == 0)
+	if(res.status != pugi::status_ok)
 	{
-		ErrorMessageBox(MEM_SCRIPT_ALLOC_ERROR,path);
-		return;
-	}
-
-	if(lpMemScript->SetBuffer(path) == 0)
-	{
-		ErrorMessageBox(lpMemScript->GetLastError());
-		delete lpMemScript;
+		ErrorMessageBox((char*)res.description());
 		return;
 	}
 
@@ -85,93 +80,85 @@ void CMonsterManager::Load(char* path) // OK
 
 	try
 	{
-		while(true)
+		pugi::xml_node main_node = file.child("MonsterList");
+
+		for(pugi::xml_node monster_node = main_node.child("Monster"); monster_node; monster_node = monster_node.next_sibling("Monster"))
 		{
-			if(lpMemScript->GetToken() == TOKEN_END)
-			{
-				break;
-			}
-
-			if(strcmp("end",lpMemScript->GetString()) == 0)
-			{
-				break;
-			}
-
 			MONSTER_INFO info;
 
 			memset(&info,0,sizeof(info));
 
-			info.Index = lpMemScript->GetNumber();
+			info.Index = monster_node.attribute("Index").as_int();
 
-			info.Rate = lpMemScript->GetAsNumber();
+			info.Rate = monster_node.attribute("Rate").as_int();
 
-			strcpy_s(info.Name,lpMemScript->GetAsString());
+			strcpy_s(info.Name, monster_node.attribute("Name").as_string());
 
-			info.Level = lpMemScript->GetAsNumber();
+			info.Level = monster_node.attribute("Level").as_int();
 
-			info.Life = lpMemScript->GetAsNumber();
+			info.Life = monster_node.attribute("Life").as_int();
 
-			info.Mana = lpMemScript->GetAsNumber();
+			info.Mana = monster_node.attribute("Mana").as_int();
 
-			info.DamageMin = lpMemScript->GetAsNumber();
+			info.DamageMin = monster_node.attribute("DamageMin").as_int();
 
-			info.DamageMax = lpMemScript->GetAsNumber();
+			info.DamageMax = monster_node.attribute("DamageMax").as_int();
 
-			info.Defense = lpMemScript->GetAsNumber();
+			info.Defense = monster_node.attribute("Defense").as_int();
 
-			info.MagicDefense = lpMemScript->GetAsNumber();
+			info.MagicDefense = monster_node.attribute("MagicDefense").as_int();
 
-			info.AttackRate = lpMemScript->GetAsNumber();
+			info.AttackRate = monster_node.attribute("AttackRate").as_int();
 
-			info.DefenseRate = lpMemScript->GetAsNumber();
+			info.DefenseRate = monster_node.attribute("DefenseRate").as_int();
 
-			info.MoveRange = lpMemScript->GetAsNumber();
+			info.MoveRange = monster_node.attribute("MoveRange").as_int();
 
-			info.AttackType = lpMemScript->GetAsNumber();
+			info.AttackType = monster_node.attribute("AttackType").as_int();
 
-			info.AttackRange = lpMemScript->GetAsNumber();
+			info.AttackRange = monster_node.attribute("AttackRange").as_int();
 
-			info.ViewRange = lpMemScript->GetAsNumber();
+			info.ViewRange = monster_node.attribute("ViewRange").as_int();
 
-			info.MoveSpeed = lpMemScript->GetAsNumber();
+			info.MoveSpeed = monster_node.attribute("MoveSpeed").as_int();
 
-			info.AttackSpeed = lpMemScript->GetAsNumber();
+			info.AttackSpeed = monster_node.attribute("AttackSpeed").as_int();
 
-			info.RegenTime = lpMemScript->GetAsNumber();
+			info.RegenTime = monster_node.attribute("RegenTime").as_int();
 
-			info.Attribute = lpMemScript->GetAsNumber();
+			info.Attribute = monster_node.attribute("Attribute").as_int();
 
-			info.ItemRate = lpMemScript->GetAsNumber();
+			info.ItemRate = monster_node.attribute("ItemRate").as_int();
 
-			info.MoneyRate = lpMemScript->GetAsNumber();
+			info.MoneyRate = monster_node.attribute("MoneyRate").as_int();
 
-			info.MaxItemLevel = lpMemScript->GetAsNumber();
+			info.MaxItemLevel = monster_node.attribute("MaxItemLevel").as_int();
 
-			info.MonsterSkill = lpMemScript->GetAsNumber();
+			info.MonsterSkill = monster_node.attribute("MonsterSkill").as_int();
 
-			info.Resistance[0] = lpMemScript->GetAsNumber();
+			info.Resistance[0] = monster_node.attribute("Resistance0").as_int();
 
-			info.Resistance[1] = lpMemScript->GetAsNumber();
+			info.Resistance[1] = monster_node.attribute("Resistance1").as_int();
 
-			info.Resistance[2] = lpMemScript->GetAsNumber();
+			info.Resistance[2] = monster_node.attribute("Resistance2").as_int();
 
-			info.Resistance[3] = lpMemScript->GetAsNumber();
+			info.Resistance[3] = monster_node.attribute("Resistance3").as_int();
 
 			#if(GAMESERVER_UPDATE>=701)
 
-			info.ElementalAttribute = lpMemScript->GetAsNumber();
+			info.ElementalAttribute = monster_node.attribute("ElementalAttribute").as_int();
 
-			info.ElementalPattern = lpMemScript->GetAsNumber();
+			info.ElementalPattern = monster_node.attribute("ElementalPattern").as_int();
 
-			info.ElementalDefense = lpMemScript->GetAsNumber();
+			info.ElementalDefense = monster_node.attribute("ElementalDefense").as_int();
 
-			info.ElementalDamageMin = lpMemScript->GetAsNumber();
+			info.ElementalDamageMin = monster_node.attribute("ElementalDamageMin").as_int();
 
-			info.ElementalDamageMax = lpMemScript->GetAsNumber();
+			info.ElementalDamageMax = monster_node.attribute("ElementalDamageMax").as_int();
 
-			info.ElementalAttackRate = lpMemScript->GetAsNumber();
+			info.ElementalAttackRate = monster_node.attribute("ElementalAttackRate").as_int();
 
-			info.ElementalDefenseRate = lpMemScript->GetAsNumber();
+			info.ElementalDefenseRate = monster_node.attribute("ElementalDefenseRate").as_int();
 
 			#endif
 
@@ -180,12 +167,10 @@ void CMonsterManager::Load(char* path) // OK
 	}
 	catch(...)
 	{
-		ErrorMessageBox(lpMemScript->GetLastError());
+		ErrorMessageBox((char*)"Error parsing Monster.xml");
 	}
 
 	this->InitMonsterItem();
-
-	delete lpMemScript;
 }
 
 void CMonsterManager::SetInfo(MONSTER_INFO info) // OK

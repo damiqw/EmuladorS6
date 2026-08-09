@@ -34,6 +34,8 @@ void CreateItemTooltip(int item_t)
 }
 
 
+extern bool g_bRenderingItemDrop;
+
 void ShowInventoryGX::RenderItemName(int This, int Index, int o, int ItemLevel, int ItemOption, int ItemExtOption, bool Sort)
 {
 	if(gProtect.m_MainInfo.ItemTooltipDropType == 1)
@@ -43,11 +45,21 @@ void ShowInventoryGX::RenderItemName(int This, int Index, int o, int ItemLevel, 
 			return;
 		}
 	}
+	g_bRenderingItemDrop = true;
 	Render_ItemName(This, Index, o, ItemLevel, ItemOption, ItemExtOption, Sort);
+	g_bRenderingItemDrop = false;
 	CreateItemTooltip((int)&*(LPVOID*)0x81F6C00 + 848 * Index);
+}
+
+void ShowInventoryGX::RenderItemNameAuto(int This, int Index, int o, int ItemLevel, int ItemOption, int ItemExtOption, bool Sort)
+{
+	g_bRenderingItemDrop = true;
+	Render_ItemName(This, Index, o, ItemLevel, ItemOption, ItemExtOption, Sort);
+	g_bRenderingItemDrop = false;
 }
 
 void ShowInventoryGX::Init()
 {
 	SetCompleteHook(0xE8, 0x00842AC7, &ShowInventoryGX::RenderItemName);
+	SetCompleteHook(0xE8, 0x00842B8D, &ShowInventoryGX::RenderItemNameAuto);
 }

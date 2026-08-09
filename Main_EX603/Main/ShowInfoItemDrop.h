@@ -16,8 +16,8 @@ public:
 	ShowInventoryGX(void);
 	virtual ~ShowInventoryGX(void);
 	void Init();
-	static void RenderItemName(int Index, int o, int ItemLevel, int ItemOption, int a5, signed int ItemExtOption, bool Sort);
-
+	static void RenderItemName(int This, int Index, int o, int ItemLevel, int ItemOption, int ItemExtOption, bool Sort);
+	static void RenderItemNameAuto(int This, int Index, int o, int ItemLevel, int ItemOption, int ItemExtOption, bool Sort);
 };
 
 extern ShowInventoryGX g_ShowInventoryGX;

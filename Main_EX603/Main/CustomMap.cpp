@@ -46,7 +46,7 @@ char* CUIMapName::GetNameMap(int world)
 
 char* GetMapName(int iMap)
 {
-	switch (MapNumber)
+	switch (iMap)
 	{
 		case 0: return "Lorencia";
 		case 1: return "Dungeon";
@@ -172,7 +172,7 @@ char* GetMapName(int iMap)
 		case 144: return "Swamp of Doom";
 		default:
 			static char szUnknown[32];
-			wsprintf(szUnknown, "Unknown(%d)", MapNumber);
+			wsprintf(szUnknown, "Unknown(%d)", iMap);
 			return szUnknown;
 	}
 }

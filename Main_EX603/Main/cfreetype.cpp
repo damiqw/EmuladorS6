@@ -598,6 +598,9 @@ void cfreetype::RenderText(int iPos_x, int iPos_y, const char* pszText, int iBox
 		glColor4ub(__Red(m_ColoText2), __Green(m_ColoText2), __Blue(m_ColoText2), __Alpha(m_ColoText2));
 		RenderColor((RealBoxPos.x / g_fScreenRate_x), (RealBoxPos.y  / g_fScreenRate_y), (RealBoxSize.cx / g_fScreenRate_x), (RealBoxSize.cy / g_fScreenRate_y), 0.0, 0);
 		EndRenderColor();
+		
+		// Unbind texture so we don't break native GL_QUADS backgrounds that might be drawn after
+		cBindTexture(32000); 
 	}
 
 	int TextureWidth = 0;
@@ -959,6 +962,8 @@ void cfreetype::RenderTextBackground(int This, int iPos_x, int iPos_y, LPCSTR ps
 	}
 }
 
+bool g_bRenderingItemDrop = false;
+
 void cfreetype::RenderTextOriginal(int This, int iPos_x, int iPos_y, LPCSTR pszText, int iBoxWidth, int iBoxHeight, int iSort, OUT SIZE* lpTextSize)
 {
 	if ( *(DWORD *)(This + 4) )
@@ -970,7 +975,7 @@ void cfreetype::RenderTextOriginal(int This, int iPos_x, int iPos_y, LPCSTR pszT
 		}
 		else
 		{
-			cfreetype::Instance()->RenderText(iPos_x, iPos_y, pszText, iBoxWidth, iBoxHeight, iSort, lpTextSize);
+			cfreetype::Instance()->RenderText(iPos_x, iPos_y, pszText, iBoxWidth, iBoxHeight, iSort, lpTextSize, FALSE, g_bRenderingItemDrop);
 		}
 	}
 }

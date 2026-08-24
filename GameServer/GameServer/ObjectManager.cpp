@@ -1482,39 +1482,7 @@ void CObjectManager::CharacterCalcExperienceParty(LPOBJ lpObj,LPOBJ lpMonster,in
 
 	if(PartyCount == 0){return;}
 
-	int ExperienceRate = (((PartyClass>=3)?gServerInfo.m_PartySpecialExperience[(PartyCount-1)]:gServerInfo.m_PartyGeneralExperience[(PartyCount-1)])*PartyCount);
-
-	PartyLevel = TotalLevel/PartyCount;
-
-	int level = ((lpMonster->Level+25)*lpMonster->Level)/3;
-
-	if((lpMonster->Level+10) < PartyLevel)
-	{
-		level = (level*(lpMonster->Level+10))/PartyLevel;
-	}
-
-	if(lpMonster->Level >= 65)
-	{
-		if(PartyCount == 1)
-		{
-			level += (lpMonster->Level-64)*(lpMonster->Level/4);
-		}
-		else
-		{
-			if(gMasterSkillTree.CheckMasterLevel(lpObj) == 0)
-			{
-				level += (200-(lpObj->Level/5));
-			}
-			else
-			{
-				level += (200-((lpObj->Level+lpObj->MasterLevel)/5));
-			}
-		}
-	}
-
-	level = ((level<0)?0:level);
-
-	DWORD TotalExperience = level+(level/4);
+	int ExperienceRate = ((PartyClass>=3)?gServerInfo.m_PartySpecialExperience[(PartyCount-1)]:gServerInfo.m_PartyGeneralExperience[(PartyCount-1)]);
 
 	lpMonster->Money = 0;
 
@@ -1531,6 +1499,40 @@ void CObjectManager::CharacterCalcExperienceParty(LPOBJ lpObj,LPOBJ lpMonster,in
 		{
 			continue;
 		}
+
+		int level = ((lpMonster->Level+25)*lpMonster->Level)/3;
+
+		if(gMasterSkillTree.CheckMasterLevel(lpTarget) == 0)
+		{
+			level = (((lpMonster->Level+10)<lpTarget->Level)?((level*(lpMonster->Level+10))/lpTarget->Level):level);
+		}
+		else
+		{
+			level = (((lpMonster->Level+10)<(lpTarget->Level+lpTarget->MasterLevel))?((level*(lpMonster->Level+10))/(lpTarget->Level+lpTarget->MasterLevel)):level);
+		}
+
+		if(lpMonster->Level >= 65)
+		{
+			if(PartyCount == 1)
+			{
+				level += (lpMonster->Level-64)*(lpMonster->Level/4);
+			}
+			else
+			{
+				if(gMasterSkillTree.CheckMasterLevel(lpTarget) == 0)
+				{
+					level += (200-(lpTarget->Level/5));
+				}
+				else
+				{
+					level += (200-((lpTarget->Level+lpTarget->MasterLevel)/5));
+				}
+			}
+		}
+
+		level = ((level<0)?0:level);
+
+		DWORD TotalExperience = level+(level/4);
 
 		QWORD experience = 0;
 
@@ -1551,7 +1553,7 @@ void CObjectManager::CharacterCalcExperienceParty(LPOBJ lpObj,LPOBJ lpMonster,in
 				expserver = gServerInfo.m_AddExperienceRate[lpTarget->AccountLevel];
 			}
 
-			experience = ((((TotalExperience*ExperienceRate)*lpTarget->Level)/TotalLevel)/100)*expserver;
+			experience = ((TotalExperience*ExperienceRate)/100)*expserver;
 
 			experience = (experience*(lpTarget->ExperienceRate+lpTarget->EffectOption.AddExperienceRate+(lpTarget->EffectOption.AddPartyBonusExperienceRate*(PartyCount-1))))/100;
 
@@ -1565,7 +1567,7 @@ void CObjectManager::CharacterCalcExperienceParty(LPOBJ lpObj,LPOBJ lpMonster,in
 		}
 		else
 		{
-			experience = ((((TotalExperience*ExperienceRate)*(lpTarget->Level+lpTarget->MasterLevel))/TotalLevel)/100)*gServerInfo.m_AddMasterExperienceRate[lpTarget->AccountLevel];
+			experience = ((TotalExperience*ExperienceRate)/100)*gServerInfo.m_AddMasterExperienceRate[lpTarget->AccountLevel];
 
 			experience = (experience*(lpTarget->MasterExperienceRate+lpTarget->EffectOption.AddMasterExperienceRate+(lpTarget->EffectOption.AddPartyBonusExperienceRate*(PartyCount-1))))/100;
 

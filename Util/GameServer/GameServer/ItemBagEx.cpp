@@ -347,79 +347,78 @@ bool CItemBagEx::DropItem(LPOBJ lpObj,int map,int x,int y) // OK
 
 			ITEM_BAG_EX_DROP_INFO* lpItemBagDropInfo = 0;
 
-			if(RandomManager.GetRandomElement((int*)&lpItemBagDropInfo) == 0)
+			if(RandomManager.GetRandomElement((int*)&lpItemBagDropInfo) != 0)
 			{
-				continue;
-			}
+				int DropCount = (lpItemBagDropInfo->MinDropCount+(GetLargeRand() % ((lpItemBagDropInfo->MaxDropCount - lpItemBagDropInfo->MinDropCount)+1)));
 
-			int DropCount = (lpItemBagDropInfo->MinDropCount+(GetLargeRand() % ((lpItemBagDropInfo->MaxDropCount - lpItemBagDropInfo->MinDropCount)+1)));
-
-			for(int n = 0; n < DropCount; n++)
-			{
-				int px = x;
-				int py = y;
-
-				if(DropCount > 1 || it != this->m_ItemBagInfo.begin() || (gMap[map].CheckAttr(px,py,4) != 0 || gMap[map].CheckAttr(px,py,8) != 0))
+				for(int n = 0; n < DropCount; n++)
 				{
-					if(gObjGetRandomFreeLocation(map,&px,&py,2,2,10) == 0)
+					int px = x;
+					int py = y;
+
+					if(DropCount > 1 || it != this->m_ItemBagInfo.begin() || (gMap[map].CheckAttr(px,py,4) != 0 || gMap[map].CheckAttr(px,py,8) != 0))
 					{
-						px = lpObj->X;
-						py = lpObj->Y;
+						if(gObjGetRandomFreeLocation(map,&px,&py,2,2,10) == 0)
+						{
+							px = lpObj->X;
+							py = lpObj->Y;
+						}
 					}
+
+					if((GetLargeRand() % 10000) < lpItemBagDropInfo->SetDropRate || lpItemBagDropInfo->Section == -1)
+					{
+						gSetItemType.MakeRandomSetItem(lpObj->Index,map,px,py);
+						continue;
+					}
+
+					std::map<int,std::vector<ITEM_BAG_EX_ITEM_INFO>>::iterator ItemInfo = this->m_ItemBagItemInfo.find(lpItemBagDropInfo->Section);
+
+					if(ItemInfo == this->m_ItemBagItemInfo.end() || ItemInfo->second.empty() != 0)
+					{
+						continue;
+					}
+
+					ITEM_BAG_EX_ITEM_INFO* lpItemBagItemInfo = &ItemInfo->second[GetLargeRand() % ItemInfo->second.size()];
+
+					WORD ItemIndex = lpItemBagItemInfo->ItemIndex;
+					BYTE ItemLevel = lpItemBagItemInfo->Level;
+					BYTE ItemDur = lpItemBagItemInfo->Durability;
+					BYTE ItemOption1 = 0;
+					BYTE ItemOption2 = 0;
+					BYTE ItemOption3 = 0;
+					BYTE ItemNewOption = 0;
+					BYTE ItemSetOption = 0;
+					BYTE ItemSocketOption[MAX_SOCKET_OPTION] = { 0xFF,0xFF,0xFF,0xFF,0xFF };
+
+					gItemOptionRate.GetItemOption0(lpItemBagItemInfo->Option0,&ItemLevel);
+
+					gItemOptionRate.GetItemOption1(lpItemBagItemInfo->Option1,&ItemOption1);
+
+					gItemOptionRate.GetItemOption2(lpItemBagItemInfo->Option2,&ItemOption2);
+
+					gItemOptionRate.GetItemOption3(lpItemBagItemInfo->Option3,&ItemOption3);
+
+					gItemOptionRate.GetItemOption4(lpItemBagItemInfo->Option4,&ItemNewOption);
+
+					gItemOptionRate.GetItemOption5(lpItemBagItemInfo->Option5,&ItemSetOption);
+
+					gItemOptionRate.GetItemOption6(lpItemBagItemInfo->Option6,&ItemSocketOption[0]);
+
+					gItemOptionRate.MakeNewOption(ItemIndex,ItemNewOption,&ItemNewOption);
+
+					gItemOptionRate.MakeSetOption(ItemIndex,ItemSetOption,&ItemSetOption);
+
+					gItemOptionRate.MakeSocketOption(ItemIndex,ItemSocketOption[0],&ItemSocketOption[0]);
+
+					GDCreateItemSend(lpObj->Index,map,px,py,ItemIndex,ItemLevel,ItemDur,ItemOption1,ItemOption2,ItemOption3,lpObj->Index,ItemNewOption,ItemSetOption,0,0,ItemSocketOption,0xFF,((lpItemBagItemInfo->Duration>0)?((DWORD)time(0)+lpItemBagItemInfo->Duration):0));
 				}
-
-				if((GetLargeRand() % 10000) < lpItemBagDropInfo->SetDropRate || lpItemBagDropInfo->Section == -1)
-				{
-					gSetItemType.MakeRandomSetItem(lpObj->Index,map,px,py);
-					continue;
-				}
-
-				if((GetLargeRand() % 10000) >= it->second.m_ItemRate)
-				{
-					gMap[map].MoneyItemDrop(it->second.m_MoneyDrop,x,y);
-					continue;
-				}
-
-				std::map<int,std::vector<ITEM_BAG_EX_ITEM_INFO>>::iterator ItemInfo = this->m_ItemBagItemInfo.find(lpItemBagDropInfo->Section);
-
-				if(ItemInfo == this->m_ItemBagItemInfo.end() || ItemInfo->second.empty() != 0)
-				{
-					continue;
-				}
-
-				ITEM_BAG_EX_ITEM_INFO* lpItemBagItemInfo = &ItemInfo->second[GetLargeRand() % ItemInfo->second.size()];
-
-				WORD ItemIndex = lpItemBagItemInfo->ItemIndex;
-				BYTE ItemLevel = lpItemBagItemInfo->Level;
-				BYTE ItemDur = lpItemBagItemInfo->Durability;
-				BYTE ItemOption1 = 0;
-				BYTE ItemOption2 = 0;
-				BYTE ItemOption3 = 0;
-				BYTE ItemNewOption = 0;
-				BYTE ItemSetOption = 0;
-				BYTE ItemSocketOption[MAX_SOCKET_OPTION] = { 0xFF,0xFF,0xFF,0xFF,0xFF };
-
-				gItemOptionRate.GetItemOption0(lpItemBagItemInfo->Option0,&ItemLevel);
-
-				gItemOptionRate.GetItemOption1(lpItemBagItemInfo->Option1,&ItemOption1);
-
-				gItemOptionRate.GetItemOption2(lpItemBagItemInfo->Option2,&ItemOption2);
-
-				gItemOptionRate.GetItemOption3(lpItemBagItemInfo->Option3,&ItemOption3);
-
-				gItemOptionRate.GetItemOption4(lpItemBagItemInfo->Option4,&ItemNewOption);
-
-				gItemOptionRate.GetItemOption5(lpItemBagItemInfo->Option5,&ItemSetOption);
-
-				gItemOptionRate.GetItemOption6(lpItemBagItemInfo->Option6,&ItemSocketOption[0]);
-
-				gItemOptionRate.MakeNewOption(ItemIndex,ItemNewOption,&ItemNewOption);
-
-				gItemOptionRate.MakeSetOption(ItemIndex,ItemSetOption,&ItemSetOption);
-
-				gItemOptionRate.MakeSocketOption(ItemIndex,ItemSocketOption[0],&ItemSocketOption[0]);
-
-				GDCreateItemSend(lpObj->Index,map,px,py,ItemIndex,ItemLevel,ItemDur,ItemOption1,ItemOption2,ItemOption3,lpObj->Index,ItemNewOption,ItemSetOption,0,0,ItemSocketOption,0xFF,((lpItemBagItemInfo->Duration>0)?((DWORD)time(0)+lpItemBagItemInfo->Duration):0));
+			}
+		}
+		else
+		{
+			if(it->second.m_MoneyDrop > 0)
+			{
+				gMap[map].MoneyItemDrop(it->second.m_MoneyDrop,x,y);
 			}
 		}
 

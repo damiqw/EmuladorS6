@@ -294,14 +294,19 @@ void CInvasionManager::MainProc() // OK
 				break;
 		}
 #if(INFO_EVENTINVASION)
-	for (int n = OBJECT_START_USER; n < MAX_OBJECT; n++)
+	if (this->GetTickCountInvasionActive + 1000 < GetTickCount())
 	{
-		if (gObjIsConnected(n) != 0 && gObj[n].Type == OBJECT_USER)
+		this->GetTickCountInvasionActive = GetTickCount();
+
+		for (int n = OBJECT_START_USER; n < MAX_OBJECT; n++)
 		{
-			if (gObj[n].Connected > OBJECT_LOGGED)
+			if (gObjIsConnected(n) != 0 && gObj[n].Type == OBJECT_USER)
 			{
-				LPOBJ lpObj = &gObj[n];
-				this->SendMain(lpObj);
+				if (gObj[n].Connected > OBJECT_LOGGED)
+				{
+					LPOBJ lpObj = &gObj[n];
+					this->SendMain(lpObj);
+				}
 			}
 		}
 	}
@@ -809,32 +814,27 @@ void CInvasionManager::ForceStart(int index) // OK
 
 void CInvasionManager::SendMain(LPOBJ lpObj)
 {
-	if (this->GetTickCountInvasionActive + 1000 < GetTickCount())
+	PMSG_INVASION_INFO pMsg;
+	memset(&pMsg, 0, sizeof(pMsg));
+	pMsg.h.set((LPBYTE)&pMsg, 0xFA, 0xF8, sizeof(pMsg));
+	int tmp = 0;
+	for (int n = 0; n < MAX_INVASION; n++)
 	{
-		PMSG_INVASION_INFO pMsg;
-		memset(&pMsg, 0, sizeof(pMsg));
-		pMsg.h.set((LPBYTE)&pMsg, 0xFA, 0xF8, sizeof(pMsg));
-		int tmp = 0;
-		for (int n = 0; n < MAX_INVASION; n++)
+		INVASION_INFO* lpInfo = &this->m_InvasionInfo[n];
+		pMsg.Info[n].Index = lpInfo->Index;
+		pMsg.Info[n].State = lpInfo->State;
+		pMsg.Info[n].RemainTime = lpInfo->RemainTime;
+
+		memcpy(pMsg.Info[n].NameInvasion, lpInfo->AlertMessage, 128);
+
+		if (lpInfo->State == 2)
 		{
-			INVASION_INFO* lpInfo = &this->m_InvasionInfo[n];
-			pMsg.Info[n].Index = lpInfo->Index;
-			pMsg.Info[n].State = lpInfo->State;
-			pMsg.Info[n].RemainTime = lpInfo->RemainTime;
-
-			memcpy(pMsg.Info[n].NameInvasion, lpInfo->AlertMessage, 128);
-
-			if (lpInfo->State == 2)
-			{
-				pMsg.Info[n].Page = tmp;
-				tmp++;
-			}
+			pMsg.Info[n].Page = tmp;
+			tmp++;
 		}
-
-		DataSend(lpObj->Index, (LPBYTE)&pMsg, sizeof(pMsg));
-
-		this->GetTickCountInvasionActive = GetTickCount();
 	}
+
+	DataSend(lpObj->Index, (LPBYTE)&pMsg, sizeof(pMsg));
 }
 
 void CInvasionManager::SendMonter(int aIndex, EVENT_INVASION_ACTION* aRecv)

@@ -719,22 +719,19 @@ void HookRenderItemToolTip(int a1)
 		{
 			uniqId = item->UniqueID + 0x20000000;
 		}
-		//
-		// CTRL + Right Click (block equip / block move)
-		if ((GetKeyState(VK_RBUTTON) & 0x8000) && (GetKeyState(VK_CONTROL) & 0x8000))
+		// CTRL + Click (Post Item link to chat)
+		if ((GetKeyState(VK_CONTROL) & 0x8000) && ((GetKeyState(VK_RBUTTON) & 0x8000) || (GetKeyState(VK_LBUTTON) & 0x8000)))
 		{
 			JCItemPublic.PostItemProc(uniqId); // your link item function
 			return; // IMPORTANT: block default MU behavior
 		}
-
 		else
 		{
-			// === Right click = Jewel Bank ===
-			if (GetKeyState(VK_RBUTTON) & 0x8000 && GetKeyState(VK_SHIFT) & 0x8000)
+			// === SHIFT + Right Click = Jewel Bank ===
+			if ((GetKeyState(VK_RBUTTON) & 0x8000) && (GetKeyState(VK_SHIFT) & 0x8000))
 			{
 				// panel: normal / expanded / 2nd inventory
 				int panel = *(DWORD*)(a1 + 44);
-
 
 				if (panel == 200 || panel == 44 || panel == 131)
 				{

@@ -93,7 +93,7 @@ void InvetoryItemOver(int This)
 
 void CCustomJewelBank::Load()
 {
-	SetCompleteHook(0xE8, 0x007DD0D9, &InvetoryItemOver);
+	// SetCompleteHook(0xE8, 0x007DD0D9, &InvetoryItemOver); // Handled in post_item.cpp (HookRenderItemToolTip)
 }
 
 

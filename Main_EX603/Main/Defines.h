@@ -41,6 +41,13 @@
 #define HDK_NEXT_ITEM_COLOR 0x0057AF2E //0x0052B150
 #define MAIN_LANGUAGE 0x00E8C5C4
 #define VK_N 0x4E
+#define VK_H 0x48
+#ifndef SceneFlag
+#define SceneFlag *(int*)0x0E609E8
+#endif
+#ifndef MAIN_SCENE
+#define MAIN_SCENE 5
+#endif
 #define VK_R 0x52
 #define VK_O 0x4F
 #define VK_W 0x57

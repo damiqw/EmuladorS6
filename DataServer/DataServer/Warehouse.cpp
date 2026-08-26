@@ -34,7 +34,14 @@ void CWarehouse::GDWarehouseItemRecv(SDHP_WAREHOUSE_ITEM_RECV* lpMsg,int index) 
 
 	memcpy(pMsg.account,lpMsg->account,sizeof(pMsg.account));
 
-	if (gQueryManager.ExecQuery("SELECT * FROM MEMB_INFO WHERE memb___id='%s'", lpMsg->account) == 0 || gQueryManager.Fetch() == SQL_NO_DATA)
+	if (gQueryManager.ExecQuery("SELECT * FROM MEMB_INFO WHERE memb___id='%s'", lpMsg->account) == 0)
+	{
+		gQueryManager.Close();
+		LogAdd(LOG_RED, "[Warehouse Error] MEMB_INFO Query Failed for Account: %s", lpMsg->account);
+		return;
+	}
+
+	if (gQueryManager.Fetch() == SQL_NO_DATA)
 	{
 		gQueryManager.Close();
 	}
@@ -47,13 +54,26 @@ void CWarehouse::GDWarehouseItemRecv(SDHP_WAREHOUSE_ITEM_RECV* lpMsg,int index) 
 
 	if(lpMsg->WarehouseNumber == 0)
 	{
-		if(gQueryManager.ExecQuery("SELECT AccountID FROM warehouse WHERE AccountID='%s'",lpMsg->account) == 0 || gQueryManager.Fetch() == SQL_NO_DATA)
+		if(gQueryManager.ExecQuery("SELECT AccountID FROM warehouse WHERE AccountID='%s'",lpMsg->account) == 0)
 		{
 			gQueryManager.Close();
-			gQueryManager.ExecQuery("INSERT INTO warehouse (AccountID,Money,EndUseDate,DbVersion) VALUES ('%s',0,getdate(),3)",lpMsg->account);
+			LogAdd(LOG_RED, "[Warehouse Error] SELECT warehouse AccountID Query Failed for Account: %s", lpMsg->account);
+			return;
+		}
+
+		if(gQueryManager.Fetch() == SQL_NO_DATA)
+		{
 			gQueryManager.Close();
-			gQueryManager.ExecQuery("UPDATE warehouse SET Items=CONVERT(varbinary(%d),REPLICATE(char(0xFF),%d)) WHERE AccountID='%s'",sizeof(pMsg.WarehouseItem),sizeof(pMsg.WarehouseItem),lpMsg->account);
-			gQueryManager.Close();
+			if(gQueryManager.ExecQuery("INSERT INTO warehouse (AccountID,Money,EndUseDate,DbVersion) VALUES ('%s',0,getdate(),3)",lpMsg->account) != 0)
+			{
+				gQueryManager.Close();
+				gQueryManager.ExecQuery("UPDATE warehouse SET Items=CONVERT(varbinary(%d),REPLICATE(char(0xFF),%d)) WHERE AccountID='%s'",sizeof(pMsg.WarehouseItem),sizeof(pMsg.WarehouseItem),lpMsg->account);
+				gQueryManager.Close();
+			}
+			else
+			{
+				gQueryManager.Close();
+			}
 			this->DGWarehouseFreeSend(index,lpMsg->index,lpMsg->account);
 			return;
 		}
@@ -61,7 +81,14 @@ void CWarehouse::GDWarehouseItemRecv(SDHP_WAREHOUSE_ITEM_RECV* lpMsg,int index) 
 		{
 			gQueryManager.Close();
 
-			if(gQueryManager.ExecQuery("SELECT Items,Money,pw FROM warehouse WHERE AccountID='%s'",lpMsg->account) == 0 || gQueryManager.Fetch() == SQL_NO_DATA)
+			if(gQueryManager.ExecQuery("SELECT Items,Money,pw FROM warehouse WHERE AccountID='%s'",lpMsg->account) == 0)
+			{
+				gQueryManager.Close();
+				LogAdd(LOG_RED, "[Warehouse Error] SELECT warehouse Items Query Failed for Account: %s", lpMsg->account);
+				return;
+			}
+
+			if(gQueryManager.Fetch() == SQL_NO_DATA)
 			{
 				gQueryManager.Close();
 
@@ -85,13 +112,26 @@ void CWarehouse::GDWarehouseItemRecv(SDHP_WAREHOUSE_ITEM_RECV* lpMsg,int index) 
 	}
 	else
 	{
-		if(gQueryManager.ExecQuery("SELECT AccountID FROM ExtWarehouse WHERE AccountID='%s' AND Number=%d",lpMsg->account,lpMsg->WarehouseNumber) == 0 || gQueryManager.Fetch() == SQL_NO_DATA)
+		if(gQueryManager.ExecQuery("SELECT AccountID FROM ExtWarehouse WHERE AccountID='%s' AND Number=%d",lpMsg->account,lpMsg->WarehouseNumber) == 0)
 		{
 			gQueryManager.Close();
-			gQueryManager.ExecQuery("INSERT INTO ExtWarehouse (AccountID,Money,Number) VALUES ('%s',0,%d)",lpMsg->account,lpMsg->WarehouseNumber);
+			LogAdd(LOG_RED, "[ExtWarehouse Error] SELECT ExtWarehouse AccountID Query Failed for Account: %s (Vault %d)", lpMsg->account, lpMsg->WarehouseNumber);
+			return;
+		}
+
+		if(gQueryManager.Fetch() == SQL_NO_DATA)
+		{
 			gQueryManager.Close();
-			gQueryManager.ExecQuery("UPDATE ExtWarehouse SET Items=CONVERT(varbinary(%d),REPLICATE(char(0xFF),%d)) WHERE AccountID='%s' AND Number=%d",sizeof(pMsg.WarehouseItem),sizeof(pMsg.WarehouseItem),lpMsg->account,lpMsg->WarehouseNumber);
-			gQueryManager.Close();
+			if(gQueryManager.ExecQuery("INSERT INTO ExtWarehouse (AccountID,Money,Number) VALUES ('%s',0,%d)",lpMsg->account,lpMsg->WarehouseNumber) != 0)
+			{
+				gQueryManager.Close();
+				gQueryManager.ExecQuery("UPDATE ExtWarehouse SET Items=CONVERT(varbinary(%d),REPLICATE(char(0xFF),%d)) WHERE AccountID='%s' AND Number=%d",sizeof(pMsg.WarehouseItem),sizeof(pMsg.WarehouseItem),lpMsg->account,lpMsg->WarehouseNumber);
+				gQueryManager.Close();
+			}
+			else
+			{
+				gQueryManager.Close();
+			}
 			this->DGWarehouseFreeSend(index,lpMsg->index,lpMsg->account);
 			return;
 		}
@@ -99,7 +139,14 @@ void CWarehouse::GDWarehouseItemRecv(SDHP_WAREHOUSE_ITEM_RECV* lpMsg,int index) 
 		{
 			gQueryManager.Close();
 
-			if(gQueryManager.ExecQuery("SELECT Items,Money FROM ExtWarehouse WHERE AccountID='%s' AND Number=%d",lpMsg->account,lpMsg->WarehouseNumber) == 0 || gQueryManager.Fetch() == SQL_NO_DATA)
+			if(gQueryManager.ExecQuery("SELECT Items,Money FROM ExtWarehouse WHERE AccountID='%s' AND Number=%d",lpMsg->account,lpMsg->WarehouseNumber) == 0)
+			{
+				gQueryManager.Close();
+				LogAdd(LOG_RED, "[ExtWarehouse Error] SELECT ExtWarehouse Items Query Failed for Account: %s (Vault %d)", lpMsg->account, lpMsg->WarehouseNumber);
+				return;
+			}
+
+			if(gQueryManager.Fetch() == SQL_NO_DATA)
 			{
 				gQueryManager.Close();
 
@@ -115,7 +162,14 @@ void CWarehouse::GDWarehouseItemRecv(SDHP_WAREHOUSE_ITEM_RECV* lpMsg,int index) 
 
 				gQueryManager.Close();
 
-				if(gQueryManager.ExecQuery("SELECT pw FROM warehouse WHERE AccountID='%s'",lpMsg->account) == 0 || gQueryManager.Fetch() == SQL_NO_DATA)
+				if(gQueryManager.ExecQuery("SELECT pw FROM warehouse WHERE AccountID='%s'",lpMsg->account) == 0)
+				{
+					gQueryManager.Close();
+					LogAdd(LOG_RED, "[Warehouse Error] SELECT warehouse pw Query Failed for Account: %s", lpMsg->account);
+					return;
+				}
+
+				if(gQueryManager.Fetch() == SQL_NO_DATA)
 				{
 					gQueryManager.Close();
 

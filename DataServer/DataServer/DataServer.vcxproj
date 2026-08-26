@@ -73,7 +73,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_EX603|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>C:\Users\ivan\Desktop\Fuente LEGADO-4.3\SOURCE 4.3\DataServer\Release</OutDir>
+    <OutDir>..\Release</OutDir>
     <IntDir>Release\DataServer_EX603\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_EX401|Win32'">

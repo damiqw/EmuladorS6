@@ -18,6 +18,7 @@
 #include "MapManager.h"
 #include "RuneEffect.h"
 #include "Util.h"
+#include "CustomItemColor.h"
 #if(HAISLOTRING)
 #include "NewUIMyInventory.h"
 #endif
@@ -734,6 +735,8 @@ void CViewport::GCViewportPlayerSend(int aIndex) // OK
 		size += InfoSize;
 
 		pMsg.count++;
+
+		gCustomItemColor.SendViewportItemColor(lpTarget, aIndex);
 	}
 
 	if(pMsg.count > 0)

@@ -17,6 +17,7 @@
 #include "CustomRankUser.h"
 #include "CustomStore.h"
 #include "CustomWing.h"
+#include "CustomItemColor.h"
 #include "ESProtocol.h"
 #include "EventInventory.h"
 #include "Filter.h"
@@ -506,6 +507,14 @@ void DataServerProtocolCore(BYTE head,BYTE* lpMsg,int size) // OK
 			break;
 		case 0x50:
 			gCustomMonsterKillCount.DGMonsterKillCountRecv((SDHP_MONSTER_KILL_COUNT_RECV*)lpMsg);
+			break;
+		case 0xED:
+			switch (((lpMsg[0] == 0xC1) ? lpMsg[3] : lpMsg[4]))
+			{
+				case 0x00:
+					gCustomItemColor.GDItemColorLoadRecv((SDHP_CUSTOM_ITEM_COLOR_LOAD_RECV*)lpMsg);
+					break;
+			}
 			break;
 		case 0x72:
 			DGGlobalWhisperRecv((SDHP_GLOBAL_WHISPER_RECV*)lpMsg);
@@ -1401,6 +1410,8 @@ void DGCharacterInfoRecv(SDHP_CHARACTER_INFO_RECV* lpMsg) // OK
 	gSkillManager.SkillChangeUse(lpObj->Index);
 
 	gObjViewportListProtocolCreate(lpObj);
+
+	gCustomItemColor.DGItemColorLoadSend(lpObj->Index);
 
 	gObjectManager.CharacterUpdateMapEffect(lpObj);
 

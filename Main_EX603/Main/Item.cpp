@@ -18,11 +18,14 @@
 #include "Protect.h"
 #include "ItemShopValue.h"
 #include "CustomFlag.h"
+#include "CustomItemColor.h"
 
 cItem gItem;
 
 void InitItem() // OK
 {
+	gCustomItemColor.InstallRenderHooks();
+
 	SetCompleteHook(0xFF,0x00633FCB,&ItemModelLoad);
 
 	SetCompleteHook(0xFF,0x00633FE3,&ItemTextureLoad);
@@ -157,12 +160,49 @@ void InitWing() // OK
 
 DWORD pItemType = 0;
 DWORD Item = 0;
+static DWORD s_pCharAddress = 0;
+static bool s_CustomDyeActive = false;
+static float s_CustomDyeR = 1.0f;
+static float s_CustomDyeG = 1.0f;
+static float s_CustomDyeB = 1.0f;
+
+bool CheckCustomItemDye(DWORD pCharAddr, DWORD itemType)
+{
+	if (!pCharAddr)
+	{
+		return false;
+	}
+
+	float customColor[3];
+	if (gCustomItemColor.GetCharacterSlotColor((ObjectPreview*)pCharAddr, (int)itemType, customColor))
+	{
+		s_CustomDyeR = customColor[0];
+		s_CustomDyeG = customColor[1];
+		s_CustomDyeB = customColor[2];
+		return true;
+	}
+
+	return false;
+}
 
 __declspec(naked) void SetItemEffect()
 {
 	__asm
 	{
 		Mov pItemType, Eax
+		Mov Eax, Dword Ptr Ss:[Ebp+0x08]
+		Mov s_pCharAddress, Eax
+	}
+
+	s_CustomDyeActive = CheckCustomItemDye(s_pCharAddress, pItemType);
+
+	if (s_CustomDyeActive)
+	{
+		__asm
+		{
+			Mov Esi, HDK_ITEM_EFFECT_ALLOW
+			JMP Esi
+		}
 	}
 
 	Item = gSmokeEffect.GetItemID(pItemType);
@@ -197,6 +237,25 @@ float BlueColor = 255.0;
 
 __declspec(naked) void SetColorEffect()
 {
+	if (s_CustomDyeActive)
+	{
+		s_CustomDyeActive = false;
+		__asm
+		{
+			MOV EAX, DWORD PTR SS:[EBP+0xC]
+			FLD DWORD PTR DS:[s_CustomDyeR]
+			FSTP DWORD PTR DS:[EAX+0x9C]
+			MOV ECX, DWORD PTR SS:[EBP+0xC]
+			FLD DWORD PTR DS:[s_CustomDyeG]
+			FSTP DWORD PTR DS:[ECX+0xA0]
+			MOV EDX, DWORD PTR SS:[EBP+0xC]
+			FLD DWORD PTR DS:[s_CustomDyeB]
+			FSTP DWORD PTR DS:[EDX+0xA4]
+			Mov Esi, HDK_NEXT_ITEM_COLOR
+			JMP Esi
+		}
+	}
+
 	__asm
 	{
 		Mov pItemType, Edx
@@ -413,7 +472,41 @@ void LoadItemTexture(int index,char* folder,char* name,int value) // OK
 
 void GetItemColor(DWORD a,DWORD b,DWORD c,DWORD d,DWORD e) // OK
 {
-	if(gCustomItem.GetCustomItemColor((a - ITEM_BASE_MODEL),(float*)d) == 0)
+	int itemIndex = a - ITEM_BASE_MODEL;
+
+	// 1. Live preview when Master Color Studio is open:
+	if (gCustomItemColor.IsWindowOpen() && gCustomItemColor.m_SelectedSlot != 255)
+	{
+		if (g_pCurrentRenderingPreview == NULL || g_pCurrentRenderingPreview == (ObjectPreview*)oUserPreviewStruct || (gObjUser.lpViewPlayer && g_pCurrentRenderingPreview == gObjUser.lpViewPlayer))
+		{
+			int selectedItem = gCustomItemColor.m_SelectedItemIndex;
+			if (itemIndex == selectedItem || (itemIndex - ITEM_INTER) == selectedItem || (int)a == selectedItem || itemIndex == (selectedItem + ITEM_INTER))
+			{
+				float* pColor = (float*)d;
+				pColor[0] = (float)(gCustomItemColor.m_ColorR / 255.0f);
+				pColor[1] = (float)(gCustomItemColor.m_ColorG / 255.0f);
+				pColor[2] = (float)(gCustomItemColor.m_ColorB / 255.0f);
+				return;
+			}
+		}
+	}
+
+	// 2. Exact Per-Character Dye Matching:
+	if (g_pCurrentRenderingPreview != NULL)
+	{
+		float customColor[3];
+		if (gCustomItemColor.GetCharacterSlotColor(g_pCurrentRenderingPreview, (int)a, customColor))
+		{
+			float* pColor = (float*)d;
+			pColor[0] = customColor[0];
+			pColor[1] = customColor[1];
+			pColor[2] = customColor[2];
+			return;
+		}
+	}
+
+	// 3. Fallback to static custom items:
+	if(gCustomItem.GetCustomItemColor(itemIndex,(float*)d) == 0)
 	{
 		((void(*)(DWORD,DWORD,DWORD,DWORD,DWORD))0x005F8C50)(a,b,c,d,e);
 	}

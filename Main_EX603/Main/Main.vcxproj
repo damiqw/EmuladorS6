@@ -120,6 +120,7 @@
     <ClInclude Include="CustomFlag.h" />
     <ClInclude Include="cfreetype.h" />
     <ClInclude Include="CustomJewelBank.h" />
+    <ClInclude Include="CustomItemColor.h" />
     <ClInclude Include="CustomRanking.h" />
     <ClInclude Include="DailyReward.h" />
     <ClInclude Include="discord.h" />
@@ -292,6 +293,7 @@
     <ClCompile Include="CustomItem.cpp" />
     <ClCompile Include="CustomJewel.cpp" />
     <ClCompile Include="CustomJewelBank.cpp" />
+    <ClCompile Include="CustomItemColor.cpp" />
     <ClCompile Include="CustomMap.cpp" />
     <ClCompile Include="CustomMessage.cpp" />
     <ClCompile Include="CustomModelEffect.cpp" />

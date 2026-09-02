@@ -42,6 +42,7 @@
 #include "DailyReward.h"
 #include "ThueFlag.h"
 #include "CustomRanking.h"
+#include "CustomItemColor.h"
 
 #if(LuckyWheelV2)
 VONGQUAYINFO_CLIENT mDataVongQuayClient;
@@ -166,6 +167,20 @@ BOOL ProtocolCoreEx(BYTE head,BYTE* lpMsg,int size,int key) // OK
 			{
 				case 0x03:
 					gMiniMap.RecvMiniMapInfo((MINIMAP_INFO_RECV*)lpMsg);
+					return 1;
+			}
+			break;
+		case 0xEF:
+			switch (((lpMsg[0] == 0xC1) ? lpMsg[3] : lpMsg[4]))
+			{
+				case 0x10:
+					gCustomItemColor.RecvNpcOpen((PMSG_CUSTOM_ITEM_COLOR_NPC_OPEN_RECV*)lpMsg);
+					return 1;
+				case 0x12:
+					gCustomItemColor.RecvAnswer((PMSG_CUSTOM_ITEM_COLOR_ANS_RECV*)lpMsg);
+					return 1;
+				case 0x13:
+					gCustomItemColor.RecvViewportSync((PMSG_VIEWPORT_CUSTOM_ITEM_COLOR_RECV*)lpMsg);
 					return 1;
 			}
 			break;

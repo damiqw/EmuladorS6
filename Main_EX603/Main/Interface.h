@@ -238,6 +238,7 @@ enum ObjectID
 	CharacterSelect_Button4,
 	CharacterSelect_Button5,
 	eJewelBank_WITHDRAW,
+	eITEMCOLOR_MAIN,
 
 	OBJECT_PARTYSETTINGS_MAIN = eJewelBank_WITHDRAW + 150,
 	OBJECT_PARTYSETTINGS_TITLE,

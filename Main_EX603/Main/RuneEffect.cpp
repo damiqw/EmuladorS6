@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "RuneEffect.h"
+#include "CustomItemColor.h"
 #include "Object.h"
 #include "Import.h"
 #include "Defines.h"
@@ -100,9 +101,9 @@ void RenderCharacter(ObjectPreview* a4, OBJECT* a5, int Select)
 			else if (*(BYTE*)(v6 + 780) && *(BYTE*)(v6 + 788))
 			{
 				if (i == *(DWORD*)0xE61730 || i == *(DWORD*)0xE6172C)
-					pDrawViewPort(v6, v5, 1);
+					HookDrawViewPort(v6, v5, 1);
 				else
-					pDrawViewPort(v6, v5, 0);
+					HookDrawViewPort(v6, v5, 0);
 
 				if (*(DWORD*)(v6 + 824) == MODEL_PLAYER)
 				{

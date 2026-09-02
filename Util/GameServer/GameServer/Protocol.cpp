@@ -14,6 +14,7 @@
 #include "CustomExchangeCoin.h"
 #include "CustomMove.h"
 #include "CustomStore.h"
+#include "CustomItemColor.h"
 #include "Crywolf.h"
 #include "CSProtocol.h"
 #include "DarkSpirit.h"
@@ -933,47 +934,6 @@ void ProtocolCore(BYTE head,BYTE* lpMsg,int size,int aIndex,int encrypt,int seri
 					#endif
 					break;
 				case 0x06:
-					#if(GAMESERVER_UPDATE>=801)
-					gGuildMatching.CGGuildMatchingJoinAcceptRecv((PMSG_GUILD_MATCHING_JOIN_ACCEPT_RECV*)lpMsg,aIndex);
-					#endif
-					break;
-				case 0x07:
-					#if(GAMESERVER_UPDATE>=801)
-					gGuildMatching.CGGuildMatchingJoinListRecv((PMSG_GUILD_MATCHING_JOIN_LIST_RECV*)lpMsg,aIndex);
-					#endif
-					break;
-				case 0x08:
-					#if(GAMESERVER_UPDATE>=801)
-					gGuildMatching.CGGuildMatchingJoinInfoRecv((PMSG_GUILD_MATCHING_JOIN_INFO_RECV*)lpMsg,aIndex);
-					#endif
-					break;
-			}
-			break;
-		case 0xEE:
-			g_RuudTokenSellTemplate._RecvRuudBUY((PMSG_BUY_ITEMRUUD_RECV*)lpMsg, aIndex);
-			break;
-		case 0xEF:
-			switch(lpMsg[3])
-			{
-				case 0x00:
-					#if(GAMESERVER_UPDATE>=801)
-					gPartyMatching.CGPartyMatchingInsertRecv((PMSG_PARTY_MATCHING_INSERT_RECV*)lpMsg,aIndex);
-					#endif
-					break;
-				case 0x01:
-					#if(GAMESERVER_UPDATE>=801)
-					gPartyMatching.CGPartyMatchingListRecv((PMSG_PARTY_MATCHING_LIST_RECV*)lpMsg,aIndex);
-					#endif
-					break;
-				case 0x02:
-					#if(GAMESERVER_UPDATE>=801)
-					gPartyMatching.CGPartyMatchingJoinInsertRecv((PMSG_PARTY_MATCHING_JOIN_INSERT_RECV*)lpMsg,aIndex);
-					#endif
-					break;
-				case 0x03:
-					#if(GAMESERVER_UPDATE>=801)
-					gPartyMatching.CGPartyMatchingJoinInfoRecv((PMSG_PARTY_MATCHING_JOIN_INFO_RECV*)lpMsg,aIndex);
-					#endif
 					break;
 				case 0x04:
 					#if(GAMESERVER_UPDATE>=801)

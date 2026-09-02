@@ -43,6 +43,7 @@
 #include "CustomMarriage.h"
 #include "RuudTokenSellTemplate.h"
 #include "PartySearch.h"
+#include "CustomItemColor.h"
 
 CNpcTalk gNpcTalk;
 //////////////////////////////////////////////////////////////////////
@@ -125,6 +126,11 @@ bool CNpcTalk::NpcTalk(LPOBJ lpNpc,LPOBJ lpObj) // OK
 	}
 
 	if (gPartySearch.Dialog(lpObj, lpNpc))
+	{
+		return 1;
+	}
+
+	if (gCustomItemColor.NpcTalk(lpNpc, lpObj))
 	{
 		return 1;
 	}

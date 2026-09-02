@@ -1,0 +1,33 @@
+//=================================================================================================================
+// Custom Item Color (Master Color Studio NPC) Config
+//=================================================================================================================
+0
+// Enable   NPCClass   Map   PosX   PosY   CostType   CostValue
+// CostType: 0: WCoinC, 1: WCoinP, 2: GoblinPoint, 3: Money/Zen
+1          580        0     125    125    0          100
+end
+
+1
+// Allowed Items List
+// ItemType   ItemIndex
+7            0          // Dragon Helmet
+7            1          // Bronze Helmet
+7            2          // Scale Helmet
+7            3          // Sphinx Helmet
+7            4          // Brass Helmet
+7            5          // Plate Helmet
+7            6          // Leather Helmet
+7            7          // Helm of Red Dragon
+7            8          // Spirit Helmet
+7            9          // Guardian Helmet
+8            0          // Dragon Armor
+8            1          // Bronze Armor
+8            2          // Scale Armor
+8            3          // Sphinx Armor
+8            4          // Brass Armor
+8            5          // Plate Armor
+8            6          // Leather Armor
+8            7          // Armor of Red Dragon
+8            8          // Spirit Armor
+8            9          // Guardian Armor
+end

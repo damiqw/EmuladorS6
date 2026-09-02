@@ -21,6 +21,7 @@
 #include "EventInvasion.h"
 #include "InterfaceElemental.h"
 #include "CustomFont.h"
+#include "CustomItemColor.h"
 #include "SEASON3B.h"
 #include "Warehouse.h"
 #include "Item.h"
@@ -337,6 +338,7 @@ void Interface::Load()
 	this->BindObject(eTrash_NO, 0x7B0C, 54, 30, -1, -1);
 
 	this->BindObject(eJewelBank_MAIN, 0x7A5A, 222, 300, -1, -1);
+	this->BindObject(eITEMCOLOR_MAIN, 0x7A5A, 222, 300, -1, -1);
 	this->BindObject(eJewelBank_TITLE, 0x7A63, 230, 67, -1, -1);
 	this->BindObject(eJewelBank_FRAME, 0x7A58, 230, 15, -1, -1);
 	this->BindObject(eJewelBank_FOOTER, 0x7A59, 230, 50, -1, -1);
@@ -863,6 +865,8 @@ void Interface::Work()
 	{
 		gCustomJewelBank.DrawJewelBankWindow();
 	}
+
+	gCustomItemColor.DrawWindow();
 
 #if(MAP_USAGE)
 	gInterface.DrawTimeUseMap();

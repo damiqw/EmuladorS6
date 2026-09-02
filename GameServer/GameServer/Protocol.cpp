@@ -16,6 +16,7 @@
 #include "CustomMove.h"
 #include "CustomStore.h"
 #include "PartySearch.h"
+#include "CustomItemColor.h"
 #include "Crywolf.h"
 #include "CSProtocol.h"
 #include "DarkSpirit.h"
@@ -957,6 +958,9 @@ void ProtocolCore(BYTE head,BYTE* lpMsg,int size,int aIndex,int encrypt,int seri
 		case 0xEF:
 			switch(lpMsg[3])
 			{
+				case 0x10:
+					gCustomItemColor.CGItemColorRecv((PMSG_CUSTOM_ITEM_COLOR_REQ*)lpMsg, aIndex);
+					break;
 				case 0x00:
 					#if(GAMESERVER_UPDATE>=801)
 					gPartyMatching.CGPartyMatchingInsertRecv((PMSG_PARTY_MATCHING_INSERT_RECV*)lpMsg,aIndex);

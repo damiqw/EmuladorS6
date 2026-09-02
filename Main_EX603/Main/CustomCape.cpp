@@ -8,6 +8,7 @@
 #include "Item.h"
 #include "CustomCloak.h"
 #include "CustomModelEffect.h"
+#include "CustomItemColor.h"
 #include "Import.h"
 
 CCapeAnimation gCapeAnimation;
@@ -91,7 +92,7 @@ void CCapeAnimation::DrawViewPort(DWORD ObjectPointer, DWORD ObjectModel, DWORD 
 	
 	gCustomModelEffect.ModelEffectRender(ObjectPointer, ObjectModel,  a3);
 
-	pDrawViewPort(ObjectPointer, ObjectModel,  a3);
+	HookDrawViewPort(ObjectPointer, ObjectModel,  a3);
 
 	//RenderMonsterEffectMesh(ObjectPointer, ObjectModel, a3);
 	//CRenderCharacter(ObjectPointer, ObjectModel, a3);

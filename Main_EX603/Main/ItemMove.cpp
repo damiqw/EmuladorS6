@@ -5,6 +5,7 @@
 #include "Item.h"
 #include "Util.h"
 #include "Import.h"
+#include "CustomItemColor.h"
 
 bool ItemMove = false;
 int SourceFlag = -1;
@@ -52,6 +53,32 @@ void RightClickMoveItem()
 	if (!ppMousePress(VK_RBUTTON) || PickedItem || ItemMove)
 	{
 		return;
+	}
+
+	if (gCustomItemColor.IsWindowOpen())
+	{
+		DWORD InventoryCtrl = -1;
+		DWORD ItemStruct = (DWORD)InventoryFindItemAtPt(InventoryThis(pWindowThis()), pCursorX, pCursorY, &InventoryCtrl);
+
+		int slot = InventoryFindItemSlot(GetMyInventoryCtrl(InventoryThis(pWindowThis()), 0), pCursorX, pCursorY);
+		if (slot == -1)
+		{
+			slot = InventoryFindItemSlot(GetMyInventoryCtrl(InventoryThis(pWindowThis()), 1), pCursorX, pCursorY);
+			if (slot != -1) slot += 12;
+		}
+		if (slot == -1)
+		{
+			slot = InventoryFindItemSlot(GetMyInventoryCtrl(InventoryThis(pWindowThis()), 2), pCursorX, pCursorY);
+			if (slot != -1) slot += 44;
+		}
+
+		if (slot != -1 && ItemStruct != 0)
+		{
+			WORD itemIndex = *(WORD*)ItemStruct;
+			gCustomItemColor.SetSelectedSlot((BYTE)(slot + INVENTORY_WEAR_SIZE), itemIndex);
+			ResetMouseRButton();
+			return;
+		}
 	}
 
 	if (pCheckWindow(pWindowThis(), 9) == 0 && pCheckWindow(pWindowThis(), 13) == 0) // ChaosBox ~ Inventory

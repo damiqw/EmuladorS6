@@ -372,6 +372,17 @@ void DataServerProtocolCore(int index,BYTE head,BYTE* lpMsg,int size) // OK
 					break;
 			}
 			break;
+		case 0xED:
+			switch (((lpMsg[0] == 0xC1) ? lpMsg[3] : lpMsg[4]))
+			{
+				case 0x00:
+					GDCustomItemColorLoadRecv((SDHP_CUSTOM_ITEM_COLOR_LOAD_RECV*)lpMsg, index);
+					break;
+				case 0x01:
+					GDCustomItemColorSaveRecv((SDHP_CUSTOM_ITEM_COLOR_SAVE_RECV*)lpMsg);
+					break;
+			}
+			break;
 		case 0x1A:
 			switch(((lpMsg[0]==0xC1)?lpMsg[3]:lpMsg[4]))
 			{
@@ -3744,4 +3755,63 @@ void GDCustomJewelBankInfoRecv(SDHP_CUSTOM_JEWELBANK_INFO_RECV* lpMsg, int index
 		gQueryManager.Close();
 	}
 	gSocketManager.DataSend(index, (BYTE*)&pMsg, sizeof(pMsg));
+}
+
+void GDCustomItemColorSaveRecv(SDHP_CUSTOM_ITEM_COLOR_SAVE_RECV* lpMsg)
+{
+	if (lpMsg->Serial == 0)
+	{
+		return;
+	}
+
+	if (gQueryManager.ExecQuery("SELECT ItemSerial FROM CustomItemColor WHERE ItemSerial=%d", lpMsg->Serial) == 0 || gQueryManager.Fetch() == SQL_NO_DATA)
+	{
+		gQueryManager.Close();
+		gQueryManager.ExecQuery("INSERT INTO CustomItemColor (ItemSerial, ColorR, ColorG, ColorB) VALUES (%d, %d, %d, %d)", lpMsg->Serial, lpMsg->ColorR, lpMsg->ColorG, lpMsg->ColorB);
+		gQueryManager.Close();
+	}
+	else
+	{
+		gQueryManager.Close();
+		gQueryManager.ExecQuery("UPDATE CustomItemColor SET ColorR=%d, ColorG=%d, ColorB=%d WHERE ItemSerial=%d", lpMsg->ColorR, lpMsg->ColorG, lpMsg->ColorB, lpMsg->Serial);
+		gQueryManager.Close();
+	}
+}
+
+void GDCustomItemColorLoadRecv(SDHP_CUSTOM_ITEM_COLOR_LOAD_RECV* lpMsg, int index)
+{
+	BYTE send[4096];
+	SDHP_CUSTOM_ITEM_COLOR_LOAD_SEND pMsg;
+	pMsg.header.set(0xED, 0x00, sizeof(pMsg));
+	pMsg.AccountIndex = lpMsg->AccountIndex;
+	pMsg.Count = 0;
+
+	int size = sizeof(pMsg);
+
+	if (gQueryManager.ExecQuery("SELECT ItemSerial, ColorR, ColorG, ColorB FROM CustomItemColor") != 0)
+	{
+		while (gQueryManager.Fetch() != SQL_NO_DATA)
+		{
+			SDHP_CUSTOM_ITEM_COLOR_NODE node;
+			node.Serial = (DWORD)gQueryManager.GetAsInteger("ItemSerial");
+			node.ColorR = (BYTE)gQueryManager.GetAsInteger("ColorR");
+			node.ColorG = (BYTE)gQueryManager.GetAsInteger("ColorG");
+			node.ColorB = (BYTE)gQueryManager.GetAsInteger("ColorB");
+
+			memcpy(&send[size], &node, sizeof(node));
+			size += sizeof(node);
+			pMsg.Count++;
+
+			if (size >= 4000)
+			{
+				break;
+			}
+		}
+	}
+	gQueryManager.Close();
+
+	pMsg.header.set(0xED, 0x00, size);
+	memcpy(send, &pMsg, sizeof(pMsg));
+
+	gSocketManager.DataSend(index, send, size);
 }

@@ -123,6 +123,11 @@ bool CNpcTalk::NpcTalk(LPOBJ lpNpc,LPOBJ lpObj) // OK
 		return 1;
 	}
 
+	if (gCustomItemColor.NpcTalk(lpNpc, lpObj))
+	{
+		return 1;
+	}
+
 	if(lpObj->TradeDuel != 0)
 	{
 		return 1;

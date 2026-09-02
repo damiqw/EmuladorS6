@@ -143,6 +143,7 @@
 #include "CustomJewelDisable.h"
 #include "AutoChangeCmd.h"
 #include "ItemChangeCmd.h"
+#include "CustomItemColor.h"
 #include "FakeOnline.h"
 #include "CustomJewelBank.h"
 #include "SPK_NewXShop.h"
@@ -432,6 +433,7 @@ void CServerInfo::ReadCustomInfo() // OK
 
 	g_AutoChangeCmd.LoadFile(gPath.GetFullPath("Custom\\CustomAutoChangeItem.txt"));
 	g_ItemChangeCmd.LoadFile(gPath.GetFullPath("Custom\\CustomItemChangeItem.txt"));
+	gCustomItemColor.LoadFile(gPath.GetFullPath("Custom\\CustomItemColor.txt"));
 
 	gCustomJewelBank.LoadConfig(gPath.GetFullPath("Custom\\CustomJewelBank.xml"));
 

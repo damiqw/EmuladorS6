@@ -328,6 +328,7 @@
     <ClInclude Include="CustomGuard.h" />
     <ClInclude Include="CustomJewel.h" />
     <ClInclude Include="CustomJewelBank.h" />
+    <ClInclude Include="CustomItemColor.h" />
     <ClInclude Include="CustomJewelDisable.h" />
     <ClInclude Include="CustomLukeHelper.h" />
     <ClInclude Include="CustomMarriage.h" />
@@ -610,6 +611,7 @@
     <ClCompile Include="CustomGuard.cpp" />
     <ClCompile Include="CustomJewel.cpp" />
     <ClCompile Include="CustomJewelBank.cpp" />
+    <ClCompile Include="CustomItemColor.cpp" />
     <ClCompile Include="CustomJewelDisable.cpp" />
     <ClCompile Include="CustomLukeHelper.cpp" />
     <ClCompile Include="CustomMarriage.cpp" />

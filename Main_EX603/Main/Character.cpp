@@ -6,6 +6,7 @@
 #include "CustomFont.h"
 #include "CustomMonster.h"
 #include "SEASON3B.h"
+#include "CustomItemColor.h"
 
 int TypeCharSelect = -1;
 OBJECT m_PhotoHelper[9];
@@ -97,7 +98,7 @@ void cCharacter::Draw(int c, float x, float y, float w, float h, float rot, floa
 	*(float*)(o + 160) = 1.0;
 	*(float*)(o + 164) = 1.0;
 
-	((int(__cdecl*)(int c, int o, int Select)) 0x0056F210)(c, o, 0); //RenderCharacter
+	HookDrawViewPort(c, o, 0); //RenderCharacter
 
 	glMatrixMode(GL_MODELVIEW);
 	glPopMatrix();
@@ -172,7 +173,7 @@ void cCharacter::Draw2(int c, float x, float y, float w, float h, float rot, flo
 	*(float*)(o + 160) = 1.0;
 	*(float*)(o + 164) = 1.0;
 
-	((int(__cdecl*)(int c, int o, int Select)) 0x0056F210)(c, o, 0); //RenderCharacter
+	HookDrawViewPort(c, o, 0); //RenderCharacter
 
 	glMatrixMode(GL_MODELVIEW);
 	glPopMatrix();

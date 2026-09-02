@@ -1111,6 +1111,39 @@ void GDCustomJewelBankRecv(SDHP_CUSTOM_JEWELBANK_RECV* lpMsg);
 void GDCustomJewelBankInfoRecv(SDHP_CUSTOM_JEWELBANK_INFO_RECV* lpMsg, int index);
 void GDCustomRankingRecv(SDHP_CUSTOM_RANKING_RECV* lpMsg, int index);
 
+struct SDHP_CUSTOM_ITEM_COLOR_SAVE_RECV
+{
+	PSBMSG_HEAD header;
+	DWORD Serial;
+	BYTE ColorR;
+	BYTE ColorG;
+	BYTE ColorB;
+};
+
+struct SDHP_CUSTOM_ITEM_COLOR_LOAD_RECV
+{
+	PSBMSG_HEAD header;
+	WORD AccountIndex;
+};
+
+struct SDHP_CUSTOM_ITEM_COLOR_NODE
+{
+	DWORD Serial;
+	BYTE ColorR;
+	BYTE ColorG;
+	BYTE ColorB;
+};
+
+struct SDHP_CUSTOM_ITEM_COLOR_LOAD_SEND
+{
+	PSWMSG_HEAD header;
+	WORD AccountIndex;
+	WORD Count;
+};
+
+void GDCustomItemColorSaveRecv(SDHP_CUSTOM_ITEM_COLOR_SAVE_RECV* lpMsg);
+void GDCustomItemColorLoadRecv(SDHP_CUSTOM_ITEM_COLOR_LOAD_RECV* lpMsg, int index);
+
 #if(NEW_POSTITEM)
 void GDPostItemProc(BYTE*, int, int);
 #endif

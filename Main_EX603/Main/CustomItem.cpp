@@ -65,6 +65,8 @@ CUSTOM_ITEM_INFO* CCustomItem::GetInfoByItem(int ItemIndex) // OK
 	return 0;
 }
 
+#include "CustomItemColor.h"
+
 BOOL CCustomItem::GetCustomItemColor(int ItemIndex,float* ItemColor) // OK
 {
 	std::map<int,CUSTOM_ITEM_INFO>::iterator it1 = this->m_CustomItemInfo.find(ItemIndex);

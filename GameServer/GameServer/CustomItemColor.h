@@ -61,6 +61,10 @@ struct VIEWPORT_ITEM_COLOR_NODE
 	BYTE ColorG;
 	BYTE ColorB;
 	DWORD Serial;
+	short ItemID;
+	int Level;
+	BYTE ExcellentOption;
+	BYTE AncientOption;
 };
 
 struct PMSG_VIEWPORT_CUSTOM_ITEM_COLOR

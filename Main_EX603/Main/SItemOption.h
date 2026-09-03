@@ -12,7 +12,7 @@
 #define INVENTORY_WEAR_SIZE 12
 
 #define pMultiLineTooltip ((void(__cdecl*)(int x, int y, int nCount, int witd, int height,int type, int Align)) 0x005BF700)
-
+extern ObjectItem* GItemPointer;
 typedef char tooltiparray[100];
 // ---------------------------------------------------------------------------------------------
 

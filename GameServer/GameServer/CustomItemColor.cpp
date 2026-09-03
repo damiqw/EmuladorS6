@@ -330,50 +330,110 @@ void CCustomItemColor::CGItemColorRecv(PMSG_CUSTOM_ITEM_COLOR_REQ* lpMsg, int aI
 
 void CCustomItemColor::SendViewportItemColor(LPOBJ lpObj, int aTargetIndex)
 {
-	BYTE buffer[1024];
-	PMSG_VIEWPORT_CUSTOM_ITEM_COLOR* lpMsg = (PMSG_VIEWPORT_CUSTOM_ITEM_COLOR*)buffer;
-	
-	int count = 0;
-	BYTE* body = buffer + sizeof(PMSG_VIEWPORT_CUSTOM_ITEM_COLOR);
-
-	for (int i = 0; i < INVENTORY_WEAR_SIZE; i++)
-	{
-		if (lpObj->Inventory[i].IsItem())
-		{
-			BYTE r, g, b;
-			if (this->GetItemColor(lpObj->Inventory[i].m_Serial, r, g, b))
-			{
-				VIEWPORT_ITEM_COLOR_NODE node;
-				node.Slot = (BYTE)i;
-				node.ColorR = r;
-				node.ColorG = g;
-				node.ColorB = b;
-				node.Serial = lpObj->Inventory[i].m_Serial;
-
-				memcpy(body + (count * sizeof(VIEWPORT_ITEM_COLOR_NODE)), &node, sizeof(VIEWPORT_ITEM_COLOR_NODE));
-				count++;
-			}
-		}
-	}
-
-	if (count == 0)
-	{
-		return;
-	}
-
-	int size = sizeof(PMSG_VIEWPORT_CUSTOM_ITEM_COLOR) + (count * sizeof(VIEWPORT_ITEM_COLOR_NODE));
-	lpMsg->header.set(0xEF, 0x13, size);
-	lpMsg->TargetIndex = lpObj->Index;
-	lpMsg->Count = (BYTE)count;
-
 	if (aTargetIndex != -1 && aTargetIndex != lpObj->Index)
 	{
-		DataSend(aTargetIndex, buffer, size);
+		// Sending only EQUIPPED items to a specific OTHER player
+		BYTE buffer[1024];
+		PMSG_VIEWPORT_CUSTOM_ITEM_COLOR* lpMsg = (PMSG_VIEWPORT_CUSTOM_ITEM_COLOR*)buffer;
+		int count = 0;
+		BYTE* body = buffer + sizeof(PMSG_VIEWPORT_CUSTOM_ITEM_COLOR);
+
+		for (int i = 0; i < INVENTORY_WEAR_SIZE; i++)
+		{
+			if (lpObj->Inventory[i].IsItem())
+			{
+				std::map<DWORD, CUSTOM_ITEM_COLOR_DATA>::iterator it = m_ItemColorMap.find(lpObj->Inventory[i].m_Serial);
+				if (it != m_ItemColorMap.end())
+				{
+					VIEWPORT_ITEM_COLOR_NODE node;
+					node.Slot = i;
+					node.ColorR = it->second.ColorR;
+					node.ColorG = it->second.ColorG;
+					node.ColorB = it->second.ColorB;
+					node.Serial = lpObj->Inventory[i].m_Serial;
+					node.ItemID = lpObj->Inventory[i].m_Index;
+					node.Level = lpObj->Inventory[i].m_Level;
+					node.ExcellentOption = lpObj->Inventory[i].m_NewOption;
+					node.AncientOption = lpObj->Inventory[i].m_SetOption;
+
+					memcpy(body + (count * sizeof(VIEWPORT_ITEM_COLOR_NODE)), &node, sizeof(VIEWPORT_ITEM_COLOR_NODE));
+					count++;
+				}
+			}
+		}
+
+		if (count > 0)
+		{
+			int size = sizeof(PMSG_VIEWPORT_CUSTOM_ITEM_COLOR) + (count * sizeof(VIEWPORT_ITEM_COLOR_NODE));
+			lpMsg->header.set(0xEF, 0x13, size);
+			lpMsg->TargetIndex = lpObj->Index;
+			lpMsg->Count = (BYTE)count;
+			DataSend(aTargetIndex, buffer, size);
+		}
 	}
 	else
 	{
-		DataSend(lpObj->Index, buffer, size);
-		MsgSendV2(lpObj, buffer, size);
+		// Sending FULL inventory to LOCAL player
+		BYTE bufferLocal[4096];
+		PMSG_VIEWPORT_CUSTOM_ITEM_COLOR* lpMsgLocal = (PMSG_VIEWPORT_CUSTOM_ITEM_COLOR*)bufferLocal;
+		int countLocal = 0;
+		BYTE* bodyLocal = bufferLocal + sizeof(PMSG_VIEWPORT_CUSTOM_ITEM_COLOR);
+
+		// Sending EQUIPPED inventory to OTHER players (Broadcast)
+		BYTE bufferBroadcast[1024];
+		PMSG_VIEWPORT_CUSTOM_ITEM_COLOR* lpMsgBroadcast = (PMSG_VIEWPORT_CUSTOM_ITEM_COLOR*)bufferBroadcast;
+		int countBroadcast = 0;
+		BYTE* bodyBroadcast = bufferBroadcast + sizeof(PMSG_VIEWPORT_CUSTOM_ITEM_COLOR);
+
+		for (int i = 0; i < INVENTORY_SIZE; i++)
+		{
+			if (lpObj->Inventory[i].IsItem())
+			{
+				std::map<DWORD, CUSTOM_ITEM_COLOR_DATA>::iterator it = m_ItemColorMap.find(lpObj->Inventory[i].m_Serial);
+				if (it != m_ItemColorMap.end())
+				{
+					VIEWPORT_ITEM_COLOR_NODE node;
+					node.Slot = i;
+					node.ColorR = it->second.ColorR;
+					node.ColorG = it->second.ColorG;
+					node.ColorB = it->second.ColorB;
+					node.Serial = lpObj->Inventory[i].m_Serial;
+					node.ItemID = lpObj->Inventory[i].m_Index;
+					node.Level = lpObj->Inventory[i].m_Level;
+					node.ExcellentOption = lpObj->Inventory[i].m_NewOption;
+					node.AncientOption = lpObj->Inventory[i].m_SetOption;
+
+					// Add to local packet (all slots)
+					memcpy(bodyLocal + (countLocal * sizeof(VIEWPORT_ITEM_COLOR_NODE)), &node, sizeof(VIEWPORT_ITEM_COLOR_NODE));
+					countLocal++;
+
+					// Add to broadcast packet (only equipped slots 0-11)
+					if (i < INVENTORY_WEAR_SIZE)
+					{
+						memcpy(bodyBroadcast + (countBroadcast * sizeof(VIEWPORT_ITEM_COLOR_NODE)), &node, sizeof(VIEWPORT_ITEM_COLOR_NODE));
+						countBroadcast++;
+					}
+				}
+			}
+		}
+
+		if (countLocal > 0)
+		{
+			int sizeLocal = sizeof(PMSG_VIEWPORT_CUSTOM_ITEM_COLOR) + (countLocal * sizeof(VIEWPORT_ITEM_COLOR_NODE));
+			lpMsgLocal->header.set(0xEF, 0x13, sizeLocal);
+			lpMsgLocal->TargetIndex = lpObj->Index;
+			lpMsgLocal->Count = (BYTE)countLocal;
+			DataSend(lpObj->Index, bufferLocal, sizeLocal);
+		}
+
+		if (countBroadcast > 0)
+		{
+			int sizeBroadcast = sizeof(PMSG_VIEWPORT_CUSTOM_ITEM_COLOR) + (countBroadcast * sizeof(VIEWPORT_ITEM_COLOR_NODE));
+			lpMsgBroadcast->header.set(0xEF, 0x13, sizeBroadcast);
+			lpMsgBroadcast->TargetIndex = lpObj->Index;
+			lpMsgBroadcast->Count = (BYTE)countBroadcast;
+			MsgSendV2(lpObj, bufferBroadcast, sizeBroadcast);
+		}
 	}
 }
 

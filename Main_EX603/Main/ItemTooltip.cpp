@@ -7,6 +7,7 @@
 #include "Import.h"
 #include "Offset.h"
 #include "CustomFont.h"
+#include "CustomItemColor.h"
 
 nCInfo GInfo;
 
@@ -80,6 +81,25 @@ int nCInfo::nInformationOP(int CurrenLine, int ItemSearch)
 			wsprintf(TooltipLine[ CurrenLine ], "%s", nGetTextLine( it->second.TextIndex[ i ] ));
 			ColorTexto[ CurrenLine ] = it->second.TextColor[ i ];
 			LineWeight[ CurrenLine++ ] = 0;
+		}
+	}
+
+	if (GItemPointer)
+	{
+		float color[3];
+		if (gCustomItemColor.GetHoveredItemColor(GItemPointer, color))
+		{
+			tooltiparray* TooltipLine = (tooltiparray*)NewAddressData3;
+			int* ColorTexto = (int*)NewAddressData1;
+			int* LineWeight = (int*)NewAddressData2;
+
+			wsprintf(TooltipLine[CurrenLine], "\n");
+			ColorTexto[CurrenLine] = TEXT_WHITE;
+			LineWeight[CurrenLine++] = 0;
+
+			wsprintf(TooltipLine[CurrenLine], "Custom RGB: %d, %d, %d", (int)(color[0] * 255.0f), (int)(color[1] * 255.0f), (int)(color[2] * 255.0f));
+			ColorTexto[CurrenLine] = TEXT_GOLD;
+			LineWeight[CurrenLine++] = 1;
 		}
 	}
 

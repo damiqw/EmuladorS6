@@ -159,10 +159,25 @@ void CCustomItemColor::RecvViewportSync(PMSG_VIEWPORT_CUSTOM_ITEM_COLOR_RECV* lp
 		data.ColorR = node->ColorR;
 		data.ColorG = node->ColorG;
 		data.ColorB = node->ColorB;
+		data.ItemID = node->ItemID;
+		data.Level = node->Level;
+		data.ExcellentOption = node->ExcellentOption;
+		data.AncientOption = node->AncientOption;
 
 		if (node->Serial != 0)
 		{
 			this->m_ItemColorMap[node->Serial] = data;
+
+			// Store the Serial in the client's ObjectItem directly!
+			if (oUserPreviewStruct != 0 && targetIndex == *(WORD*)(oUserPreviewStruct + 0x7E))
+			{
+				DWORD base = *(DWORD*)0x8128AC4; // CharacterMachine
+				if (base != 0)
+				{
+					ObjectItem* pItem = (ObjectItem*)(base + 4672 + (107 * node->Slot));
+					pItem->Unknown103 = node->Serial;
+				}
+			}
 		}
 
 		this->m_ViewportColorMap[targetIndex][node->Slot] = data;
@@ -179,10 +194,54 @@ bool CCustomItemColor::GetItemColorBySerial(DWORD serial, float* outColor)
 	std::map<DWORD, CUSTOM_ITEM_COLOR_DATA_CLIENT>::iterator it = this->m_ItemColorMap.find(serial);
 	if (it != this->m_ItemColorMap.end())
 	{
-		outColor[0] = (float)(it->second.ColorR / 255.0f);
-		outColor[1] = (float)(it->second.ColorG / 255.0f);
-		outColor[2] = (float)(it->second.ColorB / 255.0f);
+		outColor[0] = it->second.ColorR / 255.0f;
+		outColor[1] = it->second.ColorG / 255.0f;
+		outColor[2] = it->second.ColorB / 255.0f;
 		return true;
+	}
+
+	return false;
+}
+
+bool CCustomItemColor::GetHoveredItemColor(ObjectItem* pItem, float* outColor)
+{
+	if (!pItem) return false;
+
+	// Use the directly stored Serial if available! (Perfect matching)
+	if (pItem->Unknown103 != 0)
+	{
+		std::map<DWORD, CUSTOM_ITEM_COLOR_DATA_CLIENT>::iterator it = this->m_ItemColorMap.find(pItem->Unknown103);
+		if (it != this->m_ItemColorMap.end())
+		{
+			outColor[0] = it->second.ColorR / 255.0f;
+			outColor[1] = it->second.ColorG / 255.0f;
+			outColor[2] = it->second.ColorB / 255.0f;
+			return true;
+		}
+	}
+
+	// Fallback to property matching (just in case the item hasn't been synced via Serial yet)
+	if (oUserPreviewStruct != 0)
+	{
+		WORD localIndex = *(WORD*)(oUserPreviewStruct + 0x7E);
+
+		std::map<WORD, std::map<BYTE, CUSTOM_ITEM_COLOR_DATA_CLIENT>>::iterator it = this->m_ViewportColorMap.find(localIndex);
+		if (it != this->m_ViewportColorMap.end())
+		{
+			for (std::map<BYTE, CUSTOM_ITEM_COLOR_DATA_CLIENT>::iterator it2 = it->second.begin(); it2 != it->second.end(); ++it2)
+			{
+				if (it2->second.ItemID == pItem->ItemID &&
+					it2->second.Level == pItem->Level &&
+					(it2->second.ExcellentOption & 63) == (pItem->ExcellentOption & 63) &&
+					(it2->second.AncientOption & 3) == (pItem->AncientOption & 3))
+				{
+					outColor[0] = it2->second.ColorR / 255.0f;
+					outColor[1] = it2->second.ColorG / 255.0f;
+					outColor[2] = it2->second.ColorB / 255.0f;
+					return true;
+				}
+			}
+		}
 	}
 
 	return false;

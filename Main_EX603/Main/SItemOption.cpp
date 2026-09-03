@@ -188,6 +188,7 @@ bool validarTabla(int SetCountEquipado, int OptionNumber)
 }
 
 int GItemIndex;
+ObjectItem* GItemPointer = NULL;
 
 __declspec (naked) void GLItemIndex()
 {
@@ -196,6 +197,7 @@ __declspec (naked) void GLItemIndex()
 	_asm
 	{
 		MOV EAX, DWORD PTR SS : [EBP + 0x10]
+		MOV GItemPointer, EAX
 		MOVSX ECX, WORD PTR DS : [EAX]
 		MOV GItemIndex, ECX
 	}

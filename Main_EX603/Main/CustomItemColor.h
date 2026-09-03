@@ -14,6 +14,10 @@ struct CUSTOM_ITEM_COLOR_DATA_CLIENT
 	BYTE ColorR;
 	BYTE ColorG;
 	BYTE ColorB;
+	short ItemID;
+	int Level;
+	BYTE ExcellentOption;
+	BYTE AncientOption;
 };
 
 struct PMSG_CUSTOM_ITEM_COLOR_NPC_OPEN_RECV
@@ -49,6 +53,10 @@ struct VIEWPORT_ITEM_COLOR_NODE_RECV
 	BYTE ColorG;
 	BYTE ColorB;
 	DWORD Serial;
+	short ItemID;
+	int Level;
+	BYTE ExcellentOption;
+	BYTE AncientOption;
 };
 
 struct PMSG_VIEWPORT_CUSTOM_ITEM_COLOR_RECV
@@ -90,6 +98,7 @@ public:
 	void SendApplyRequest();
 
 	bool GetItemColorBySerial(DWORD serial, float* outColor);
+	bool GetHoveredItemColor(ObjectItem* pItem, float* outColor);
 	bool GetEquippedItemColor(int itemIndex, float* outColor);
 	bool GetCharacterSlotColor(ObjectPreview* pChar, int modelIndex, float* outColor);
 

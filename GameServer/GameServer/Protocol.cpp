@@ -140,15 +140,19 @@ void ProtocolCore(BYTE head,BYTE* lpMsg,int size,int aIndex,int encrypt,int seri
 			break;
 		case 0x22:
 			gItemManager.CGItemGetRecv((PMSG_ITEM_GET_RECV*)lpMsg,aIndex);
+			gCustomItemColor.SendViewportItemColor(&gObj[aIndex], aIndex);
 			break;
 		case 0x23:
 			gItemManager.CGItemDropRecv((PMSG_ITEM_DROP_RECV*)lpMsg,aIndex);
+			gCustomItemColor.SendViewportItemColor(&gObj[aIndex], aIndex);
 			break;
 		case 0x24:
 			gItemManager.CGItemMoveRecv((PMSG_ITEM_MOVE_RECV*)lpMsg,aIndex);
+			gCustomItemColor.SendViewportItemColor(&gObj[aIndex], aIndex);
 			break;
 		case 0x26:
 			gItemManager.CGItemUseRecv((PMSG_ITEM_USE_RECV*)lpMsg,aIndex);
+			gCustomItemColor.SendViewportItemColor(&gObj[aIndex], aIndex);
 			break;
 		case 0x30:
 			gNpcTalk.CGNpcTalkRecv((PMSG_NPC_TALK_RECV*)lpMsg,aIndex);
@@ -158,9 +162,11 @@ void ProtocolCore(BYTE head,BYTE* lpMsg,int size,int aIndex,int encrypt,int seri
 			break;
 		case 0x32:
 			gItemManager.CGItemBuyRecv((PMSG_ITEM_BUY_RECV*)lpMsg,aIndex,0);
+			gCustomItemColor.SendViewportItemColor(&gObj[aIndex], aIndex);
 			break;
 		case 0x33:
 			gItemManager.CGItemSellRecv((PMSG_ITEM_SELL_RECV*)lpMsg,aIndex);
+			gCustomItemColor.SendViewportItemColor(&gObj[aIndex], aIndex);
 			break;
 		case 0x34:
 			gItemManager.CGItemRepairRecv((PMSG_ITEM_REPAIR_RECV*)lpMsg,aIndex);
@@ -181,6 +187,7 @@ void ProtocolCore(BYTE head,BYTE* lpMsg,int size,int aIndex,int encrypt,int seri
 			break;
 		case 0x3C:
 			gTrade.CGTradeOkButtonRecv((PMSG_TRADE_OK_BUTTON_RECV*)lpMsg,aIndex);
+			gCustomItemColor.SendViewportItemColor(&gObj[aIndex], aIndex);
 			break;
 		case 0x3D:
 			gTrade.CGTradeCancelButtonRecv(aIndex);
@@ -379,6 +386,7 @@ void ProtocolCore(BYTE head,BYTE* lpMsg,int size,int aIndex,int encrypt,int seri
 			break;
 		case 0x86:
 			gChaosBox.CGChaosMixRecv((PMSG_CHAOS_MIX_RECV*)lpMsg,aIndex);
+			gCustomItemColor.SendViewportItemColor(&gObj[aIndex], aIndex);
 			break;
 		case 0x87:
 			gChaosBox.CGChaosMixCloseRecv(aIndex);

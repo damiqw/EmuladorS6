@@ -2646,6 +2646,8 @@ void CServerInfo::ReadCommandInfo(char* section,char* path) // OK
 
 	this->m_CommandResetAutoEnable[3] = GetPrivateProfileInt(section,"CommandResetAutoEnable_AL3",0,path);
 
+	this->m_CommandResetAutoMasterLevelUnlock = GetPrivateProfileInt(section,"CommandResetAutoMasterLevelUnlock",0,path);
+
 	this->m_CommandResetCheckItem[0] = GetPrivateProfileInt(section,"CommandResetCheckItem_AL0",0,path);
 
 	this->m_CommandResetCheckItem[1] = GetPrivateProfileInt(section,"CommandResetCheckItem_AL1",0,path);
@@ -2661,6 +2663,8 @@ void CServerInfo::ReadCommandInfo(char* section,char* path) // OK
 	this->m_CommandResetMove[2] = GetPrivateProfileInt(section,"CommandResetMove_AL2",0,path);
 
 	this->m_CommandResetMove[3] = GetPrivateProfileInt(section,"CommandResetMove_AL3",0,path);
+
+	this->m_CommandResetMoveDisableMasterLevelUnlock = GetPrivateProfileInt(section,"CommandResetMoveDisableMasterLevelUnlock",0,path);
 
 	this->m_CommandResetQuest[0] = GetPrivateProfileInt(section,"CommandResetQuest_AL0",0,path);
 

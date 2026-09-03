@@ -732,8 +732,10 @@ public:
 	int m_CommandWareNumber[MAX_ACCOUNT_LEVEL];
 	int m_CommandResetType;
 	int m_CommandResetAutoEnable[MAX_ACCOUNT_LEVEL];
+	int m_CommandResetAutoMasterLevelUnlock;
 	int m_CommandResetCheckItem[MAX_ACCOUNT_LEVEL];
 	int m_CommandResetMove[MAX_ACCOUNT_LEVEL];
+	int m_CommandResetMoveDisableMasterLevelUnlock;
 	int m_CommandResetQuest[MAX_ACCOUNT_LEVEL];
 	int m_CommandResetSkill[MAX_ACCOUNT_LEVEL];
 	int m_CommandResetLevel[MAX_ACCOUNT_LEVEL];

@@ -1081,7 +1081,14 @@ bool CCommandManager::CommandReset(LPOBJ lpObj,char* arg,int Npc) // OK
 
 void CCommandManager::CommandResetAuto(LPOBJ lpObj,char* arg,int Npc) // OK
 {
-	if(gServerInfo.m_CommandResetAutoEnable[lpObj->AccountLevel] == 0)
+	bool bAutoResetAllowed = (gServerInfo.m_CommandResetAutoEnable[lpObj->AccountLevel] != 0);
+
+	if (bAutoResetAllowed == 0 && gServerInfo.m_CommandResetAutoMasterLevelUnlock > 0 && lpObj->MasterLevel >= gServerInfo.m_CommandResetAutoMasterLevelUnlock)
+	{
+		bAutoResetAllowed = 1;
+	}
+
+	if(bAutoResetAllowed == 0)
 	{
 		gNotice.GCNoticeSend(lpObj->Index,1,0,0,0,0,0,gMessage.GetMessage(89));
 
@@ -1940,7 +1947,14 @@ void CCommandManager::DGCommandResetRecv(SDHP_COMMAND_RESET_RECV* lpMsg) // OK
 
 	gNotice.GCNoticeSend(lpObj->Index,1,0,0,0,0,0,gMessage.GetMessage(95),lpObj->Reset);
 
-	if(gServerInfo.m_CommandResetMove[lpObj->AccountLevel] != 0)
+	bool bResetMove = (gServerInfo.m_CommandResetMove[lpObj->AccountLevel] != 0);
+
+	if (bResetMove != 0 && gServerInfo.m_CommandResetMoveDisableMasterLevelUnlock > 0 && lpObj->MasterLevel >= gServerInfo.m_CommandResetMoveDisableMasterLevelUnlock)
+	{
+		bResetMove = 0;
+	}
+
+	if(bResetMove != 0)
 	{
 		switch(lpObj->Class)
 		{

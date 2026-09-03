@@ -205,7 +205,7 @@ char CMinimap::MapRender(int a1)
 		Coord.x = Bx / 1.8700005;
 		Coord.y = 256.0 - (By / 1.85);
 		WORD* TerrainWall = (WORD*)0x82C6AA0;
-		RenderBitmap(32447, StartX - 4.0f, StartY + 20.0f, MainWidth, 472.0f, 0, 0, 1.0, 1.0, 1, 1, 0.0);
+		RenderBitmap(32447, StartX - 4.0f, StartY, MainWidth, 472.0f, 0, 0, 1.0, 1.0, 1, 1, 0.0);
 
 
 
@@ -235,8 +235,6 @@ char CMinimap::MapRender(int a1)
 		}
 
 		//-- CICLO PARA PINTAR LOS NPC DESDE SERVIDOR
-		CustomFont.Draw(CustomFont.FontNormal, StartX + 20, StartY + 40, 0xFFFFFFFF, 0x00000000, 0, 0, 1, "SPOTS TOTAL: %d", gMiniMap.m_MiniMapSpotInfo.size());
-
 		for (i = 0; i < (signed int)gMiniMap.m_MiniMapSpotInfo.size(); ++i)
 		{
 			MINIMAP_SPOT_INFO* spot = &gMiniMap.m_MiniMapSpotInfo[i];

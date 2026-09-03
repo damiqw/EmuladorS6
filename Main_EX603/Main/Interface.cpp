@@ -1297,21 +1297,16 @@ void Interface::WindowedModeName()
 
 	if (gProtect.m_MainInfo.ShowInfoWindowedModeType == 1)
 	{
-		sprintf_s(interaltas, sizeof(interaltas), "%s [Player: %s] [Ping: %d] [FPS: %d]", gProtect.m_MainInfo.WindowName, gObjUser.lpPlayer->Name, gCustomPing.PingDelayRecv, gCustomPing.m_fps);
+		sprintf_s(interaltas, sizeof(interaltas), "%s [Player: %s] [Nivel: %d] [Resets: %d] [Ping: %d] [FPS: %d]", gProtect.m_MainInfo.WindowName, gObjUser.lpPlayer->Name, gObjUser.lpPlayer->Level, ViewReset, gCustomPing.PingDelayRecv, gCustomPing.m_fps);
 	}
 	else if (gProtect.m_MainInfo.ShowInfoWindowedModeType == 2)
 	{
-		sprintf_s(interaltas, sizeof(interaltas), "%s [Player: %s]", gProtect.m_MainInfo.WindowName, gObjUser.lpPlayer->Name);
+		sprintf_s(interaltas, sizeof(interaltas), "%s [Player: %s] [Nivel: %d] [Resets: %d]", gProtect.m_MainInfo.WindowName, gObjUser.lpPlayer->Name, gObjUser.lpPlayer->Level, ViewReset);
 	}
 
 	SetWindowText(pGameWindow, interaltas);
-	
-	// Draw it on screen so it's visible in all resolutions (including borderless/fullscreen)
-	pSetBlend(1);
-	gInterface.DrawFormat(eWhite, 0, 0, 640, 3, interaltas);
-	pGLSwitchBlend();
-
 }
+
 
 
 void Interface::DrawTimeUI()

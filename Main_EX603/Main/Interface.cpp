@@ -28,6 +28,7 @@
 #include "MiniMap.h"
 #include "CTimCheck.h"
 #include "PKNotice.h"
+#include "CustomMap.h"
 #include "NPCRuud.h"
 #include "CustomStatsAdvance.h"
 #include "CustomQuickAddStats.h"
@@ -878,6 +879,7 @@ void Interface::Work()
 	}
 
 	gPKNotice.DrawNoticePKSystem();
+	g_pUIMapName.DrawMapNameBanner();
 
 	gPartySearchSettings.draw_party_settings_window();
 	gPartySearch.draw_party_search();

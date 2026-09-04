@@ -17,6 +17,8 @@
 #include "Protect.h"
 #include "MiniMapBrujula.h"
 #include "Common.h"
+#include "CustomMap.h"
+#include "cfreetype.h"
 
 #if (WIDE_SCREEN == 2)
 
@@ -296,11 +298,6 @@ bool SelectObjects(int x, int y, int w, int h)
 bool DropItem(int x, int y, int w, int h)
 {
 	return pCheckMouseOver(x, y, FrameScreenWidth(), 429 + QTFrame.DisplayHeightExt);
-}
-//===Fix Map Name TGA
-void PictureMapName(int ImageID, float PosX, float PosY, float Width, float Height, float Arg6, float Arg7, float ScaleX, float ScaleY, bool ScaleSize, bool ScalePosition, float ScaleAlpha)
-{
-	RenderBitmap(ImageID, (FrameScreenWidth() * pWinWidthReal - 166) / 2, ((220.0f + QTFrame.DisplayHeightExt) * pWinHeightReal), Width, Height, Arg6, Arg7, ScaleX, ScaleY, ScaleSize, ScalePosition, ScaleAlpha);
 }
 
 void FCNewUIWindowMenuPos(int a1, float a2, float a3, float a4, float a5)
@@ -773,8 +770,6 @@ void GLCreateWindowEx( )
 
 	SetCompleteHook(0xE8, 0x005B834E, &SelectObjects); //-- Fix Chon Nhan Vat
 	SetCompleteHook(0xE8, 0x00834700, &DropItem); //-- Fix Drop item
-	SetCompleteHook(0xE8, 0x00480020, &PictureMapName);					//-- Tga Map
-	SetCompleteHook(0xE8, 0x004800A8, &PictureMapName);					//-- Tga Map
 }
 //////////////////////////////////////////////////////////////////////////////////////////////
 //-- WideScreen Principal

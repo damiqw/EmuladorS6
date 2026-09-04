@@ -50,6 +50,9 @@ public:
 	static void __thiscall InitImgPathMap(int* thisa);
 	static void __thiscall ShowMapName(int thisa);
 
+	void TriggerMapBanner(int worldId);
+	void DrawMapNameBanner();
+
 	listMap MapPath;
 };
 extern CUIMapName g_pUIMapName;

@@ -110,6 +110,7 @@ public:
 
 	void RenderText(int iPos_x, int iPos_y, const char* pszText, int iBoxWidth = 0, int iBoxHeight = 0, int iSort = 1, OUT SIZE* lpTextSize = 0, BOOL color = 0, bool back = 0);
 	void RenderTextReal(int iPos_x, int iPos_y, const char* pszText, int iBoxWidth = 0, int iBoxHeight = 0, int iSort = 1,OUT SIZE* lpTextSize = 0, BOOL color = 0, bool back = 0);
+	void RenderTextCustom(int iPos_x, int iPos_y, const char* pszText, DWORD textColor, DWORD shadowColor = 0, int iBoxWidth = 0, int iBoxHeight = 0, int iSort = 3, OUT SIZE* lpTextSize = 0);
 
 	static void __thiscall FT_RenderTextOriginal(int This, int iPos_x, int iPos_y, LPCSTR pszText, int iBoxWidth, int iBoxHeight, int iSort, OUT SIZE* lpTextSize);
 	static void __thiscall RenderTextBackground(int This, int iPos_x, int iPos_y, LPCSTR pszText, int iBoxWidth, int iBoxHeight, int iSort, OUT SIZE* lpTextSize);

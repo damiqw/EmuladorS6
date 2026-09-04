@@ -3,9 +3,16 @@
 #include "CustomMap.h"
 #include "Import.h"
 #include "SEASON3B.h"
+#include "cfreetype.h"
+#include "WideScreen.h"
+#include "CustomFont.h"
 #include <string>
 
 CUIMapName g_pUIMapName;
+static DWORD g_MapBannerStartTick = 0;
+static int g_MapBannerWorld = -1;
+static bool g_MapBannerActive = false;
+static int g_LastSeenWorld = -1;
 ImgPathMap m_mapImgPath;
 
 void CUIMapName::OpenScritp(PathMap* thisa)
@@ -207,39 +214,93 @@ void CUIMapName::InitImgPathMap(int* thisa)
 	}
 }
 
+void CUIMapName::TriggerMapBanner(int worldId)
+{
+	g_MapBannerWorld = worldId;
+	g_MapBannerStartTick = GetTickCount();
+	g_MapBannerActive = true;
+	g_LastSeenWorld = worldId;
+}
+
 void CUIMapName::ShowMapName(int thisa)
 {
-	if (World == 75 || World >= 82)
-	{
-		*(DWORD*)(thisa + 40) = FADEIN;
-		*(float*)(thisa + 52) = 0.2f;
-		*(DWORD*)(thisa + 48) = 0;
+	*(DWORD*)(thisa + 40) = HIDE; // Keep Webzen native bitmap UI hidden so it doesn't render an empty white quad
 
-		if (World != 40)
-		{
-			if (*(WORD*)(thisa + 36) != World)
-			{
-				DeleteBitmap(31255, 0);
-
-				if (m_mapImgPath.find(World) != m_mapImgPath.end())
-				{
-					pLoadImage((char*)m_mapImgPath[World].c_str(), 31255, 9728, 10496, 1, 0);
-				}
-				
-				*(WORD*)(thisa + 36) = World;
-				*(BYTE*)(thisa + 56) = IsStrifeMap(World);
-			}
-		}
-		else
-		{
-			*(DWORD*)(thisa + 40) = HIDE;
-		}
-	}
-	else
+	if (World != 40)
 	{
-		((void(__thiscall*)(int)) 0x0047FD60)(thisa);
+		g_pUIMapName.TriggerMapBanner(World);
 	}
 }
+
+void CUIMapName::DrawMapNameBanner()
+{
+	if (SceneFlag != MAIN_SCENE)
+	{
+		g_MapBannerActive = false;
+		g_LastSeenWorld = -1;
+		return;
+	}
+
+	// Auto-detect map changes even if ShowMapName was not invoked
+	if (World != g_LastSeenWorld)
+	{
+		TriggerMapBanner(World);
+	}
+
+	if (!g_MapBannerActive)
+	{
+		return;
+	}
+
+	DWORD elapsed = GetTickCount() - g_MapBannerStartTick;
+	const DWORD totalDuration = 3500; // 3.5 seconds
+	if (elapsed > totalDuration)
+	{
+		g_MapBannerActive = false;
+		return;
+	}
+
+	// Calculate smooth fade-in (first 500ms) and fade-out (last 800ms)
+	BYTE alpha = 255;
+	if (elapsed < 500)
+	{
+		alpha = (BYTE)((elapsed * 255) / 500);
+	}
+	else if (elapsed > 2700)
+	{
+		alpha = (BYTE)(255 - ((elapsed - 2700) * 255) / 800);
+	}
+
+	if (alpha < 5)
+	{
+		return;
+	}
+
+	char* pszMapName = GetMapName(g_MapBannerWorld);
+	if (!pszMapName || pszMapName[0] == '\0')
+	{
+		return;
+	}
+
+	int screenCenterLogical = (int)(MAX_WIN_WIDTH / 2);
+	int textPosY = 65;
+
+	// Primary Map Title (Gold with dark shadow)
+	DWORD titleColor = (alpha << 24) | (0x45 << 16) | (0xD7 << 8) | 0xFF; // RGBA(255, 215, 69, alpha)
+	DWORD shadowColor = ((alpha > 120 ? 180 : alpha) << 24) | 0x000000;
+
+	g_pRenderFreeType->RenderTextCustom(screenCenterLogical, textPosY, pszMapName, titleColor, shadowColor, 0, 0, RT3_WRITE_CENTER);
+
+	// Zone Subtitle (Safe Zone vs Combat Zone)
+	bool bStrife = IsStrifeMap(g_MapBannerWorld) != 0;
+	const char* pszZone = bStrife ? "- Combat Zone -" : "- Safe Zone -";
+	DWORD subColor = bStrife
+		? ((alpha << 24) | (0x60 << 16) | (0x60 << 8) | 0xFF)  // Reddish Orange
+		: ((alpha << 24) | (0x7F << 16) | (0xEA << 8) | 0x7F); // Light Green
+
+	g_pRenderFreeType->RenderTextCustom(screenCenterLogical, textPosY + 15, pszZone, subColor, shadowColor, 0, 0, RT3_WRITE_CENTER);
+}
+
 
 void PlayMp3Map(HDC hDC)
 {

@@ -862,6 +862,159 @@ void cfreetype::RenderTextReal(int iPos_x, int iPos_y, const char* pszText, int 
 	}
 }
 
+void cfreetype::RenderTextCustom(int iPos_x, int iPos_y, const char* pszText, DWORD textColor, DWORD shadowColor, int iBoxWidth, int iBoxHeight, int iSort, OUT SIZE* lpTextSize)
+{
+	if (pszText == NULL || pszText[0] == '\0') return;
+	if (__Alpha(textColor) == 0) return;
+
+	std::wstring wstr = L"";
+	ConvertCharToWideStr(wstr, pszText);
+
+	int m_TextWidth = this->ExtentPoint32(wstr);
+
+	SIZE RealTextSize;
+	RealTextSize.cx = m_TextWidth;
+	RealTextSize.cy = (iFontHeight + 2);
+
+	fPOINT RealBoxPos = { iPos_x * g_fScreenRate_x, iPos_y * g_fScreenRate_y };
+	fBOXIN RealBoxSize = { iBoxWidth * g_fScreenRate_x, iBoxHeight * g_fScreenRate_y };
+	fBOXIN RealRenderingSize = { (long)RealTextSize.cx, (long)RealTextSize.cy };
+
+	if (RealBoxSize.cx == 0)
+		RealBoxSize.cx = RealTextSize.cx;
+
+	if (RealBoxSize.cy == 0)
+		RealBoxSize.cy = RealTextSize.cy;
+	else
+		RealBoxPos.y += ((RealBoxSize.cy - RealRenderingSize.cy) / 2.f);
+
+	int iTab = 0;
+	int iClipMove = 0;
+
+	if (iSort == RT3_SORT_LEFT_CLIP)
+	{
+		if (RealRenderingSize.cx > RealBoxSize.cx)
+		{
+			iClipMove = RealRenderingSize.cx - RealBoxSize.cx;
+			RealRenderingSize.cx = RealBoxSize.cx;
+		}
+	}
+	else if (iSort == RT3_SORT_LEFT)
+	{
+		if (RealRenderingSize.cx > RealBoxSize.cx)
+			RealRenderingSize.cx = RealBoxSize.cx;
+	}
+	else if (iSort == RT3_SORT_CENTER)
+	{
+		if (RealRenderingSize.cx > RealBoxSize.cx)
+		{
+			iClipMove = (RealRenderingSize.cx - RealBoxSize.cx) / 2;
+			RealRenderingSize.cx = RealBoxSize.cx;
+		}
+		else
+		{
+			iTab = (RealBoxSize.cx - RealRenderingSize.cx) / 2;
+		}
+	}
+	else if (iSort == RT3_SORT_RIGHT)
+	{
+		if (RealRenderingSize.cx > RealBoxSize.cx)
+		{
+			iClipMove = RealRenderingSize.cx - RealBoxSize.cx;
+			RealRenderingSize.cx = RealBoxSize.cx;
+		}
+		else
+		{
+			iTab = RealBoxSize.cx - RealRenderingSize.cx;
+		}
+	}
+	else if (iSort == RT3_WRITE_RIGHT_TO_LEFT)
+	{
+		if (RealRenderingSize.cx > RealBoxSize.cx)
+		{
+			iClipMove = RealRenderingSize.cx - RealBoxSize.cx;
+			RealRenderingSize.cx = RealBoxSize.cx;
+		}
+		else
+		{
+			iTab = RealBoxSize.cx - RealRenderingSize.cx;
+		}
+		RealBoxPos.x -= RealBoxSize.cx;
+	}
+	else if (iSort == RT3_WRITE_CENTER)
+	{
+		if (RealRenderingSize.cx > RealBoxSize.cx)
+		{
+			iClipMove = (RealRenderingSize.cx - RealBoxSize.cx) / 2;
+			RealRenderingSize.cx = RealBoxSize.cx;
+		}
+		else
+		{
+			iTab = (RealBoxSize.cx - RealRenderingSize.cx) / 2;
+		}
+		RealBoxPos.x -= (RealBoxSize.cx / 2);
+	}
+
+	GLfloat m_TemColor[4];
+	glGetFloatv(GL_CURRENT_COLOR, m_TemColor);
+
+	EnableAlphaTest(true);
+
+	// Optional shadow/outline pass
+	if (shadowColor != 0 && __Alpha(shadowColor) > 0)
+	{
+		static const int shadowOffsets[4][2] = { {1, 0}, {-1, 0}, {0, 1}, {0, -1} };
+		for (int s = 0; s < 4; s++)
+		{
+			int TextureWidth = 0;
+			for (auto Key = wstr.begin(); Key != wstr.end(); Key++)
+			{
+				FTBitmap* b = (*Key == 32) ? GetULongChar('|') : GetULongChar(*Key);
+				if (!b) continue;
+
+				float Next_y = RealBoxPos.y + shadowOffsets[s][1];
+				float Next_x = RealBoxPos.x + TextureWidth + iClipMove + iTab + shadowOffsets[s][0];
+
+				if (*Key != 32)
+				{
+					Next_y += b->m_TextureV;
+					Next_x += b->m_TextureU;
+					RenderGlyph(b->BitmapIndex, Next_x, Next_y, b->m_TextureUWidth, b->m_TextureVHeight, 0.0, 0.0, 1.0, 1.0, m_TemColor, TRUE, shadowColor);
+				}
+				TextureWidth += b->m_Width;
+			}
+		}
+	}
+
+	// Main text pass
+	int TextureWidth = 0;
+	for (auto Key = wstr.begin(); Key != wstr.end(); Key++)
+	{
+		FTBitmap* b = (*Key == 32) ? GetULongChar('|') : GetULongChar(*Key);
+		if (!b) continue;
+
+		float Next_y = RealBoxPos.y;
+		float Next_x = RealBoxPos.x + TextureWidth + iClipMove + iTab;
+
+		if (*Key != 32)
+		{
+			Next_y += b->m_TextureV;
+			Next_x += b->m_TextureU;
+			RenderGlyph(b->BitmapIndex, Next_x, Next_y, b->m_TextureUWidth, b->m_TextureVHeight, 0.0, 0.0, 1.0, 1.0, m_TemColor, TRUE, textColor);
+		}
+		TextureWidth += b->m_Width;
+	}
+
+	glColor4fv(m_TemColor);
+	cBindTexture(32000);
+
+	if (lpTextSize)
+	{
+		lpTextSize->cx = (RealRenderingSize.cx / g_fScreenRate_x);
+		lpTextSize->cy = (RealRenderingSize.cy / g_fScreenRate_y);
+	}
+}
+
 int cfreetype::ExtentPoint32(std::wstring wstr)
 {
 	int TextureWidth = 0;

@@ -121,18 +121,8 @@ void cAutoLogin::SaveAccount(char* ID, char* PW, bool Save)
 void cAutoLogin::DoRequestLogin()
 {
 	if (AutoLogin.isHoveringDropdown) return;
-	int Struct = _Instance() + 16968;
 
-	InputBox_GetText(*(DWORD*)(Struct + 848), AutoLogin.iUser, 11);
-	InputBox_GetText(*(DWORD*)(Struct + 852), AutoLogin.iPassword, 11);
-	if (AutoLogin.savePass) {
-		AutoLogin.SaveAccount(AutoLogin.iUser, AutoLogin.iPassword, 1);
-		AutoLogin.ReadConfigs();
-	}
-	else {
-		WriteDword("SavePass", 0);
-	}
-	//do it
+	// Request login without auto-saving credentials to slot 1
 	RequestLogin(_Instance() + 16968);
 }
 void cAutoLogin::TongleAccount(LPVOID pClass)
@@ -316,14 +306,8 @@ void DoLoginWinCreate(int)
 	int Struct = _Instance() + 16968;
 	LoginWinCreate(Struct);
 	AutoLogin.ReadConfigs();
-	if (AutoLogin.savePass) {
-		InputBox_SetText(*(DWORD*)(Struct + 848), AutoLogin.saved_acc[0].ID);
-		InputBox_SetText(*(DWORD*)(Struct + 852), AutoLogin.saved_acc[0].PW);
-	}
-	else {
-		InputBox_SetText(*(DWORD*)(Struct + 848), AutoLogin.saved_acc[0].ID);
-		InputBox_SetText(*(DWORD*)(Struct + 852), "");
-	}
+	InputBox_SetText(*(DWORD*)(Struct + 848), "");
+	InputBox_SetText(*(DWORD*)(Struct + 852), "");
 	AutoLogin.SetShowListAccount(false);
 	AutoLogin.SetSelectedAccount(0);
 }

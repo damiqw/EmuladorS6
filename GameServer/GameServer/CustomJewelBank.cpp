@@ -94,23 +94,23 @@ int CCustomJewelBank::GetJewelSimpleType(int ItemIndex) // OK
 		case GET_ITEM(12, 142):	return 18;	//"Cụm Đá Tinh Luyện 1"
 		case GET_ITEM(12, 143):	return 19;	//"Cụm Đá Tinh Luyện 2"
 		
-		case GET_ITEM(14, 244):	return 20;	//"Ngọc Cấp Độ"
-		case GET_ITEM(14, 245):	return 21;	//"Ngọc Tuyệt Chiêu"
-		case GET_ITEM(14, 246):	return 22;	//"Ngọc May Mắn"
-		case GET_ITEM(14, 247):	return 23;	//"Ngọc Tính Năng"
-		case GET_ITEM(14, 248):	return 24;	//"Ngọc Hoàn Hảo"
-		case GET_ITEM(14, 249):	return 25;	//"Ngọc Socket"	
-		case GET_ITEM(14, 250):	return 26;	//"Ngọc Thần Loại 1"
-		case GET_ITEM(14, 251):	return 27;	//"Ngọc Thần Loại 2"
-		case GET_ITEM(14, 252):	return 28;	//"Ngọc Full"
-		case GET_ITEM(14, 260):	return 29;	//"Ngọc Nâng Cấp"
+		case GET_ITEM(14, 400):	return 20;	//"Jewel of Dark Bless"
+		case GET_ITEM(14, 401):	return 21;	//"Jewel of Dark Soul"
+		case GET_ITEM(14, 402):	return 22;	//"Jewel of Dark Life"
+		case GET_ITEM(14, 403):	return 23;	//"Jewel of Skill"
+		case GET_ITEM(14, 404):	return 24;	//"Jewel of Luck"
+		case GET_ITEM(14, 405):	return 25;	//"Jewel of Luck Wing"
+		case GET_ITEM(14, 406):	return 26;	//"Jewel of Socket"
+		case GET_ITEM(14, 407):	return 27;	//"Jewel of Exc"
+		case GET_ITEM(14, 408):	return 28;	//"Jewel of Excess"	
+		case GET_ITEM(14, 415):	return 29;	//"Jewel of Kundun"
 
-		case GET_ITEM(12, 32):	return 30;	//"Hộp Quà Đỏ",			
-		case GET_ITEM(12, 33):	return 31;	//"Hộp Quà Xanh Lá",		
-		case GET_ITEM(12, 34):	return 32;	//"Hộp Quà Xanh Dương",	
-		case GET_ITEM(14, 52):	return 33;	//"Box GM",				
-		case GET_ITEM(14, 55):	return 34;	//"Box Trang Bị 380",	
-		case GET_ITEM(14, 56):	return 35;	//"Box Vũ Khí Cấp 4",	
+		case GET_ITEM(14, 409):	return 30;	//"Jewel of Item+10"
+		case GET_ITEM(14, 410):	return 31;	//"Jewel of Item+11"
+		case GET_ITEM(14, 411):	return 32;	//"Jewel of Item+12"
+		case GET_ITEM(14, 412):	return 33;	//"Jewel of Item+13"
+		case GET_ITEM(14, 413):	return 34;	//"Jewel of Item+14"
+		case GET_ITEM(14, 414):	return 35;	//"Jewel of Item+15"
 		case GET_ITEM(14, 57):	return 36;	//"Box Khiên Cấp 4",		
 		case GET_ITEM(14, 51):	return 37;	//"Pháo Hoa Ngôi Sao",	
 		case GET_ITEM(14, 121):	return 38;	//"Hộp Quà Vàng",		
@@ -134,23 +134,23 @@ int CCustomJewelBank::GetJewelSimpleIndex(int type) // OK
 		case 8:		return GET_ITEM(14, 43); //"Đá Cấp Thấp"
 		case 9:		return GET_ITEM(14, 44); //"Đá Cấp Cao"
 
-		case 20:	return GET_ITEM(14, 244); //"Ngọc Cấp Độ"
-		case 21:	return GET_ITEM(14, 245); //"Ngọc Tuyệt Chiêu"
-		case 22:	return GET_ITEM(14, 246); //"Ngọc May Mắn"
-		case 23:	return GET_ITEM(14, 247); //"Ngọc Tính Năng"
-		case 24:	return GET_ITEM(14, 248); //"Ngọc Hoàn Hảo"
-		case 25:	return GET_ITEM(14, 249); //"Ngọc Socket"	
-		case 26:	return GET_ITEM(14, 250); //"Ngọc Thần Loại 1"
-		case 27:	return GET_ITEM(14, 251); //"Ngọc Thần Loại 2"
-		case 28:	return GET_ITEM(14, 252); //"Ngọc Full"
-		case 29:	return GET_ITEM(14, 260); //"Ngọc Nâng Cấp"
+		case 20:	return GET_ITEM(14, 400); //"Jewel of Dark Bless"
+		case 21:	return GET_ITEM(14, 401); //"Jewel of Dark Soul"
+		case 22:	return GET_ITEM(14, 402); //"Jewel of Dark Life"
+		case 23:	return GET_ITEM(14, 403); //"Jewel of Skill"
+		case 24:	return GET_ITEM(14, 404); //"Jewel of Luck"
+		case 25:	return GET_ITEM(14, 405); //"Jewel of Luck Wing"
+		case 26:	return GET_ITEM(14, 406); //"Jewel of Socket"
+		case 27:	return GET_ITEM(14, 407); //"Jewel of Exc"
+		case 28:	return GET_ITEM(14, 408); //"Jewel of Excess"
+		case 29:	return GET_ITEM(14, 415); //"Jewel of Kundun"
 
-		case 30:	return GET_ITEM(12, 32);	//"Hộp Quà Đỏ",			
-		case 31:	return GET_ITEM(12, 33);	//"Hộp Quà Xanh Lá",		
-		case 32:	return GET_ITEM(12, 34);	//"Hộp Quà Xanh Dương",	
-		case 33:	return GET_ITEM(14, 52);	//"Box GM",				
-		case 34:	return GET_ITEM(14, 55);	//"Box Trang Bị 380",	
-		case 35:	return GET_ITEM(14, 56);	//"Box Vũ Khí Cấp 4",	
+		case 30:	return GET_ITEM(14, 409);	//"Jewel of Item+10"
+		case 31:	return GET_ITEM(14, 410);	//"Jewel of Item+11"
+		case 32:	return GET_ITEM(14, 411);	//"Jewel of Item+12"
+		case 33:	return GET_ITEM(14, 412);	//"Jewel of Item+13"
+		case 34:	return GET_ITEM(14, 413);	//"Jewel of Item+14"
+		case 35:	return GET_ITEM(14, 414);	//"Jewel of Item+15"
 		case 36:	return GET_ITEM(14, 57);	//"Box Khiên Cấp 4",		
 		case 37:	return GET_ITEM(14, 51);	//"Pháo Hoa Ngôi Sao",	
 		case 38:	return GET_ITEM(14, 121);	//"Hộp Quà Vàng",		

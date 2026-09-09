@@ -61,6 +61,7 @@ struct PostItem_struct
 	char Author[11];
 	char ItemName[64];
 	char suf[35];
+	bool isGlobalPost;
 	//smt else
 };
 
@@ -118,8 +119,8 @@ public:
 	int CheckItemInfo(int);
 	static void HookSendChat(const char*);
 	static bool HookRenderFrame(int);
-	static bool ViewPostItem(int type);
-	static void RenderPostItemName(int x, int y, int type, int width);
+	static bool __stdcall ViewPostItem(int type);
+	static void __stdcall RenderPostItemName(int x, int y, int type, int width);
 	static int 	RenderText(int PosX, int PosY, LPCTSTR Text, int Width, int Height, LPINT Align, OUT SIZE* lpTextSize);
 	PostItem_struct Posts[MAX_MESSAGES];
 	HFONT	FontUnderLine;
@@ -142,3 +143,4 @@ private:
 #endif
 
 extern PostItem JCItemPublic;
+extern DWORD g_CurrentChatType;

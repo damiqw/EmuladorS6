@@ -1,8 +1,10 @@
 #include "StdAfx.h"
+#include <intrin.h>
 #include "Util.h"
 #include "SEASON3B.h"
 #include "cfreetype.h"
 #include "wsclientline.h"
+#include "post_item.h"
 #include <ft2build.h>
 #include FT_GLYPH_H
 #include FT_OUTLINE_H
@@ -556,11 +558,19 @@ void cfreetype::RenderText(int iPos_x, int iPos_y, const char* pszText, int iBox
 		{
 			m_ColoText1 = 0xFFFF8CFF; // Pink/Purple (ABGR: #FFff8cff)
 		}
+		else if (g_CurrentChatType >= CHAT_TYPE_START) // Post Item
+		{
+			int postIndex = g_CurrentChatType - CHAT_TYPE_START;
+			if (postIndex >= 0 && postIndex < MAX_MESSAGES && JCItemPublic.Posts[postIndex].isGlobalPost)
+			{
+				m_ColoText1 = 0xFF2EB4D3; // Gold color in ABGR format (#D3B42E)
+			}
+		}
 	}
 
-	if (m_ColoText1 == 0xFF000000)
+	if (m_ColoText1 == 0xFF000000 || __Alpha(m_ColoText1) == 0)
 	{
-		m_ColoText1 = 0xFFFFFFFF; // Force fallback to OpenGL color (m_TemColor)
+		m_ColoText1 |= 0xFF000000;
 	}
 
 	if (pszText)
@@ -620,7 +630,7 @@ void cfreetype::RenderText(int iPos_x, int iPos_y, const char* pszText, int iBox
 		float Next_y = RealBoxPos.y;
 		float Next_x = RealBoxPos.x + TextureWidth + iClipMove + iTab;
 
-		if (*Key != 32 && Next_x >= RealBoxPos.x && Next_x <= RealBoxPos.x+RealBoxSize.cx && __Alpha(m_ColoText1) > 0)
+		if (*Key != 32 && Next_x >= RealBoxPos.x && (iBoxWidth == 0 || Next_x <= RealBoxPos.x + RealBoxSize.cx) && __Alpha(m_ColoText1) > 0)
 		{
 			/*if (b->BitmapIndex == EMOJI_LIST1)
 			{
@@ -784,11 +794,19 @@ void cfreetype::RenderTextReal(int iPos_x, int iPos_y, const char* pszText, int 
 		{
 			m_ColoText1 = 0xFFFF8CFF; // Pink/Purple (ABGR: #FFff8cff)
 		}
+		else if (g_CurrentChatType >= CHAT_TYPE_START) // Post Item
+		{
+			int postIndex = g_CurrentChatType - CHAT_TYPE_START;
+			if (postIndex >= 0 && postIndex < MAX_MESSAGES && JCItemPublic.Posts[postIndex].isGlobalPost)
+			{
+				m_ColoText1 = 0xFF2EB4D3; // Gold color in ABGR format (#D3B42E)
+			}
+		}
 	}
 
-	if (m_ColoText1 == 0xFF000000)
+	if (m_ColoText1 == 0xFF000000 || __Alpha(m_ColoText1) == 0)
 	{
-		m_ColoText1 = 0xFFFFFFFF; // Force fallback to OpenGL color (m_TemColor)
+		m_ColoText1 |= 0xFF000000;
 	}
 
 	if (pszText)
@@ -836,7 +854,7 @@ void cfreetype::RenderTextReal(int iPos_x, int iPos_y, const char* pszText, int 
 		float Next_y = RealBoxPos.y;
 		float Next_x = RealBoxPos.x + TextureWidth + iClipMove + iTab;
 
-		if (*Key != 32 && Next_x >= RealBoxPos.x && Next_x <= RealBoxPos.x + RealBoxSize.cx && __Alpha(m_ColoText1) > 0)
+		if (*Key != 32 && Next_x >= RealBoxPos.x && (iBoxWidth == 0 || Next_x <= RealBoxPos.x + RealBoxSize.cx) && __Alpha(m_ColoText1) > 0)
 		{
 			/*if (b->BitmapIndex == EMOJI_LIST1)
 			{
@@ -1031,7 +1049,7 @@ int cfreetype::ExtentPoint32(std::wstring wstr)
 
 		if ( !pNewBitmap ) continue;
 
-		TextureWidth += pNewBitmap->m_uWidth;
+		TextureWidth += pNewBitmap->m_Width;
 	}
 	return TextureWidth;
 }
@@ -1054,7 +1072,7 @@ void cfreetype::ExtentPoint32(LPCWSTR wstrText, OUT SIZE* lpTextSize)
 
 		if ( !pNewBitmap ) continue;
 
-		TextureWidth += pNewBitmap->m_uWidth;
+		TextureWidth += pNewBitmap->m_Width;
 	}
 
 	lpTextSize->cx = TextureWidth;
@@ -1080,7 +1098,7 @@ void cfreetype::ExtentPoint32(const char* pszText, OUT SIZE* lpTextSize)
 
 		if ( !pNewBitmap ) continue;
 
-		TextureWidth += pNewBitmap->m_uWidth;
+		TextureWidth += pNewBitmap->m_Width;
 	}
 
 	lpTextSize->cx = TextureWidth;
@@ -1117,25 +1135,95 @@ void cfreetype::RenderTextBackground(int This, int iPos_x, int iPos_y, LPCSTR ps
 
 bool g_bRenderingItemDrop = false;
 
-void cfreetype::RenderTextOriginal(int This, int iPos_x, int iPos_y, LPCSTR pszText, int iBoxWidth, int iBoxHeight, int iSort, OUT SIZE* lpTextSize)
+static int GetNativeTextWidth(LPCSTR pszText)
+{
+	if (!pszText || pszText[0] == '\0')
+		return 0;
+
+	std::wstring wstrText = L"";
+	ConvertCharToWideStr(wstrText, pszText);
+
+	HDC hdc = ExtraHDc();
+	SIZE sz = { 0, 0 };
+	if (hdc && GetTextExtentPoint32W(hdc, wstrText.c_str(), wstrText.length(), &sz))
+	{
+		if (sz.cx > 0)
+			return sz.cx;
+	}
+
+	HDC screenDC = GetDC(NULL);
+	if (screenDC)
+	{
+		HFONT hFont = *(HFONT*)0x00E8C588;
+		HGDIOBJ oldFont = SelectObject(screenDC, hFont);
+		GetTextExtentPoint32W(screenDC, wstrText.c_str(), wstrText.length(), &sz);
+		SelectObject(screenDC, oldFont);
+		ReleaseDC(NULL, screenDC);
+		if (sz.cx > 0)
+			return sz.cx;
+	}
+
+	return 0;
+}
+
+int cfreetype::RenderTextOriginal(int This, int iPos_x, int iPos_y, LPCSTR pszText, int iBoxWidth, int iBoxHeight, int iSort, OUT SIZE* lpTextSize)
 {
 	if ( *(DWORD *)(This + 4) )
 	{
 		g_dwCurrentFontThis = This;
-		if ( SceneFlag == LOG_IN_SCENE || SceneFlag == CHARACTER_SCENE)
+		if ( SceneFlag == LOG_IN_SCENE || SceneFlag == CHARACTER_SCENE )
 		{
-			rendertextOriginal(This, iPos_x, iPos_y, (int)pszText, iBoxWidth, iBoxHeight, iSort, (int)lpTextSize);
+			SIZE sz = { 0, 0 };
+			rendertextOriginal(This, iPos_x, iPos_y, (int)pszText, iBoxWidth, iBoxHeight, iSort, (int)(lpTextSize ? lpTextSize : &sz));
+			if (lpTextSize && lpTextSize->cx > 0)
+			{
+				return lpTextSize->cx;
+			}
+			if (sz.cx > 0)
+			{
+				if (lpTextSize)
+				{
+					lpTextSize->cx = sz.cx;
+					if (lpTextSize->cy <= 0) lpTextSize->cy = sz.cy > 0 ? sz.cy : 14;
+				}
+				return sz.cx;
+			}
+			int measuredWidth = GetNativeTextWidth(pszText);
+			if (lpTextSize)
+			{
+				lpTextSize->cx = measuredWidth;
+				if (lpTextSize->cy <= 0) lpTextSize->cy = 14;
+			}
+			return measuredWidth;
 		}
 		else
 		{
 			cfreetype::Instance()->RenderText(iPos_x, iPos_y, pszText, iBoxWidth, iBoxHeight, iSort, lpTextSize, FALSE, g_bRenderingItemDrop);
+			if (lpTextSize && lpTextSize->cx > 0)
+			{
+				return lpTextSize->cx;
+			}
+			else if (pszText && pszText[0] != '\0')
+			{
+				std::wstring wstr = L"";
+				ConvertCharToWideStr(wstr, pszText);
+				int w = (int)(cfreetype::Instance()->ExtentPoint32(wstr) / g_fScreenRate_x);
+				if (lpTextSize)
+				{
+					lpTextSize->cx = w;
+					if (lpTextSize->cy <= 0) lpTextSize->cy = 14;
+				}
+				return w;
+			}
+			return 0;
 		}
 	}
+	return 0;
 }
 
 BOOL cfreetype::_GetTextExtentPoint32(int This, HDC hdc, LPCSTR lpString, int cbString, LPSIZE lpSize)
 {
-	if ( SceneFlag == LOG_IN_SCENE || SceneFlag == CHARACTER_SCENE)
+	if ( SceneFlag == LOG_IN_SCENE || SceneFlag == CHARACTER_SCENE )
 	{
 		std::wstring wstrText = L"";
 		ConvertCharToWideStr(wstrText, lpString);
@@ -1144,14 +1232,74 @@ BOOL cfreetype::_GetTextExtentPoint32(int This, HDC hdc, LPCSTR lpString, int cb
 	}
 	else
 	{
-		cfreetype::Instance()->ExtentPoint32(lpString, lpSize);
+		if (!lpString || cbString <= 0)
+		{
+			if (lpSize) { lpSize->cx = 0; lpSize->cy = 0; }
+			return TRUE;
+		}
+
+		std::wstring wstrText = L"";
+		ConvertCharToWideStr(wstrText, lpString);
+
+		int maxChars = (int)wstrText.length();
+		if (cbString < maxChars) maxChars = cbString;
+
+		int TextureWidth = 0;
+		for (int i = 0; i < maxChars; i++)
+		{
+			wchar_t Key = wstrText[i];
+			if (Key == 0) break;
+
+			FTBitmap* pNewBitmap = NULL;
+			if (Key == 32 || Key == 0x0A)
+				pNewBitmap = GetULongChar('|');
+			else
+				pNewBitmap = GetULongChar(Key);
+
+			if (!pNewBitmap) continue;
+
+			TextureWidth += pNewBitmap->m_Width;
+		}
+
+		if (lpSize)
+		{
+			lpSize->cx = TextureWidth;
+			lpSize->cy = (iFontHeight + 2);
+		}
 		return TRUE;
 	}
 }
 
 BOOL cfreetype::_ExtentPoint32(int This, HDC hdc, LPCWSTR lpString, int cbString, LPSIZE lpSize)
 {
-	cfreetype::Instance()->ExtentPoint32(lpString, lpSize);
+	if (!lpString || cbString <= 0)
+	{
+		if (lpSize) { lpSize->cx = 0; lpSize->cy = 0; }
+		return TRUE;
+	}
+
+	int TextureWidth = 0;
+	for (int i = 0; i < cbString; i++)
+	{
+		wchar_t Key = lpString[i];
+		if (Key == 0) break;
+
+		FTBitmap* pNewBitmap = NULL;
+		if (Key == 32 || Key == 0x0A)
+			pNewBitmap = GetULongChar('|');
+		else
+			pNewBitmap = GetULongChar(Key);
+
+		if (!pNewBitmap) continue;
+
+		TextureWidth += pNewBitmap->m_Width;
+	}
+
+	if (lpSize)
+	{
+		lpSize->cx = TextureWidth;
+		lpSize->cy = (iFontHeight + 2);
+	}
 	return TRUE;
 }
 

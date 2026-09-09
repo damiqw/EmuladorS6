@@ -79,7 +79,7 @@ public:
 #define glcolor(back)			glColor4ub(__Red(back), __Green(back), __Blue(back), __Alpha(back))
 #define _FindText				((bool (__cdecl*)(const char* Text,const char* Token,bool First)) 0x005A8500)
 
-#define rendertextOriginal(This, iPos_x, iPos_y, pszText, iBoxWidth, iBoxHeight, iSort, lpTextSize)		((*(void (__thiscall **)(int, int, int, int, int, int, int, int))(**(DWORD **)(This + 4) + 44))(*(DWORD *)(This + 4), iPos_x, iPos_y, pszText, iBoxWidth, iBoxHeight, iSort, lpTextSize))
+#define rendertextOriginal(This, iPos_x, iPos_y, pszText, iBoxWidth, iBoxHeight, iSort, lpTextSize)		((*(int (__thiscall **)(int, int, int, int, int, int, int, int))(**(DWORD **)(This + 4) + 44))(*(DWORD *)(This + 4), iPos_x, iPos_y, pszText, iBoxWidth, iBoxHeight, iSort, lpTextSize))
 
 #define GlColorText()			glcolor(textcolor())
 #define _alpha					__Alpha(textcolor())
@@ -118,7 +118,7 @@ public:
 	bool OpenTga(GLuint uiBitmapIndex, const std::string& filename, GLuint uiFilter = GL_NEAREST, GLuint uiWrapMode = GL_CLAMP);
 	static BOOL __thiscall _ExtentPoint32(int This, HDC hdc, LPCWSTR lpString, int cbString, LPSIZE lpSize);
 	static BOOL __thiscall _GetTextExtentPoint32(int This, HDC hdc, LPCSTR lpMultiByteStr, int c, LPSIZE psizl);
-	static void __thiscall RenderTextOriginal(int This, int iPos_x, int iPos_y, LPCSTR pszText, int iBoxWidth, int iBoxHeight, int iSort, OUT SIZE* lpTextSize);
+	static int __thiscall RenderTextOriginal(int This, int iPos_x, int iPos_y, LPCSTR pszText, int iBoxWidth, int iBoxHeight, int iSort, OUT SIZE* lpTextSize);
 
 	static void __thiscall GetCurrentText_basic(int This, char *pszText, int iGetLength);
 	static int __thiscall ConvertWideCharToStr(__MultiLanguage* This, int wstrDest, LPCWSTR lpString, int iConversionType);

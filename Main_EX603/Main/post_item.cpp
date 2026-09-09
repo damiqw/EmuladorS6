@@ -30,7 +30,7 @@ PostItem::PostItem()
 PostItem::~PostItem()
 {
 }
-DWORD g_CurrentChatType = 0xFFFFFFFF;
+DWORD g_CurrentChatType = 0;
 
 void __declspec (naked) HookRenderNewChat()
 {
@@ -38,31 +38,43 @@ void __declspec (naked) HookRenderNewChat()
 	static DWORD sub_78C050 = 0x0078C050;
 	static DWORD cntAddr = 0x007890A9;
 	_asm {
-		// Get chat type
-		mov ecx, [ebp - 0x2C];
-		call sub_78C050;
-		mov g_CurrentChatType, eax;
+		// Save ECX (FontThis)
+		push	ecx;
 
-		// Call RenderText
-		lea ecx, JCItemPublic;
-		call [PostItem::RenderText];
+		// Get chat type from chat object [ebp - 0x2C]
+		mov		ecx, [ebp - 0x2C];
+		call	sub_78C050;
+		mov		g_CurrentChatType, eax;
 
-		// Reset global chat type while preserving EAX (return value)
-		push eax;
-		mov g_CurrentChatType, 0xFFFFFFFF;
-		pop eax;
+		// Restore ECX (FontThis)
+		pop		ecx;
 
-		// Continue original HookRenderNewChat logic
+		// Call 0x00420150 to render prefix text (arguments are already on stack)
+		call	sub_420150;
+
+		// Preserve returned width in EAX
 		push	eax;
-		mov     ecx, [ebp - 0x2C];
+		mov		g_CurrentChatType, 0;
+		pop		eax;
+
+		// Arguments for PostItem::RenderPostItemName(x, y, type, width)
+		// 4th arg: width
+		push	eax;
+
+		// 3rd arg: type
+		mov		ecx, [ebp - 0x2C];
 		call	sub_78C050;
 		push	eax;
-		mov     edx, [ebp - 0x34];
-		push    edx;
-		mov     eax, [ebp - 0x38];
-		push    eax;
-		lea		ecx, JCItemPublic;
-		call[PostItem::RenderPostItemName];
+
+		// 2nd arg: y
+		mov		edx, [ebp - 0x34];
+		push	edx;
+
+		// 1st arg: x
+		mov		eax, [ebp - 0x38];
+		push	eax;
+
+		call	PostItem::RenderPostItemName;
 		jmp		cntAddr;
 	}
 }
@@ -83,12 +95,44 @@ void __declspec (naked) HookNewChatTaget()
 		cmp		eax, 0xA;
 		jle		cancel;
 		push	eax;
-		lea		ecx, JCItemPublic;
-		call[PostItem::ViewPostItem];
+		call	PostItem::ViewPostItem;
 	cancel:
 		jmp		cntAddr;
 	}
 }
+void* __stdcall GetChatBufferImpl(void* This, int MsgType)
+{
+	switch (MsgType)
+	{
+		case 0: return (void*)((DWORD)This + 0x10);
+		case 1: return (void*)((DWORD)This + 0x28);
+		case 2: return (void*)((DWORD)This + 0x40);
+		case 3: return (void*)((DWORD)This + 0xA0);
+		case 4: return (void*)((DWORD)This + 0xB8);
+		case 5: return (void*)((DWORD)This + 0x58);
+		case 6: return (void*)((DWORD)This + 0x70);
+		case 7: return (void*)((DWORD)This + 0x88);
+		case 8: return (void*)((DWORD)This + 0xD0);
+		case 9: return (void*)((DWORD)This + 0xE8);
+		default:
+			if (MsgType >= 10)
+			{
+				return (void*)((DWORD)This + 0xE8);
+			}
+			return (void*)((DWORD)This + 0x10);
+	}
+}
+
+void __declspec(naked) HookGetChatBuffer()
+{
+	_asm {
+		push dword ptr [esp + 4];
+		push ecx;
+		call GetChatBufferImpl;
+		retn 4;
+	}
+}
+
 void __declspec (naked) CheckGetNewChatType()
 {
 	static DWORD allAddr = 0x0078BAD5;
@@ -96,7 +140,13 @@ void __declspec (naked) CheckGetNewChatType()
 	_asm {
 		cmp		eax, 0x0A;
 		jle		check;
-		mov		eax, 0x0;
+		movzx   eax, byte ptr[edx + 0x100];
+		test    eax, eax;
+		jnz     allowed;
+		movzx   eax, byte ptr[edx + 9 + 0x100];
+		test    eax, eax;
+		jnz     allowed;
+		jmp		blkAddr;
 	check:
 		movzx   eax, byte ptr[edx + eax + 0x100];
 		test    eax, eax;
@@ -113,7 +163,13 @@ void __declspec (naked) CheckRenderNewChatType()
 	_asm {
 		cmp		eax, 0x0A;
 		jle		check;
-		mov		eax, 0x0;
+		movzx	edx, byte ptr[ecx + 0x100];
+		test    edx, edx;
+		jnz     allowed;
+		movzx	edx, byte ptr[ecx + 9 + 0x100];
+		test    edx, edx;
+		jnz     allowed;
+		jmp		blkAddr;
 	check:
 		movzx	edx, byte ptr[ecx + eax + 0x100];
 		test    edx, edx;
@@ -154,6 +210,7 @@ void __declspec (naked) RenderNewChatType()
 		call Addr1;
 		mov ecx, eax;
 		call Addr3;
+		mov byte ptr [ebp - 0x2D], 1;
 		jmp alwAddr;
 	render_post_item:
 		push 0xC8; // Alpha
@@ -163,13 +220,14 @@ void __declspec (naked) RenderNewChatType()
 		call Addr1;
 		mov ecx, eax;
 		call Addr2;
-		push 0xFF; // Solid white/light-blue BG
-		push 0xC8; // Blue
-		push 0xC8; // Green
-		push 0xFF; // Red
+		push 0x3F; // default transparent BG
+		push 0x00;
+		push 0x00;
+		push 0x00;
 		call Addr1;
 		mov ecx, eax;
 		call Addr3;
+		mov byte ptr [ebp - 0x2D], 1;
 		jmp alwAddr;
 	deny:
 		jmp denAddr;
@@ -203,26 +261,9 @@ void __declspec (naked) HookNewChatSelectType()
 void __declspec (naked) HookAllowCreateChatType()
 {
 	static DWORD Addr1 = 0x0078BFF1;
-	static DWORD Addr2 = 0x0078C017;
-	static DWORD chatType;
 	_asm {
-		cmp dword ptr[ebp - 0x08], 0x0A;
-		jne createChat;
-		xor al, al
-			jmp Addr2;
-	createChat:
 		jmp Addr1;
 	}
-	/*if (chatType == 10) {
-	_asm {
-	jmp Addr2
-	}
-	}
-	else {
-	_asm {
-	jmp Addr1;
-	}
-	}*/
 }
 void __declspec (naked) HookFixGetBgColor() {
 	_asm {
@@ -247,6 +288,7 @@ void PostItem::ClearPostItem()
 	for (int i = 0; i < MAX_MESSAGES; i++)
 	{
 		this->Posts[i].item.ItemID = -1;
+		this->Posts[i].isGlobalPost = false;
 	}
 }
 void PostItem::PostItemProc(DWORD s)
@@ -274,7 +316,7 @@ void PostItem::PostItemProc(DWORD s)
 	HWND hWndEdit = *(HWND*)(m_pChatInputBox + 120);
 
 	const int ChatInputBoxMaxLen = 44;
-	char curText[ChatInputBoxMaxLen + 1];
+	char curText[ChatInputBoxMaxLen + 1] = { 0 };
 	char newText[ChatInputBoxMaxLen + 1] = { 0, };
 	DWORD dwStart = 0, dwEnd = 0;
 	DWORD nwStart = 0;
@@ -465,19 +507,40 @@ void PostItem::GCPostItem(BYTE* a)
 		lpItemObj ip = &this->Posts[index].item;
 
 		char Text[100] = { 0, };
-		//std::string TextBB;
-		//pDrawMessage(Data->chatid, 2);
-		//pDrawMessage(Data->pre, 1);
 
-		if (strlen(Data->pre)) {
-			strcat(Text, Data->pre);
-			//TextBB += Data->pre;
+		bool isPost = false;
+		const char* preStr = Data->pre;
+		if (Data->pre[0] == '\x01')
+		{
+			isPost = true;
+			preStr = &Data->pre[1];
+		}
+
+		this->Posts[index].isGlobalPost = isPost;
+
+		if (isPost)
+		{
+			if (strlen(preStr) > 0)
+			{
+				wsprintf(Text, "[POST]: %s", preStr);
+			}
+			else
+			{
+				wsprintf(Text, "[POST]: ");
+			}
 		}
 		else
 		{
-			//TextBB += " ";
-			strcat(Text, " "); //atleast 1 character like " " to make the chat avaiable | it nhat la " " de chat hoat dong
+			if (strlen(preStr) > 0)
+			{
+				strcat(Text, preStr);
+			}
+			else
+			{
+				strcat(Text, " "); //atleast 1 character like " " to make the chat avaiable | it nhat la " " de chat hoat dong
+			}
 		}
+
 		if (strlen(Data->suf) && strlen(Data->suf) < 35)
 		{
 			ZeroMemory(this->Posts[index].suf, sizeof(this->Posts[index].suf));
@@ -752,6 +815,16 @@ void HookRenderItemToolTip(int a1)
 	}
 }
 
+void __declspec(naked) HookRenderNewChatNotice()
+{
+	static DWORD sub_420150 = 0x00420150;
+	static DWORD cntAddr = 0x007890F2;
+	_asm {
+		call sub_420150;
+		jmp cntAddr;
+	}
+}
+
 void PostItem::Hook()
 {
 	//MemorySet(0x0070725C, 0x90, 5);
@@ -759,7 +832,7 @@ void PostItem::Hook()
 	//MemorySet(0x007071D8, 0x90, 5);
 
 	SetCompleteHook(0xE8, 0x007DD0D9, &HookRenderItemToolTip);
-	SetCompleteHook(0xE9, 0x0078BFE7, &HookAllowCreateChatType);
+	SetCompleteHook(0xE9, 0x0078B7C0, &HookGetChatBuffer);
 	SetCompleteHook(0xE9, 0x0078BFE7, &HookAllowCreateChatType);
 	SetCompleteHook(0xE9, 0x0078A9CA, &HookNewChatSelectType);
 	SetCompleteHook(0xE9, 0x00788EE7, &RenderNewChatType);
@@ -767,6 +840,7 @@ void PostItem::Hook()
 	SetCompleteHook(0xE9, 0x0078BA89, &CheckGetNewChatType);
 	SetCompleteHook(0xE9, 0x00788FF2, &HookNewChatTaget);
 	SetCompleteHook(0xE9, 0x007890A4, &HookRenderNewChat);
+	SetCompleteHook(0xE9, 0x007890ED, &HookRenderNewChatNotice);
 	SetCompleteHook(0xE8, 0x0078B0CF, &HookRenderFrame);
 	SetCompleteHook(0xE8, 0x0078707F, &HookSendChat);
 	//fix core
@@ -776,7 +850,7 @@ void PostItem::Hook()
 	SetCompleteHook(0xE9, 0x0083B7E4 + 0x150, &Equipments);//1.04D->0x0083B7E4
 #endif
 }
-bool PostItem::ViewPostItem(int type)
+bool __stdcall PostItem::ViewPostItem(int type)
 {
 	if (type < CHAT_TYPE_START || type >= (CHAT_TYPE_START + MAX_MESSAGES))
 	{
@@ -841,7 +915,7 @@ int	PostItem::RenderText(int PosX, int PosY, LPCTSTR Text, int Width, int Height
 		(((int(*)()) 0x0041FE10)(), PosX, PosY, Text, Width, Height, Align, &textSize); //String 1
 	return textSize.cx;
 }
-void PostItem::RenderPostItemName(int x, int y, int type, int width)
+void __stdcall PostItem::RenderPostItemName(int x, int y, int type, int width)
 {
 	if (type < CHAT_TYPE_START || type >= (CHAT_TYPE_START + MAX_MESSAGES))
 	{
@@ -864,22 +938,43 @@ void PostItem::RenderPostItemName(int x, int y, int type, int width)
 	}
 
 
-	SIZE textSize;
-	((int(__thiscall*)(int, HFONT)) 0x00420120)(((int(*)()) 0x0041FE10)(), JCItemPublic.FontUnderLine); //Set Font Name Item
+	SIZE textSize = { 0, 0 };
 	JCItemPublic.SetColor(JCItemPublic.Posts[index].ClrType);
 	//=Item Name
 	char ItemName[120] = { 0 };
 	wsprintf(ItemName, "[%s]", JCItemPublic.Posts[index].ItemName);
 
-	((int(__thiscall*)(int This, int PosX, int PosY, LPCTSTR Text, int Width, int Height, LPINT Align, OUT SIZE * lpTextSize)) 0x00420150)
+	g_CurrentChatType = type;
+	int itemWidth = ((int(__thiscall*)(int This, int PosX, int PosY, LPCTSTR Text, int Width, int Height, LPINT Align, OUT SIZE * lpTextSize)) 0x00420150)
 		(((int(*)()) 0x0041FE10)(), x + width, y, ItemName, 0, 0, (LPINT)0, &textSize);
-	((int(__thiscall*)(int, HFONT)) 0x00420120)(((int(*)()) 0x0041FE10)(), *(HFONT*)0x00E8C588);
+	if (textSize.cx <= 0)
+	{
+		textSize.cx = itemWidth;
+	}
+
+	// Draw underline for linked item using game's pDrawBarForm
+	if (textSize.cx > 0)
+	{
+		pDrawBarForm((float)(x + width), (float)(y + 10), (float)textSize.cx, 1.0f, 0.0f, 0);
+		pGLSwitchBlend();
+	}
+
+	g_CurrentChatType = 0;
 	if (isSuf)
 	{
-		((DWORD(__thiscall*)(DWORD, DWORD)) 0x00420080)(((int(*)()) 0x0041FE10)(), clrB);
+		if (JCItemPublic.Posts[index].isGlobalPost)
+		{
+			((DWORD(__thiscall*)(DWORD, DWORD)) 0x00420080)(((int(*)()) 0x0041FE10)(), 0xFF2EB4D3); // Gold color for suf
+		}
+		else
+		{
+			((DWORD(__thiscall*)(DWORD, DWORD)) 0x00420080)(((int(*)()) 0x0041FE10)(), clrB);
+		}
 		((DWORD(__thiscall*)(DWORD, DWORD)) 0x004200F0)(((int(*)()) 0x0041FE10)(), bgcB);
+		g_CurrentChatType = type;
 		((int(__thiscall*)(int This, int PosX, int PosY, LPCTSTR Text, int Width, int Height, LPINT Align, OUT SIZE * lpTextSize)) 0x00420150)
 			(((int(*)()) 0x0041FE10)(), x + width + textSize.cx, y, JCItemPublic.Posts[index].suf, 0, 0, (LPINT)0, 0);
+		g_CurrentChatType = 0;
 	}
 
 	if (JCItemPublic.viewing == index) {
@@ -979,8 +1074,33 @@ void PostItem::HookSendChat(const char* Text)
 	if (strlen(Text) < 10) {
 		return ((void(__cdecl*)(const char*)) 0x005BDE40)(Text);
 	}
+
+	bool isPostCmd = false;
+	int cmdEnd = 0;
+	if (_strnicmp(Text, "/post", 5) == 0)
+	{
+		if (Text[5] == ' ' || Text[5] == '\t')
+		{
+			isPostCmd = true;
+			cmdEnd = 6;
+			while (Text[cmdEnd] == ' ' || Text[cmdEnd] == '\t')
+			{
+				cmdEnd++;
+			}
+		}
+		else if (Text[5] == '[')
+		{
+			isPostCmd = true;
+			cmdEnd = 5;
+		}
+	}
+
 	for (int i = 0; i < sizeof(lspzCommand); i++) {
 		if (Text[0] == lspzCommand[i]) {
+			if (lspzCommand[i] == '/' && isPostCmd) {
+				// Allow /post with linked item tag to proceed
+				break;
+			}
 			return ((void(__cdecl*)(const char*)) 0x005BDE40)(Text);
 		}
 	}
@@ -1011,7 +1131,28 @@ void PostItem::HookSendChat(const char* Text)
 		return;
 	}
 	pos += item->PosX + item->PosY * 8;
-	JCItemPublic.CGPostItem(pos, s.substr(0, min(sP, 34)).c_str(), s.substr(sP + 10, s.length() - (sP + 10)).c_str());
+
+	std::string sendPre = "";
+	if (isPostCmd)
+	{
+		sendPre = "\x01";
+		if (sP > cmdEnd)
+		{
+			sendPre += s.substr(cmdEnd, min(sP - cmdEnd, 33));
+		}
+	}
+	else
+	{
+		sendPre = s.substr(0, min(sP, 34));
+	}
+
+	std::string sendSuf = "";
+	if (s.length() > (size_t)(sP + 10))
+	{
+		sendSuf = s.substr(sP + 10, min(s.length() - (sP + 10), (size_t)34));
+	}
+
+	JCItemPublic.CGPostItem(pos, sendPre.c_str(), sendSuf.c_str());
 }
 
 void PostItem::CGPostItem(DWORD pos, const char* pre, const char* suf) {

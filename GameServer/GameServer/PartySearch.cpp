@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "PartySearch.h"
+#include "PartyRestore.h"
 #include "Util.h"
 #include "Party.h"
 #include "DefaultClassInfo.h"
@@ -82,6 +83,8 @@ void CPartySearch::PartySearchAddToList(PMSG_RECV_PARTYSEARCH_ADD* lpMsg, int aI
 		{
 			it->second = info;
 		}
+
+		gPartyRestore.SavePartySearch(info.Name);
 	}
 	else
 	{
@@ -94,6 +97,7 @@ void CPartySearch::PartySearchAddToList(PMSG_RECV_PARTYSEARCH_ADD* lpMsg, int aI
 		if(it != this->m_Registered.end())
 		{
 			this->m_Registered.erase(it);
+			gPartyRestore.RemovePartySearch(info.Name);
 		}
 	}
 }
@@ -114,6 +118,7 @@ void CPartySearch::PartySearchDelFromList(char* Name)
 	if(it != this->m_Registered.end())
 	{
 		this->m_Registered.erase(it);
+		gPartyRestore.RemovePartySearch(Name);
 	}
 }
 

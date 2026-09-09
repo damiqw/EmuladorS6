@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "Party.h"
+#include "PartyRestore.h"
 #include "EffectManager.h"
 #include "Map.h"
 #include "PartyMatching.h"
@@ -145,6 +146,7 @@ bool CParty::Create(int aIndex) // OK
 			}
 			this->GCPartyListSend(count);
 			this->m_PartyCount = (((++this->m_PartyCount)>=MAX_OBJECT)?0:this->m_PartyCount);
+			gPartyRestore.SaveParty(count);
 			return 1;
 		}
 		else
@@ -174,6 +176,8 @@ bool CParty::Destroy(int index) // OK
 		}
 	}
 
+	gPartyRestore.RemoveParty(index);
+
 	return 1;
 }
 
@@ -197,6 +201,7 @@ bool CParty::AddMember(int index,int aIndex) // OK
 			this->m_PartyInfo[index].Count++;
 			this->m_PartyInfo[index].Index[n] = aIndex;
 			this->GCPartyListSend(index);
+			gPartyRestore.SaveParty(index);
 			return 1;
 		}
 	}
@@ -221,6 +226,14 @@ bool CParty::DelMember(int index,int aIndex) // OK
 			this->ChangeLeader(index,n);
 			this->GCPartyDelMemberSend(aIndex);
 			this->GCPartyListSend(index);
+			if(this->m_PartyInfo[index].Count <= 0)
+			{
+				gPartyRestore.RemoveParty(index);
+			}
+			else
+			{
+				gPartyRestore.SaveParty(index);
+			}
 			return 1;
 		}
 	}

@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "OfflineMode.h"
 #include "PartySearch.h"
+#include "PartyRestore.h"
 #include "ObjectManager.h"
 #include "Log.h"
 #include "Attack.h"
@@ -794,7 +795,11 @@ bool CObjectManager::CharacterGameClose(int aIndex) // OK
 	{
 		if(IT_MAP_RANGE(lpObj->Map) == 0 && DG_MAP_RANGE(lpObj->Map) == 0 && IG_MAP_RANGE(lpObj->Map) == 0)
 		{
-			if(gParty.GetMemberCount(lpObj->PartyNumber) <= 1)
+			if(lpObj->m_OfflineMode != 0 || lpObj->AttackCustomOffline != 0)
+			{
+				gPartyRestore.OnCharacterClose(lpObj);
+			}
+			else if(gParty.GetMemberCount(lpObj->PartyNumber) <= 1)
 			{
 				gParty.Destroy(lpObj->PartyNumber);
 			}
@@ -843,7 +848,10 @@ bool CObjectManager::CharacterGameClose(int aIndex) // OK
 
 	gObjFixEventInventoryPointer(aIndex);
 
-	gPartySearch.PartySearchDelFromList(lpObj->Name);
+	if(lpObj->m_OfflineMode == 0 && lpObj->AttackCustomOffline == 0)
+	{
+		gPartySearch.PartySearchDelFromList(lpObj->Name);
+	}
 
 	GDCharacterInfoSaveSend(aIndex);
 

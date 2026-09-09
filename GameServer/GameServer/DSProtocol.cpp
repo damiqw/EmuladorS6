@@ -2,6 +2,7 @@
 #include "resource.h"
 #include "DSProtocol.h"
 #include "PartySearch.h"
+#include "PartyRestore.h"
 #include "BloodCastle.h"
 #include "CashShop.h"
 #include "CastleSiege.h"
@@ -1562,6 +1563,8 @@ void DGCharacterInfoRecv(SDHP_CHARACTER_INFO_RECV* lpMsg) // OK
 #if(FLAG)
 	ThueFlag.OnLogin(lpObj->Index);
 #endif
+
+	gPartyRestore.OnCharacterLogin(lpObj);
 
 	gPartySearch.SendPartySettings(lpObj);
 

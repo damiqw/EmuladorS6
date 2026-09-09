@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "OfflineMode.h"
 #include "OfflineRestore.h"
+#include "PartyRestore.h"
 #include "User.h"
 #include "380ItemOption.h"
 #include "Attack.h"
@@ -317,6 +318,8 @@ void gObjFirstProc() // OK
 	gReconnect.MainProc();
 
 	gOfflineRestore.MainProc();
+
+	gPartyRestore.MainProc();
 
 	gCastleSiegeSync.AdjustTributeMoney();
 

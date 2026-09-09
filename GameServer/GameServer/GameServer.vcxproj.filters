@@ -285,6 +285,9 @@
     <ClInclude Include="PartySearch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="PartyRestore.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="GameMain.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1125,6 +1128,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="PartySearch.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PartyRestore.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="GameMain.cpp">

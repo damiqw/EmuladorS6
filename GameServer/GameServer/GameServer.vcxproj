@@ -487,6 +487,7 @@
     <ClInclude Include="PartyMatching.h" />
     <ClInclude Include="Path.h" />
     <ClInclude Include="PartySearch.h" />
+    <ClInclude Include="PartyRestore.h" />
     <ClInclude Include="PcPoint.h" />
     <ClInclude Include="PentagramSystem.h" />
     <ClInclude Include="PersonalShop.h" />
@@ -770,6 +771,7 @@
     <ClCompile Include="PartyMatching.cpp" />
     <ClCompile Include="Path.cpp" />
     <ClCompile Include="PartySearch.cpp" />
+    <ClCompile Include="PartyRestore.cpp" />
     <ClCompile Include="PcPoint.cpp" />
     <ClCompile Include="PentagramSystem.cpp" />
     <ClCompile Include="PersonalShop.cpp" />

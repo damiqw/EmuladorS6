@@ -107,7 +107,18 @@ _declspec(naked) void CheckTickCount2() // OK
 {
 	static DWORD CheckTickCountAddress1 = 0x004DA3F0;
 	static DWORD FrameCount = 0x11;
-	FrameCount = 0x5;
+
+	static HWND hWnd;
+	hWnd = *(HWND*)(MAIN_WINDOW);
+	if(hWnd != 0 && (IsIconic(hWnd) != 0 || IsWindowVisible(hWnd) == 0))
+	{
+		FrameCount = 40; // Throttle to ~25 FPS and Sleep when minimized or in tray
+	}
+	else
+	{
+		FrameCount = 0x5;
+	}
+
 	_asm
 	{
 		Mov Ecx, Dword Ptr Ss : [Ebp - 0x6C]

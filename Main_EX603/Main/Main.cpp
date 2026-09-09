@@ -335,7 +335,7 @@ SHORT WINAPI KeysProc(int nCode) // OK
 		return 0;
 	}
 
-	return GetAsyncKeyState(nCode);
+	return GetKeyState(nCode);
 }
 
 HICON WINAPI IconProc(HINSTANCE hInstance,LPCSTR lpIconName) // OK

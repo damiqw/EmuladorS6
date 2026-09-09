@@ -30,6 +30,7 @@ public:
 	CHwidManager();
 	virtual ~CHwidManager();
 	bool CheckHwid(char* HardwarewId);
+	int GetOfflineCountByHwid(char* HardwarewId);
 	void InsertHwid(char* HardwarewId, int aIndex);
 	void RemoveHwid(char* HardwarewId);
 	void ConnectHwid(CG_HWID_SEND *lpMsg, LPOBJ lpObj);

@@ -159,6 +159,7 @@
 #define pMUHelperThis			((LPVOID(__cdecl*)()) 0x4DB240)
 #define pMUHelperClass			*(int*)0xE8CB7C
 #define pMUHelperClose			((void(__thiscall*)(LPVOID This)) 0x95D450)
+#define pMUHelperCheckStart		((bool(__thiscall*)(LPVOID This)) 0x95CEC0)
 #define pMUHelperStart			((void(__thiscall*)(LPVOID This)) 0x95D190)
 #define pMUHelperDataSet		((bool(__thiscall*)(LPVOID This, LPBYTE Data)) 0x960C10)
 #define pMUIsLoaded				*(DWORD*)0xE60974

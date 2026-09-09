@@ -1104,6 +1104,7 @@ struct OBJECTSTRUCT
 	short m_OfflineCoordY;
 	DWORD m_OfflineTimeResetMove;
 	int		MuOffHelperTime;
+	bool	m_OfflineHwidGrace;
 
 #if(BOT_BUFFER == 1)
 	//Buff Times
@@ -1328,6 +1329,7 @@ bool gObjIsConnectedGP(int aIndex);
 bool gObjIsConnectedGS(int aIndex);
 bool gObjIsNameValid(int aIndex,char* name);
 bool gObjIsAccountValid(int aIndex,char* account);
+bool gObjIsOfflineAccount(char* account,char* HardwareId=0);
 bool gObjIsChangeSkin(int aIndex);
 bool gObjCheckMaxMoney(int aIndex,DWORD AddMoney);
 bool gObjCheckPersonalCode(int aIndex,char* PersonalCode);

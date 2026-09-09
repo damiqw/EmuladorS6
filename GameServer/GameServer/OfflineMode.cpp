@@ -63,6 +63,40 @@ void OfflineMode::OnHelperpAlreadyConnected(LPOBJ lpObj) // OK
 	}
 }
 
+bool gObjIsOfflineAccount(char* account, char* HardwareId)
+{
+	if (account == 0 || account[0] == '\0')
+	{
+		return false;
+	}
+
+	for (int i = OBJECT_START_USER; i < MAX_OBJECT; i++)
+	{
+		if (gObj[i].Connected >= OBJECT_CONNECTED)
+		{
+			if (gObj[i].m_OfflineMode != 0 || gObj[i].AttackCustomOffline != 0 || gObj[i].PShopCustomOffline != 0)
+			{
+				if (strncmp(account, gObj[i].Account, 10) == 0)
+				{
+					if (HardwareId != 0 && HardwareId[0] != '\0')
+					{
+						if (strcmp(gObj[i].HardwareId, HardwareId) == 0)
+						{
+							return true;
+						}
+					}
+					else
+					{
+						return true;
+					}
+				}
+			}
+		}
+	}
+
+	return false;
+}
+
 void OfflineMode::Start(CG_OFFMODE_RESULT* aRecv, int aIndex)
 {
 	if (!gObjIsConnectedGP(aIndex))

@@ -917,33 +917,6 @@ void Interface::Work()
 		}
 	}
 
-	if (gProtect.m_MainInfo.EnableEventTimeButton == 1)
-	{
-		if (GetKeyState('H') & 0x4000 && GetTickCount() >= gCustomEventTime.OpenTestDelay + 250)
-		{
-			if (GetForegroundWindow() == pGameWindow && !gInterface.CheckWindow(ObjWindow::ChatWindow))
-			{
-				if (gCustomEventTime.CheckTestWindow())
-				{
-					gCustomEventTime.CloseTestWindow();
-				}
-				else
-				{
-					gCustomEventTime.ClearCustomEventTime();
-
-					PMSG_CUSTOM_EVENTTIME_SEND pMsg;
-
-					pMsg.header.set(0xF3, 0xE8, sizeof(pMsg));
-
-					DataSend((BYTE*)&pMsg, pMsg.header.size);
-
-					gCustomEventTime.OpenTestWindow();
-				}
-				gCustomEventTime.OpenTestDelay = GetTickCount();
-			}
-		}
-	}
-
 	if (gProtect.m_MainInfo.EnableAntilagSystemButton == 1)
 	{
 		if (GetKeyState(VK_F6) & 0x4000 && GetTickCount() >= gAntiLagSystem.OpenTestDelay + 250)
@@ -1164,12 +1137,7 @@ bool Interface::UpdateKey(DWORD Class)
 				BYTE isHelperOn = *(BYTE*)(pHelper + 0x08);
 				if (isHelperOn == 0)
 				{
-					bool inSafeZone = *(bool*)(MAIN_CHARACTER_STRUCT + 0x0E);
-					if (inSafeZone)
-					{
-						pDrawMessage("No se puede activar el Helper en zona segura.", 1);
-					}
-					else
+					if (pMUHelperCheckStart((LPVOID)pHelper))
 					{
 						pMUHelperStart((LPVOID)pHelper);
 					}

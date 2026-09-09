@@ -11,6 +11,7 @@
 #include "ChaosBox.h"
 #include "ChaosCastle.h"
 #include "CommandManager.h"
+#include "CustomAttack.h"
 #include "CustomCommandDescription.h"
 #include "CustomExchangeCoin.h"
 #include "CustomMove.h"
@@ -2216,6 +2217,15 @@ void CGConnectAccountRecv(PMSG_CONNECT_ACCOUNT_RECV* lpMsg,int aIndex) // OK
 	char account_tmp[11] = { 0 };
 	PacketArgumentDecrypt(account_tmp, lpMsg->account, (sizeof(account_tmp)-1));
 
+	if (lpObj->m_OfflineHwidGrace != false)
+	{
+		if (gObjIsOfflineAccount(account_tmp, lpObj->HardwareId) == 0)
+		{
+			CloseClient(aIndex);
+			return;
+		}
+	}
+
 	for (int i = OBJECT_START_USER; i < MAX_OBJECT; i++)
 	{
 		LPOBJ sObj = &gObj[i];
@@ -2226,26 +2236,28 @@ void CGConnectAccountRecv(PMSG_CONNECT_ACCOUNT_RECV* lpMsg,int aIndex) // OK
 			{
 				if (!strncmp(account_tmp, sObj->Account, 10))
 				{
-#if USE_FAKE_ONLINE == TRUE
 					if (sObj->m_OfflineMode == 1)
 					{
-						sObj->m_OfflineMode = 0;
-						gObjDel(i);
+						g_OfflineMode.OnHelperpAlreadyConnected(sObj);
 					}
+					else if (sObj->AttackCustomOffline != 0)
+					{
+						gCustomAttack.OnAttackAlreadyConnected(sObj);
+					}
+					else if (sObj->PShopCustomOffline != 0)
+					{
+						gCustomStore.OnPShopAlreadyConnected(sObj);
+					}
+#if USE_FAKE_ONLINE == TRUE
 					if (sObj->IsFakeOnline == 1)
 					{
-
-						s_FakeOnline.OnAttackAlreadyConnected(&gObj[i]); // Add
-
-						gObjDel(i);
+						s_FakeOnline.OnAttackAlreadyConnected(sObj);
 					}
 #endif
 					break;
-
 				}
 			}
 		}
-
 	}
 
 

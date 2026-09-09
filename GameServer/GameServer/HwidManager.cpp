@@ -33,6 +33,32 @@ bool CHwidManager::CheckHwid(char* HardwarewId) // OK
 	}
 }
 
+int CHwidManager::GetOfflineCountByHwid(char* HardwarewId)
+{
+	if(HardwarewId == 0 || HardwarewId[0] == '\0')
+	{
+		return 0;
+	}
+
+	int count = 0;
+
+	for(int n = OBJECT_START_USER; n < MAX_OBJECT; n++)
+	{
+		if(gObj[n].Connected >= OBJECT_CONNECTED)
+		{
+			if(strcmp(gObj[n].HardwareId, HardwarewId) == 0)
+			{
+				if(gObj[n].m_OfflineMode != 0 || gObj[n].AttackCustomOffline != 0 || gObj[n].PShopCustomOffline != 0)
+				{
+					count++;
+				}
+			}
+		}
+	}
+
+	return count;
+}
+
 void CHwidManager::InsertHwid(char* HardwarewId, int aIndex) // OK
 {
 	HardwareId_INFO info;
@@ -152,7 +178,19 @@ void CHwidManager::ConnectHwid(CG_HWID_SEND *lpMsg, LPOBJ lpObj)
 		}
 	}
 
-	if (this->CheckHwid(lpMsg->HardwareId) == 0)
+	bool AllowConnection = (this->CheckHwid(lpMsg->HardwareId) != 0);
+
+	if (AllowConnection == 0)
+	{
+		int OfflineCount = this->GetOfflineCountByHwid(lpMsg->HardwareId);
+		if (OfflineCount > 0)
+		{
+			lpObj->m_OfflineHwidGrace = true;
+			AllowConnection = 1;
+		}
+	}
+
+	if (AllowConnection == 0)
 	{
 		gObjDel(lpObj->Index);
 		return;

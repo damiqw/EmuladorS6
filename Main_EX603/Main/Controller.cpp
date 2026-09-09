@@ -7,6 +7,7 @@
 #include "resource.h"
 #include "ControllerTextBox.h"
 #include "Defines.h"
+#include "CustomEventTime.h"
 // ----------------------------------------------------------------------------------------------
 Controller	gController;
 // ----------------------------------------------------------------------------------------------
@@ -72,19 +73,35 @@ LRESULT Controller::Keyboard(int Code, WPARAM wParam, LPARAM lParam)
 
 			if (Hook.vkCode == 0x48) // VK_H
 			{
-				if (SceneFlag != MAIN_SCENE 
-					|| gInterface.CheckWindow(ObjWindow::MuHelper)
-					|| gInterface.CheckWindow(ObjWindow::Store)
-					|| gInterface.CheckWindow(ObjWindow::CreateGuild)
-					|| gInterface.CheckWindow(ObjWindow::FastDial)
-					|| gInterface.CheckWindow(ObjWindow::FriendList))
+				if (SceneFlag == MAIN_SCENE 
+					&& !gInterface.CheckWindow(ObjWindow::ChatWindow)
+					&& !gInterface.CheckWindow(ObjWindow::MuHelper)
+					&& !gInterface.CheckWindow(ObjWindow::Store)
+					&& !gInterface.CheckWindow(ObjWindow::CreateGuild)
+					&& !gInterface.CheckWindow(ObjWindow::FastDial)
+					&& !gInterface.CheckWindow(ObjWindow::FriendList))
 				{
-					short symbol = gTextBoxController.GetSymbolFromVK(Hook.vkCode);
-					if (symbol != 0)
+					if (gProtect.m_MainInfo.EnableEventTimeButton == 1 && GetTickCount() >= gCustomEventTime.OpenTestDelay + 250)
 					{
-						PostMessage(*(HWND*)(MAIN_WINDOW), WM_CHAR, symbol, 1);
+						if (gCustomEventTime.CheckTestWindow())
+						{
+							gCustomEventTime.CloseTestWindow();
+						}
+						else
+						{
+							gCustomEventTime.ClearCustomEventTime();
+
+							PMSG_CUSTOM_EVENTTIME_SEND pMsg;
+
+							pMsg.header.set(0xF3, 0xE8, sizeof(pMsg));
+
+							DataSend((BYTE*)&pMsg, pMsg.header.size);
+
+							gCustomEventTime.OpenTestWindow();
+						}
+						gCustomEventTime.OpenTestDelay = GetTickCount();
+						return 1;
 					}
-					return 1;
 				}
 			}
 		}

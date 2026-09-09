@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "CustomStore.h"
+#include "OfflineRestore.h"
 #include "CashShop.h"
 #include "CommandManager.h"
 #include "DSProtocol.h"
@@ -202,6 +203,8 @@ bool CCustomStore::CommandCustomStoreOffline(LPOBJ lpObj,char* arg) // OK
 	lpObj->PShopCustomTime = this->m_CustomStoreTime[lpObj->AccountLevel]*60;
 
 	closesocket(lpObj->PerSocketContext->Socket);
+
+	gOfflineRestore.SaveOffline(lpObj, OFFLINE_RESTORE_STORE);
 
 	return 1;
 }

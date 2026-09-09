@@ -2277,6 +2277,8 @@ void CGConnectAccountRecv(PMSG_CONNECT_ACCOUNT_RECV* lpMsg,int aIndex) // OK
 
 		PacketArgumentDecrypt(password,lpMsg->password,(sizeof(password)-1));
 
+		memcpy(lpObj->Password,password,sizeof(lpObj->Password));
+
 		lpObj->MapServerMoveRequest = 0;
 		lpObj->LastServerCode = -1;
 		lpObj->DestMap = -1;

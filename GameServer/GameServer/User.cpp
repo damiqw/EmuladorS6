@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "OfflineMode.h"
+#include "OfflineRestore.h"
 #include "User.h"
 #include "380ItemOption.h"
 #include "Attack.h"
@@ -314,6 +315,8 @@ void gObjFirstProc() // OK
 	#endif
 
 	gReconnect.MainProc();
+
+	gOfflineRestore.MainProc();
 
 	gCastleSiegeSync.AdjustTributeMoney();
 
@@ -904,6 +907,10 @@ void gObjCharZeroSet(int aIndex) // OK
 	lpObj->m_OfflineCoordY = 0;
 	lpObj->m_OfflineTimeResetMove = 0;
 //	lpObj->AttackCustomOfflineMoneyDelay = 0;
+	memset(lpObj->Password, 0, sizeof(lpObj->Password));
+	lpObj->m_OfflineRestoreType = 0;
+	memset(lpObj->m_OfflineRestoreName, 0, sizeof(lpObj->m_OfflineRestoreName));
+	gOfflineRestore.RemoveOffline(lpObj->Account);
 	lpObj->AttackCustomAutoBuff = 0;
 	lpObj->AttackCustomAutoBuffDelay = 0;
 	lpObj->MiniMapState = 0;
@@ -3643,7 +3650,7 @@ void gObjSecondProc()
 					}
 				}
 
-				// Aquí se agrega la línea para procesar el ataque falso
+				// AquÃ­ se agrega la lÃ­nea para procesar el ataque falso
 #if USE_FAKE_ONLINE == TRUE
 				s_FakeOnline.FakeAttackProc(lpObj); // add this
 #endif

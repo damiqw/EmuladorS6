@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "CustomAttack.h"
+#include "OfflineRestore.h"
 #include "CommandManager.h"
 #include "EffectManager.h"
 #include "GameMain.h"
@@ -189,6 +190,8 @@ bool CCustomAttack::CommandCustomAttackOffline(LPOBJ lpObj,char* arg) // OK
 	lpObj->AttackCustomOfflineTime = 0;
 
 	closesocket(lpObj->PerSocketContext->Socket);
+
+	gOfflineRestore.SaveOffline(lpObj, OFFLINE_RESTORE_ATTACK);
 
 	return 1;
 }

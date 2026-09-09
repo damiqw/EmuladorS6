@@ -68,7 +68,7 @@ void JGConnectAccountRecv(SDHP_CONNECT_ACCOUNT_RECV* lpMsg) // OK
 		return;
 	}
 
-	// Agregar la línea para obtener la información de experiencia offline
+	// Agregar la lÃ­nea para obtener la informaciÃ³n de experiencia offline
 #if USE_FAKE_ONLINE == TRUE
 	OFFEXP_DATA* info = s_FakeOnline.GetOffExpInfoByAccount(&gObj[lpMsg->index]);
 #endif
@@ -113,6 +113,11 @@ void JGConnectAccountRecv(SDHP_CONNECT_ACCOUNT_RECV* lpMsg) // OK
 		gObj[lpMsg->index].IsFakeOnline = true;
 	}
 #endif
+
+	if (gObj[lpMsg->index].m_OfflineRestoreType > 0 && gObj[lpMsg->index].Socket == INVALID_SOCKET)
+	{
+		GDCharacterInfoSend(lpMsg->index, gObj[lpMsg->index].m_OfflineRestoreName);
+	}
 
 	gObj[lpMsg->index].Connected = OBJECT_LOGGED;
 

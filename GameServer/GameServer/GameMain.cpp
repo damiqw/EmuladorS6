@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "OfflineMode.h"
+#include "OfflineRestore.h"
 #include "GameMain.h"
 #include "BattleSoccerManager.h"
 #include "CommandManager.h"
@@ -61,6 +62,8 @@ void GameMainInit(HWND hwnd) // OK
 	gJoinServerConnection.Init(hwnd,JoinServerProtocolCore);
 
 	gDataServerConnection.Init(hwnd,DataServerProtocolCore);
+
+	gOfflineRestore.Init();
 
 	PROTECT_FINAL
 }

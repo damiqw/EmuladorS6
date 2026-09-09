@@ -4,6 +4,7 @@
 
 #include "StdAfx.h"
 #include "OfflineMode.h"
+#include "OfflineRestore.h"
 #include "User.h"
 #include "GameMain.h"
 #include "Message.h"
@@ -180,6 +181,7 @@ void OfflineMode::Start(CG_OFFMODE_RESULT* aRecv, int aIndex)
 	CloseClient(aIndex);
 	lpObj->m_OfflineSocket = false;
 	lpObj->m_OfflineMode = 1;
+	gOfflineRestore.SaveOffline(lpObj, OFFLINE_RESTORE_HELPER);
 }
 
 void OfflineMode::OnAttackSecondProcHelper(LPOBJ lpObj) // OK

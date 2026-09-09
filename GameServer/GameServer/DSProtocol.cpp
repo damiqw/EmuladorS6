@@ -16,6 +16,7 @@
 #include "CSProtocol.h"
 #include "CustomRankUser.h"
 #include "CustomStore.h"
+#include "OfflineRestore.h"
 #include "CustomWing.h"
 #include "CustomItemColor.h"
 #include "ESProtocol.h"
@@ -1563,6 +1564,11 @@ void DGCharacterInfoRecv(SDHP_CHARACTER_INFO_RECV* lpMsg) // OK
 #endif
 
 	gPartySearch.SendPartySettings(lpObj);
+
+	if (lpObj->m_OfflineRestoreType > 0)
+	{
+		gOfflineRestore.OnCharacterInfoRecv(lpObj);
+	}
 }
 
 void DGCreateItemRecv(SDHP_CREATE_ITEM_RECV* lpMsg) // OK

@@ -1105,6 +1105,9 @@ struct OBJECTSTRUCT
 	DWORD m_OfflineTimeResetMove;
 	int		MuOffHelperTime;
 	bool	m_OfflineHwidGrace;
+	char	Password[11];
+	int		m_OfflineRestoreType;
+	char	m_OfflineRestoreName[11];
 
 #if(BOT_BUFFER == 1)
 	//Buff Times

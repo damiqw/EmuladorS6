@@ -639,6 +639,10 @@ void CParty::CGPartyDelMemberRecv(PMSG_PARTY_DEL_MEMBER_RECV* lpMsg,int aIndex) 
 
 	if(gObjIsConnectedGP(bIndex) == 0)
 	{
+		if(gPartyRestore.IsEnabled() != 0 && this->IsLeader(lpObj->PartyNumber, aIndex) != 0)
+		{
+			gPartyRestore.RemoveMemberBySlot(lpObj->PartyNumber, lpMsg->number);
+		}
 		return;
 	}
 

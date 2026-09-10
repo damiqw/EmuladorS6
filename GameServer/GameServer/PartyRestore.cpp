@@ -38,6 +38,10 @@ CPartyRestore::~CPartyRestore()
 
 void CPartyRestore::Init()
 {
+	this->m_Enabled = 1;
+	this->m_Timeout = 1800;
+	this->m_TimeoutOnlyIfEmpty = 1;
+
 	EnterCriticalSection(&this->m_critical);
 	this->m_Parties.clear();
 	this->m_PartyNumberToID.clear();
@@ -46,6 +50,13 @@ void CPartyRestore::Init()
 	LeaveCriticalSection(&this->m_critical);
 
 	this->LoadData();
+}
+
+void CPartyRestore::ReadConfig(char* section, char* path)
+{
+	this->m_Enabled = GetPrivateProfileInt(section, "PartyRestoreSwitch", 1, path);
+	this->m_Timeout = GetPrivateProfileInt(section, "PartyRestoreTimeout", 1800, path);
+	this->m_TimeoutOnlyIfEmpty = GetPrivateProfileInt(section, "PartyRestoreTimeoutOnlyIfEmpty", 1, path);
 }
 
 void CPartyRestore::LoadData()
@@ -480,8 +491,78 @@ void CPartyRestore::OnCharacterLogin(LPOBJ lpObj)
 	LeaveCriticalSection(&this->m_critical);
 }
 
+void CPartyRestore::RemoveMemberBySlot(int partyNumber, BYTE slot)
+{
+	if (partyNumber < 0 || gParty.IsParty(partyNumber) == 0)
+	{
+		return;
+	}
+
+	EnterCriticalSection(&this->m_critical);
+
+	std::map<int, DWORD>::iterator itID = this->m_PartyNumberToID.find(partyNumber);
+	if (itID != this->m_PartyNumberToID.end())
+	{
+		std::map<DWORD, PARTY_RESTORE_INFO>::iterator itP = this->m_Parties.find(itID->second);
+		if (itP != this->m_Parties.end())
+		{
+			for (int m = 0; m < itP->second.Count; ++m)
+			{
+				if (itP->second.Members[m].Slot == slot)
+				{
+					LogAdd(LOG_BLUE, "[PartyRestore] Removed member [%s] by leader from party [%d] slot [%d]",
+						itP->second.Members[m].Name, partyNumber, slot);
+
+					for (int k = m; k < itP->second.Count - 1; ++k)
+					{
+						itP->second.Members[k] = itP->second.Members[k + 1];
+					}
+					itP->second.Count--;
+					break;
+				}
+			}
+
+			if (itP->second.Count <= 1)
+			{
+				gParty.Destroy(partyNumber);
+				this->m_PartyNumberToID.erase(partyNumber);
+				this->m_Parties.erase(itP);
+				LeaveCriticalSection(&this->m_critical);
+				this->SaveData();
+				return;
+			}
+		}
+	}
+
+	gParty.m_PartyInfo[partyNumber].Index[slot] = -1;
+
+	int activeCount = 0;
+	for (int i = 0; i < MAX_PARTY_USER; ++i)
+	{
+		if (OBJECT_RANGE(gParty.m_PartyInfo[partyNumber].Index[i]) != 0)
+		{
+			activeCount++;
+		}
+	}
+	gParty.m_PartyInfo[partyNumber].Count = activeCount;
+
+	if (activeCount > 0)
+	{
+		gParty.GCPartyListSend(partyNumber);
+	}
+
+	LeaveCriticalSection(&this->m_critical);
+
+	this->SaveData();
+}
+
 void CPartyRestore::OnCharacterClose(LPOBJ lpObj)
 {
+	if (this->m_Enabled == 0)
+	{
+		return;
+	}
+
 	if (lpObj == 0 || lpObj->PartyNumber < 0 || gParty.IsParty(lpObj->PartyNumber) == 0)
 	{
 		return;
@@ -513,21 +594,57 @@ void CPartyRestore::OnCharacterClose(LPOBJ lpObj)
 				}
 			}
 
-			LogAdd(LOG_BLUE, "[PartyRestore] Vacated slot [%d] in party [%d] for character [%s] (transition to client)",
+			int activeCount = 0;
+			for (int i = 0; i < MAX_PARTY_USER; ++i)
+			{
+				if (OBJECT_RANGE(gParty.m_PartyInfo[partyNumber].Index[i]) != 0)
+				{
+					activeCount++;
+				}
+			}
+			gParty.m_PartyInfo[partyNumber].Count = activeCount;
+
+			if (activeCount > 0)
+			{
+				gParty.GCPartyListSend(partyNumber);
+			}
+			else
+			{
+				if (itID != this->m_PartyNumberToID.end())
+				{
+					std::map<DWORD, PARTY_RESTORE_INFO>::iterator itP = this->m_Parties.find(itID->second);
+					if (itP != this->m_Parties.end())
+					{
+						itP->second.ActivePartyNumber = -1;
+					}
+					this->m_PartyNumberToID.erase(itID);
+				}
+			}
+
+			lpObj->PartyNumber = -1;
+
+			LogAdd(LOG_BLUE, "[PartyRestore] Vacated slot [%d] in party [%d] for character [%s] (preserved for reconnect)",
 				n, partyNumber, lpObj->Name);
 			break;
 		}
 	}
 
 	LeaveCriticalSection(&this->m_critical);
+
+	this->SaveData();
 }
 
 void CPartyRestore::MainProc()
 {
+	if (this->m_Enabled == 0)
+	{
+		return;
+	}
+
 	EnterCriticalSection(&this->m_critical);
 
 	DWORD currentTick = GetTickCount();
-	DWORD timeout = (DWORD)(gServerInfo.m_PartyReconnectTime > 0 ? gServerInfo.m_PartyReconnectTime * 1000 : 300000);
+	DWORD timeout = (DWORD)(this->m_Timeout > 0 ? this->m_Timeout * 1000 : 1800000);
 
 	for (std::map<DWORD, PARTY_RESTORE_INFO>::iterator it = this->m_Parties.begin(); it != this->m_Parties.end();)
 	{
@@ -549,31 +666,38 @@ void CPartyRestore::MainProc()
 		bool erased = false;
 
 		// Clean up members that exceeded timeout
-		for (int m = 0; m < it->second.Count;)
+		// If m_TimeoutOnlyIfEmpty is enabled, do NOT purge members as long as at least 1 member is online/offhelper
+		if (this->m_Timeout > 0 && (this->m_TimeoutOnlyIfEmpty == 0 || onlineCount == 0))
 		{
-			if (it->second.Members[m].DisconnectTick != 0 && (currentTick - it->second.Members[m].DisconnectTick) > timeout)
+			for (int m = 0; m < it->second.Count;)
 			{
-				BYTE timedOutSlot = it->second.Members[m].Slot;
-
-				if (partyAlive && gParty.m_PartyInfo[partyNumber].Index[timedOutSlot] == -1)
+				if (it->second.Members[m].DisconnectTick != 0 && (currentTick - it->second.Members[m].DisconnectTick) > timeout)
 				{
-					if (timedOutSlot == 0 && onlineCount > 0)
+					BYTE timedOutSlot = it->second.Members[m].Slot;
+
+					if (partyAlive && gParty.m_PartyInfo[partyNumber].Index[timedOutSlot] == -1)
 					{
-						gParty.ChangeLeader(partyNumber, 0);
+						if (timedOutSlot == 0 && onlineCount > 0)
+						{
+							gParty.ChangeLeader(partyNumber, 0);
+						}
 					}
-				}
 
-				for (int k = m; k < it->second.Count - 1; ++k)
-				{
-					it->second.Members[k] = it->second.Members[k + 1];
+					LogAdd(LOG_BLUE, "[PartyRestore] Member [%s] timed out from party [%d] slot [%d]",
+						it->second.Members[m].Name, partyNumber, timedOutSlot);
+
+					for (int k = m; k < it->second.Count - 1; ++k)
+					{
+						it->second.Members[k] = it->second.Members[k + 1];
+					}
+					it->second.Count--;
+					continue;
 				}
-				it->second.Count--;
-				continue;
+				m++;
 			}
-			m++;
 		}
 
-		if (it->second.Count == 0)
+		if (it->second.Count <= 1 && onlineCount == 0)
 		{
 			if (partyAlive)
 			{

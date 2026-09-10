@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "OfflineMode.h"
 #include "OfflineRestore.h"
+#include "PartyRestore.h"
 #include "ServerInfo.h"
 #include "380ItemOption.h"
 #include "380ItemType.h"
@@ -337,6 +338,8 @@ void CServerInfo::ReadCustomInfo() // OK
 	this->ReadCustomInfo("GameServerInfo",".\\Data\\GameServerInfo - Custom.dat");
 
 	gOfflineRestore.ReadConfig("GameServerInfo",".\\Data\\GameServerInfo - Custom.dat");
+
+	gPartyRestore.ReadConfig("GameServerInfo",".\\Data\\GameServerInfo - Custom.dat");
 
 	gCustomArena.ReadCustomArenaInfo("GameServerInfo",".\\Data\\GameServerInfo - Custom.dat");
 

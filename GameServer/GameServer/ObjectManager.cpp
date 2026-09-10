@@ -795,7 +795,11 @@ bool CObjectManager::CharacterGameClose(int aIndex) // OK
 	{
 		if(IT_MAP_RANGE(lpObj->Map) == 0 && DG_MAP_RANGE(lpObj->Map) == 0 && IG_MAP_RANGE(lpObj->Map) == 0)
 		{
-			if(lpObj->m_OfflineMode != 0 || lpObj->AttackCustomOffline != 0)
+			if(gPartyRestore.IsEnabled() != 0)
+			{
+				gPartyRestore.OnCharacterClose(lpObj);
+			}
+			else if(lpObj->m_OfflineMode != 0 || lpObj->AttackCustomOffline != 0)
 			{
 				gPartyRestore.OnCharacterClose(lpObj);
 			}

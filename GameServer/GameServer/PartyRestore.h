@@ -48,21 +48,27 @@ public:
 	CPartyRestore();
 	virtual ~CPartyRestore();
 	void Init();
+	void ReadConfig(char* section, char* path);
 	void LoadData();
 	void SaveData();
 	void SaveParty(int partyNumber);
 	void RemoveParty(int partyNumber);
+	void RemoveMemberBySlot(int partyNumber, BYTE slot);
 	void SavePartySearch(char* name);
 	void RemovePartySearch(char* name);
 	void OnCharacterLogin(LPOBJ lpObj);
 	void OnCharacterClose(LPOBJ lpObj);
 	void MainProc();
+	bool IsEnabled() { return this->m_Enabled != 0; }
 private:
 	CRITICAL_SECTION m_critical;
 	std::map<DWORD, PARTY_RESTORE_INFO> m_Parties;
 	std::map<int, DWORD> m_PartyNumberToID;
 	std::map<std::string, PARTY_SEARCH_RESTORE_DATA> m_PartySearch;
 	DWORD m_NextPartyID;
+	int m_Enabled;
+	int m_Timeout;
+	int m_TimeoutOnlyIfEmpty;
 };
 
 extern CPartyRestore gPartyRestore;

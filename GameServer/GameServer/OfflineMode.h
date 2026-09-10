@@ -2,6 +2,7 @@
 
 #include "StdAfx.h"
 #include "Protocol.h"
+#include "DefaultClassInfo.h"
 // ----------------------------------------------------------------------------------------------
 
 #define OFFMAXTIME_FOR_BUFF		20	
@@ -73,6 +74,8 @@ public:
 	DWORD m_ConnectTick;
 	int m_MUOffHelperEnabled[4];
 	int m_MUOffHelperTimer[4];
+	int m_MUOffHelperAttackDelay[MAX_CLASS];
+	int m_MUOffHelperMinDelay[MAX_CLASS];
 	void ReadOffLine(char* section, char* path);
 	void Start(CG_OFFMODE_RESULT* aRecv, int UserIndex);
 	void Attack(int UserIndex);

@@ -29,6 +29,12 @@ OfflineMode g_OfflineMode;
 OfflineMode::OfflineMode()
 {
 	this->m_bLoadedDB = false;
+
+	for(int n = 0; n < MAX_CLASS; n++)
+	{
+		this->m_MUOffHelperAttackDelay[n] = 1000;
+		this->m_MUOffHelperMinDelay[n] = 500;
+	}
 }
 // ----------------------------------------------------------------------------------------------
 
@@ -47,11 +53,35 @@ void OfflineMode::ReadOffLine(char* section, char* path)
 	this->m_MUOffHelperTimer[2] = GetPrivateProfileInt(section, "MuOffHelperTime_AL2", -1, path);
 	this->m_MUOffHelperTimer[3] = GetPrivateProfileInt(section, "MuOffHelperTime_AL3", -1, path);
 
+	int globalBaseDelay = GetPrivateProfileInt(section, "MuOffHelperAttackDelay", 1000, path);
+	int globalMinDelay = GetPrivateProfileInt(section, "MuOffHelperMinDelay", 500, path);
+
+	const char* classNames[MAX_CLASS] = { "DW", "DK", "FE", "MG", "DL", "SU", "RF" };
+
+	for(int n = 0; n < MAX_CLASS; n++)
+	{
+		char keyBase[64], keyMin[64];
+		wsprintf(keyBase, "MuOffHelperAttackDelay_%s", classNames[n]);
+		wsprintf(keyMin, "MuOffHelperMinDelay_%s", classNames[n]);
+
+		this->m_MUOffHelperAttackDelay[n] = GetPrivateProfileInt(section, keyBase, globalBaseDelay, path);
+		this->m_MUOffHelperMinDelay[n] = GetPrivateProfileInt(section, keyMin, globalMinDelay, path);
+	}
+
 	LogAdd(LOG_RED, "[OfflineMode] ReadOffLine -> AL0:%d(%dmin) AL1:%d(%dmin) AL2:%d(%dmin) AL3:%d(%dmin)",
 		m_MUOffHelperEnabled[0], m_MUOffHelperTimer[0],
 		m_MUOffHelperEnabled[1], m_MUOffHelperTimer[1],
 		m_MUOffHelperEnabled[2], m_MUOffHelperTimer[2],
 		m_MUOffHelperEnabled[3], m_MUOffHelperTimer[3]);
+
+	LogAdd(LOG_BLUE, "[OfflineMode] Delays -> DW:%d/%d DK:%d/%d FE:%d/%d MG:%d/%d DL:%d/%d SU:%d/%d RF:%d/%d",
+		this->m_MUOffHelperAttackDelay[CLASS_DW], this->m_MUOffHelperMinDelay[CLASS_DW],
+		this->m_MUOffHelperAttackDelay[CLASS_DK], this->m_MUOffHelperMinDelay[CLASS_DK],
+		this->m_MUOffHelperAttackDelay[CLASS_FE], this->m_MUOffHelperMinDelay[CLASS_FE],
+		this->m_MUOffHelperAttackDelay[CLASS_MG], this->m_MUOffHelperMinDelay[CLASS_MG],
+		this->m_MUOffHelperAttackDelay[CLASS_DL], this->m_MUOffHelperMinDelay[CLASS_DL],
+		this->m_MUOffHelperAttackDelay[CLASS_SU], this->m_MUOffHelperMinDelay[CLASS_SU],
+		this->m_MUOffHelperAttackDelay[CLASS_RF], this->m_MUOffHelperMinDelay[CLASS_RF]);
 }
 
 void OfflineMode::OnHelperpAlreadyConnected(LPOBJ lpObj) // OK
@@ -747,9 +777,28 @@ void OfflineMode::RenderAttack(int aIndex)
 				}
 			}
 
-			int MultiPlicador = (lpObj->Class == CLASS_RF) ? 1 : 5;
+			DWORD speed = (lpObj->PhysiSpeed > 0) ? (DWORD)lpObj->PhysiSpeed : 20;
 
-			if((GetTickCount() - ((DWORD)lpObj->AttackCustomDelay)) >= (((((DWORD)lpObj->PhysiSpeed) * MultiPlicador) > 1500) ? 0 : (1500 - (((DWORD)lpObj->PhysiSpeed) * MultiPlicador))))
+			if((lpObj->Class == CLASS_DW || lpObj->Class == CLASS_SU) && (DWORD)lpObj->MagicSpeed > speed)
+			{
+				speed = (DWORD)lpObj->MagicSpeed;
+			}
+
+			int classNum = (lpObj->Class >= 0 && lpObj->Class < MAX_CLASS) ? lpObj->Class : CLASS_DK;
+
+			// Retardo calibrado por raza: base configurable (def: 1000ms) reducida suavemente por la velocidad
+			DWORD baseDelay = (this->m_MUOffHelperAttackDelay[classNum] > 0) ? (DWORD)this->m_MUOffHelperAttackDelay[classNum] : 1000;
+			DWORD minDelay = (this->m_MUOffHelperMinDelay[classNum] > 0) ? (DWORD)this->m_MUOffHelperMinDelay[classNum] : 500;
+
+			DWORD reduction = speed * 3;
+			DWORD attackDelay = (baseDelay > reduction) ? (baseDelay - reduction) : minDelay;
+
+			if(attackDelay < minDelay)
+			{
+				attackDelay = minDelay;
+			}
+
+			if((GetTickCount() - ((DWORD)lpObj->AttackCustomDelay)) >= attackDelay)
 			{
 				lpObj->AttackCustomDelay = GetTickCount();
 

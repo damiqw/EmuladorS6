@@ -23,6 +23,11 @@ CIpManager::~CIpManager() // OK
 
 bool CIpManager::CheckIpAddress(char* IpAddress) // OK
 {
+	if(strcmp(IpAddress,"127.0.0.1") == 0)
+	{
+		return 1;
+	}
+
 	std::map<std::string,IP_ADDRESS_INFO>::iterator it = this->m_IpAddressInfo.find(std::string(IpAddress));
 
 	if(it == this->m_IpAddressInfo.end())

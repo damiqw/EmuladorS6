@@ -50,6 +50,8 @@ struct CG_OFFMODE_RESULT
 	BYTE DistanceReturnOn;
 	WORD DistanceMin;//-- tiempo
 	WORD SkillBasicID;
+	WORD SkillSecond1ID;
+	WORD SkillSecond2ID;
 	BYTE ComboOn;				//-> CLASS_KNIGHT
 	BYTE PartyModeOn;
 	BYTE PartyModeHealOn;		//-> CLASS_ELF

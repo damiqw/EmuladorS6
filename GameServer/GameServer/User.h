@@ -1081,6 +1081,9 @@ struct OBJECTSTRUCT
 	int		ObtainPickExtraCount;
 	/*+300*/	char	ObtainPickItemList[12][16];
 	/*+188*/	DWORD	SkillBasicID;
+	/*+192*/	DWORD	SkillSecond1ID;
+	/*+216*/	DWORD	SkillSecond2ID;
+	int		OfflineComboStep;
 	/*+240*/	BYTE	ComboOn;				//-> CLASS_KNIGHT
 	/*+241*/	BYTE	PartyModeOn;
 	/*+242*/	BYTE	PartyModeHealOn;		//-> CLASS_ELF

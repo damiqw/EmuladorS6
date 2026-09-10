@@ -82,6 +82,7 @@ void CPartyRestore::LoadData()
 		if (fread(&party, sizeof(party), 1, file) == 1)
 		{
 			party.ActivePartyNumber = -1;
+			party.CreateTick = GetTickCount();
 			for (int m = 0; m < party.Count; ++m)
 			{
 				party.Members[m].DisconnectTick = GetTickCount();
@@ -368,7 +369,7 @@ void CPartyRestore::OnCharacterLogin(LPOBJ lpObj)
 	{
 		for (int m = 0; m < it->second.Count; ++m)
 		{
-			if (strcmp(it->second.Members[m].Name, lpObj->Name) == 0)
+			if (_stricmp(it->second.Members[m].Name, lpObj->Name) == 0)
 			{
 				targetPartyID = it->first;
 				targetSlot = it->second.Members[m].Slot;
@@ -572,7 +573,7 @@ void CPartyRestore::MainProc()
 			m++;
 		}
 
-		if (it->second.Count == 0 || (onlineCount == 0 && (currentTick - it->second.CreateTick) > timeout))
+		if (it->second.Count == 0)
 		{
 			if (partyAlive)
 			{

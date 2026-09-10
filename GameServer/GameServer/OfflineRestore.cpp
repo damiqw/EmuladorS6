@@ -17,7 +17,7 @@
 COfflineRestore gOfflineRestore;
 
 #define OFFLINE_RESTORE_MAGIC 0x4F464652 // 'OFFR'
-#define OFFLINE_RESTORE_VERSION 1
+#define OFFLINE_RESTORE_VERSION 3
 #define OFFLINE_RESTORE_XOR_KEY 0x5A
 
 struct OFFLINE_RESTORE_HEADER
@@ -171,6 +171,8 @@ void COfflineRestore::SaveOffline(LPOBJ lpObj, int type)
 	memcpy(data.Account, lpObj->Account, sizeof(data.Account));
 	memcpy(data.Password, lpObj->Password, sizeof(data.Password));
 	memcpy(data.Name, lpObj->Name, sizeof(data.Name));
+	memcpy(data.IpAddr, lpObj->IpAddr, sizeof(data.IpAddr));
+	memcpy(data.HardwareId, lpObj->HardwareId, sizeof(data.HardwareId));
 	data.Type = (BYTE)type;
 	data.Map = (BYTE)lpObj->Map;
 	data.X = (BYTE)lpObj->X;
@@ -200,6 +202,8 @@ void COfflineRestore::SaveOffline(LPOBJ lpObj, int type)
 		data.DistanceReturnOn = lpObj->DistanceReturnOn;
 		data.DistanceMin = lpObj->DistanceMin;
 		data.SkillBasicID = (WORD)lpObj->SkillBasicID;
+		data.SkillSecond1ID = (WORD)lpObj->SkillSecond1ID;
+		data.SkillSecond2ID = (WORD)lpObj->SkillSecond2ID;
 		data.ComboOn = lpObj->ComboOn;
 		data.PartyModeOn = lpObj->PartyModeOn;
 		data.PartyModeHealOn = lpObj->PartyModeHealOn;
@@ -350,7 +354,9 @@ void COfflineRestore::MainProc()
 			continue;
 		}
 
-		int aIndex = gObjAddSearch(0, "127.0.0.1");
+		const char* restoreIp = (data.IpAddr[0] != '\0') ? data.IpAddr : "127.0.0.1";
+
+		int aIndex = gObjAddSearch(0, (char*)restoreIp);
 
 		if (aIndex < 0)
 		{
@@ -359,11 +365,10 @@ void COfflineRestore::MainProc()
 			return;
 		}
 
-		gObjAdd(0, "127.0.0.1", aIndex);
+		gObjAdd(0, (char*)restoreIp, aIndex);
 
 		LPOBJ lpObj = &gObj[aIndex];
 
-		lpObj->LoginMessageSend++;
 		lpObj->LoginMessageSend++;
 		lpObj->LoginMessageCount++;
 		lpObj->ConnectTickCount = GetTickCount();
@@ -381,16 +386,17 @@ void COfflineRestore::MainProc()
 		memcpy(lpObj->Account, data.Account, sizeof(lpObj->Account));
 		memcpy(lpObj->Password, data.Password, sizeof(lpObj->Password));
 		memcpy(lpObj->m_OfflineRestoreName, data.Name, sizeof(lpObj->m_OfflineRestoreName));
+		memcpy(lpObj->HardwareId, data.HardwareId, sizeof(lpObj->HardwareId));
 
 		char account[11] = { 0 };
 		char password[11] = { 0 };
 		memcpy(account, data.Account, sizeof(account) - 1);
 		memcpy(password, data.Password, sizeof(password) - 1);
 
-		GJConnectAccountSend(aIndex, account, password, "127.0.0.1");
+		GJConnectAccountSend(aIndex, account, password, (char*)restoreIp);
 
-		LogAdd(LOG_BLUE, "[OfflineRestore] Restoring [%s][%s] Type: %d (Slot: %d)",
-			data.Account, data.Name, data.Type, aIndex);
+		LogAdd(LOG_BLUE, "[OfflineRestore] Restoring [%s][%s] Type: %d (Slot: %d, IP: %s, PassLen: %d)",
+			data.Account, data.Name, data.Type, aIndex, restoreIp, (int)strlen(password));
 
 		return; // Process next character in next tick
 	}
@@ -456,6 +462,9 @@ void COfflineRestore::OnCharacterInfoRecv(LPOBJ lpObj)
 		lpObj->DistanceReturnOn = data.DistanceReturnOn;
 		lpObj->DistanceMin = data.DistanceMin;
 		lpObj->SkillBasicID = data.SkillBasicID;
+		lpObj->SkillSecond1ID = data.SkillSecond1ID;
+		lpObj->SkillSecond2ID = data.SkillSecond2ID;
+		lpObj->OfflineComboStep = 0;
 		lpObj->ComboOn = data.ComboOn;
 		lpObj->PartyModeOn = data.PartyModeOn;
 		lpObj->PartyModeHealOn = data.PartyModeHealOn;

@@ -15,6 +15,7 @@
 #include "ConnectMember.h"
 #include "FakeOnline.h"
 #include "OfflineMode.h"
+#include "OfflineRestore.h"
 
 void JoinServerProtocolCore(BYTE head,BYTE* lpMsg,int size) // OK
 {
@@ -87,7 +88,12 @@ void JGConnectAccountRecv(SDHP_CONNECT_ACCOUNT_RECV* lpMsg) // OK
 
 	if (lpMsg->result != 1)
 	{
+		LogAdd(LOG_RED, "[JGConnectAccountRecv] Login failed for [%d][%s] Result: %d", lpMsg->index, lpMsg->account, lpMsg->result);
 		GCConnectAccountSend(lpMsg->index, ((gObj[lpMsg->index].LoginMessageCount >= 3) ? 8 : lpMsg->result));
+		if (gObj[lpMsg->index].Socket == INVALID_SOCKET)
+		{
+			gObjDel(lpMsg->index);
+		}
 		return;
 	}
 
@@ -117,6 +123,10 @@ void JGConnectAccountRecv(SDHP_CONNECT_ACCOUNT_RECV* lpMsg) // OK
 	if (gObj[lpMsg->index].m_OfflineRestoreType > 0 && gObj[lpMsg->index].Socket == INVALID_SOCKET)
 	{
 		GDCharacterInfoSend(lpMsg->index, gObj[lpMsg->index].m_OfflineRestoreName);
+	}
+	else if (gObj[lpMsg->index].Socket != INVALID_SOCKET)
+	{
+		gOfflineRestore.RemoveOffline(lpMsg->account);
 	}
 
 	gObj[lpMsg->index].Connected = OBJECT_LOGGED;

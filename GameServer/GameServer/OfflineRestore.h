@@ -19,6 +19,8 @@ struct OFFLINE_RESTORE_DATA
 	char Account[11];
 	char Password[11];
 	char Name[11];
+	char IpAddr[16];
+	char HardwareId[37];
 	BYTE Type; // eOfflineRestoreType
 	BYTE Map;
 	BYTE X;
@@ -41,6 +43,8 @@ struct OFFLINE_RESTORE_DATA
 	BYTE DistanceReturnOn;
 	DWORD DistanceMin;
 	WORD SkillBasicID;
+	WORD SkillSecond1ID;
+	WORD SkillSecond2ID;
 	BYTE ComboOn;
 	BYTE PartyModeOn;
 	BYTE PartyModeHealOn;

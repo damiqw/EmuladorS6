@@ -40,6 +40,8 @@ void cMuOffHelper::RunningOffHelper()
 	pRequest.DistanceReturnOn = *(BYTE*)(*(DWORD*)(MAIN_HELPER_STRUCT) + 183);
 	pRequest.DistanceMin = *(WORD*)(*(DWORD*)(MAIN_HELPER_STRUCT) + 184);
 	pRequest.SkillBasicID = *(WORD*)(*(DWORD*)(MAIN_HELPER_STRUCT) + 188);
+	pRequest.SkillSecond1ID = *(WORD*)(*(DWORD*)(MAIN_HELPER_STRUCT) + 192);
+	pRequest.SkillSecond2ID = *(WORD*)(*(DWORD*)(MAIN_HELPER_STRUCT) + 216);
 	pRequest.ComboOn = *(BYTE*)(*(DWORD*)(MAIN_HELPER_STRUCT) + 240);
 	//-- Party Settings
 	pRequest.PartyModeOn = *(BYTE*)(*(DWORD*)(MAIN_HELPER_STRUCT) + 241);

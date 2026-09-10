@@ -144,6 +144,9 @@ void OfflineMode::Start(CG_OFFMODE_RESULT* aRecv, int aIndex)
 	lpObj->DistanceReturnOn = aRecv->DistanceReturnOn;
 	lpObj->DistanceMin = aRecv->DistanceMin;
 	lpObj->SkillBasicID = aRecv->SkillBasicID;
+	lpObj->SkillSecond1ID = aRecv->SkillSecond1ID;
+	lpObj->SkillSecond2ID = aRecv->SkillSecond2ID;
+	lpObj->OfflineComboStep = 0;
 	lpObj->ComboOn = (lpObj->Class == CLASS_DK) ? aRecv->ComboOn : 0;
 	//--
 	lpObj->PartyModeOn = aRecv->PartyModeOn;
@@ -386,20 +389,15 @@ void OfflineMode::RenderAutoPote(int aIndex) // OK
 	}
 
 	// RECOVERY HEALING ELF
-	if(lpObj->RecoveryHealOn != 0)
+	if(lpObj->RecoveryHealOn != 0 && lpObj->Class == CLASS_FE)
 	{
-		CSkill* RenderSkillHealing;
-
-		RenderSkillHealing = gSkillManager.GetSkill(lpObj, SKILL_HEAL);
+		CSkill* RenderSkillHealing = gSkillManager.GetSkill(lpObj, SKILL_HEAL);
 
 		if(RenderSkillHealing != 0)
 		{
-			if(lpObj->Life < ((lpObj->MaxLife * lpObj->RecoveryHealPercent) / 100))
+			if(lpObj->Life > 0 && lpObj->Life < ((lpObj->MaxLife * lpObj->RecoveryHealPercent) / 100))
 			{
-				if(gEffectManager.CheckEffect(lpObj, gSkillManager.GetSkillEffect(RenderSkillHealing->m_index)) == 0)
-				{
-					gSkillManager.UseAttackSkill(lpObj->Index, lpObj->Index, RenderSkillHealing);
-				}
+				gSkillManager.UseAttackSkill(lpObj->Index, lpObj->Index, RenderSkillHealing);
 			}
 		}
 	}
@@ -413,21 +411,21 @@ void OfflineMode::RenderAutoBuffParty(int aIndex) // OK
 	}
 
 	LPOBJ lpObj = &gObj[aIndex];
-	LPOBJ lpTarget;
 
 	// AUTOBUFF PROPIO
 	if(lpObj->BuffOn != 0)
 	{
-		CSkill* RenderBuff;
 		for(int n = 0; n < 3; n++)
 		{
 			if(lpObj->BuffSkill[n] > 0)
 			{
-				RenderBuff = gSkillManager.GetSkill(lpObj, lpObj->BuffSkill[n]);
+				CSkill* RenderBuff = gSkillManager.GetSkill(lpObj, lpObj->BuffSkill[n]);
 
 				if(RenderBuff != 0)
 				{
-					if(gEffectManager.CheckEffect(lpObj, gSkillManager.GetSkillEffect(RenderBuff->m_index)) == 0)
+					int effect = gSkillManager.GetSkillEffect(RenderBuff->m_index);
+
+					if(effect != -1 && gEffectManager.CheckEffect(lpObj, effect) == 0)
 					{
 						gSkillManager.UseAttackSkill(lpObj->Index, lpObj->Index, RenderBuff);
 					}
@@ -436,36 +434,56 @@ void OfflineMode::RenderAutoBuffParty(int aIndex) // OK
 		}
 	}
 
-	// MODO PARTY ON
-	if(lpObj->PartyModeOn != 0)
+	// MODO PARTY ON: solo si PartyModeOn esta activo y el personaje esta efectivamente en un party valido
+	if(lpObj->PartyModeOn != 0 && gParty.IsParty(lpObj->PartyNumber) != 0)
 	{
 		// PARTY HEAL ELF
 		if(lpObj->PartyModeHealOn != 0 && lpObj->Class == CLASS_FE)
 		{
-			CSkill* RenderPartyHealing;
+			CSkill* RenderPartyHealing = gSkillManager.GetSkill(lpObj, SKILL_HEAL);
 
-			for(int i = 0; i < MAX_PARTY_USER; i++)
+			if(RenderPartyHealing != 0)
 			{
-				if(OBJECT_RANGE(gParty.m_PartyInfo[lpObj->PartyNumber].Index[i]) != 0)
+				for(int i = 0; i < MAX_PARTY_USER; i++)
 				{
-					RenderPartyHealing = gSkillManager.GetSkill(lpObj, SKILL_HEAL);
+					int memberIndex = gParty.m_PartyInfo[lpObj->PartyNumber].Index[i];
 
-					if(RenderPartyHealing != 0)
+					if(OBJECT_RANGE(memberIndex) == 0 || memberIndex == lpObj->Index)
 					{
-						lpTarget = &gObj[gParty.m_PartyInfo[lpObj->PartyNumber].Index[i]];
+						continue;
+					}
 
-						if(lpTarget->Index == lpObj->Index)
-						{
-							continue;
-						}
+					if(gObjIsConnectedGP(memberIndex) == 0)
+					{
+						continue;
+					}
 
-						if(lpTarget->Life < ((lpTarget->MaxLife * lpObj->PartyModeHealPercent) / 100))
-						{
-							if(gEffectManager.CheckEffect(lpTarget, gSkillManager.GetSkillEffect(RenderPartyHealing->m_index)) == 0)
-							{
-								gSkillManager.UseAttackSkill(lpObj->Index, lpTarget->Index, RenderPartyHealing);
-							}
-						}
+					LPOBJ lpTarget = &gObj[memberIndex];
+
+					if(lpTarget->Live == 0 || lpTarget->State != OBJECT_PLAYING)
+					{
+						continue;
+					}
+
+					if(lpTarget->Map != lpObj->Map)
+					{
+						continue;
+					}
+
+					if(gObjCalcDistance(lpObj, lpTarget) > MAX_PARTY_DISTANCE)
+					{
+						continue;
+					}
+
+					if(gSkillManager.CheckSkillRange(RenderPartyHealing->m_index, lpObj->X, lpObj->Y, lpTarget->X, lpTarget->Y) == 0)
+					{
+						continue;
+					}
+
+					if(lpTarget->Life > 0 && lpTarget->Life < ((lpTarget->MaxLife * lpObj->PartyModeHealPercent) / 100))
+					{
+						gSkillManager.UseAttackSkill(lpObj->Index, lpTarget->Index, RenderPartyHealing);
+						break;
 					}
 				}
 			}
@@ -474,25 +492,52 @@ void OfflineMode::RenderAutoBuffParty(int aIndex) // OK
 		// PARTY BUFF
 		if(lpObj->PartyModeBuffOn != 0)
 		{
-			CSkill* RenderPartyBuff;
-
 			for(int i = 0; i < MAX_PARTY_USER; i++)
 			{
-				if(OBJECT_RANGE(gParty.m_PartyInfo[lpObj->PartyNumber].Index[i]) != 0)
+				int memberIndex = gParty.m_PartyInfo[lpObj->PartyNumber].Index[i];
+
+				if(OBJECT_RANGE(memberIndex) == 0 || memberIndex == lpObj->Index)
 				{
-					for(int n = 0; n < 3; n++)
+					continue;
+				}
+
+				if(gObjIsConnectedGP(memberIndex) == 0)
+				{
+					continue;
+				}
+
+				LPOBJ lpTarget = &gObj[memberIndex];
+
+				if(lpTarget->Live == 0 || lpTarget->State != OBJECT_PLAYING)
+				{
+					continue;
+				}
+
+				if(lpTarget->Map != lpObj->Map)
+				{
+					continue;
+				}
+
+				if(gObjCalcDistance(lpObj, lpTarget) > MAX_PARTY_DISTANCE)
+				{
+					continue;
+				}
+
+				for(int n = 0; n < 3; n++)
+				{
+					if(lpObj->BuffSkill[n] > 0)
 					{
-						if(lpObj->BuffSkill[n] > 0)
+						CSkill* RenderPartyBuff = gSkillManager.GetSkill(lpObj, lpObj->BuffSkill[n]);
+
+						if(RenderPartyBuff != 0)
 						{
-							RenderPartyBuff = gSkillManager.GetSkill(lpObj, lpObj->BuffSkill[n]);
+							int effect = gSkillManager.GetSkillEffect(RenderPartyBuff->m_index);
 
-							if(RenderPartyBuff != 0)
+							if(effect != -1 && gEffectManager.CheckEffect(lpTarget, effect) == 0)
 							{
-								lpTarget = &gObj[gParty.m_PartyInfo[lpObj->PartyNumber].Index[i]];
-
-								if(gEffectManager.CheckEffect(lpTarget, gSkillManager.GetSkillEffect(RenderPartyBuff->m_index)) == 0)
+								if(gSkillManager.CheckSkillRange(RenderPartyBuff->m_index, lpObj->X, lpObj->Y, lpTarget->X, lpTarget->Y) != 0)
 								{
-									gSkillManager.UseAttackSkill(lpObj->Index, gParty.m_PartyInfo[lpObj->PartyNumber].Index[i], RenderPartyBuff);
+									gSkillManager.UseAttackSkill(lpObj->Index, lpTarget->Index, RenderPartyBuff);
 								}
 							}
 						}
@@ -512,14 +557,90 @@ void OfflineMode::RenderAttack(int aIndex)
 
 	LPOBJ lpObj = &gObj[aIndex];
 	int caminar = 0;
-	int distance = (lpObj->HuntingRange > 6) ? 6 : lpObj->HuntingRange;
+	int distance = (lpObj->HuntingRange > 0) ? lpObj->HuntingRange : 6;
 
-	CSkill* SkillRender;
+	CSkill* SkillRender = 0;
 
-	// Seleccionar skill: si es Summoner con drain y tiene poca vida, usar drain; sino usar skill basica
-	SkillRender = (lpObj->Life < ((lpObj->MaxLife * lpObj->RecoveryDrainPercent) / 100) && lpObj->RecoveryDrainOn != 0)
-		? gSkillManager.GetSkill(lpObj, SKILL_DRAIN_LIFE)
-		: gSkillManager.GetSkill(lpObj, lpObj->SkillBasicID);
+	// Seleccionar skill: si es Summoner con drain y tiene poca vida, usar drain
+	if(lpObj->Life < ((lpObj->MaxLife * lpObj->RecoveryDrainPercent) / 100) && lpObj->RecoveryDrainOn != 0)
+	{
+		SkillRender = gSkillManager.GetSkill(lpObj, SKILL_DRAIN_LIFE);
+	}
+	else if(lpObj->Class == CLASS_DK && lpObj->ComboOn != 0)
+	{
+		// Si expiro la ventana de combo (3 seg), reiniciar al primer paso para sincronizar con skill tipo 0
+		if(lpObj->ComboSkill.m_time < GetTickCount())
+		{
+			lpObj->OfflineComboStep = 0;
+		}
+
+		WORD skillIds[3] = { (WORD)lpObj->SkillBasicID, (WORD)lpObj->SkillSecond1ID, (WORD)lpObj->SkillSecond2ID };
+
+		// Intentar formar secuencia de combo: [0] = Tipo 0 (Arma), [1] = Tipo 1 A, [2] = Tipo 1 B
+		CSkill* comboSkills[3] = { 0, 0, 0 };
+
+		for(int i = 0; i < 3; i++)
+		{
+			if(skillIds[i] > 0 && skillIds[i] != 0xFFFF)
+			{
+				CSkill* lpSkill = gSkillManager.GetSkill(lpObj, skillIds[i]);
+				if(lpSkill != 0)
+				{
+					int type = lpObj->ComboSkill.GetSkillType(lpSkill->m_skill);
+					if(type == 0 && comboSkills[0] == 0)
+					{
+						comboSkills[0] = lpSkill;
+					}
+					else if(type == 1)
+					{
+						if(comboSkills[1] == 0)
+						{
+							comboSkills[1] = lpSkill;
+						}
+						else if(comboSkills[2] == 0 && comboSkills[1]->m_skill != lpSkill->m_skill)
+						{
+							comboSkills[2] = lpSkill;
+						}
+					}
+				}
+			}
+		}
+
+		if(comboSkills[0] != 0 && comboSkills[1] != 0 && comboSkills[2] != 0)
+		{
+			SkillRender = comboSkills[lpObj->OfflineComboStep % 3];
+		}
+		else
+		{
+			// Si no forman combo completo, rotar entre los skills validos configurados
+			int validCount = 0;
+			CSkill* validSkills[3];
+			for(int i = 0; i < 3; i++)
+			{
+				if(skillIds[i] > 0 && skillIds[i] != 0xFFFF)
+				{
+					CSkill* lpSkill = gSkillManager.GetSkill(lpObj, skillIds[i]);
+					if(lpSkill != 0)
+					{
+						validSkills[validCount++] = lpSkill;
+					}
+				}
+			}
+
+			if(validCount > 0)
+			{
+				SkillRender = validSkills[lpObj->OfflineComboStep % validCount];
+			}
+			else
+			{
+				SkillRender = gSkillManager.GetSkill(lpObj, lpObj->SkillBasicID);
+			}
+		}
+	}
+	else
+	{
+		SkillRender = gSkillManager.GetSkill(lpObj, lpObj->SkillBasicID);
+	}
 
 	if(SkillRender == 0)
 	{
@@ -553,38 +674,50 @@ void OfflineMode::RenderAttack(int aIndex)
 			return;
 		}
 
-		int dis = (int)sqrt((float)((lpObj->X - gObj[tObjNum].X) * (lpObj->X - gObj[tObjNum].X) + (lpObj->Y - gObj[tObjNum].Y) * (lpObj->Y - gObj[tObjNum].Y)));
+		// Verificar que el monstruo este dentro del rango de caza desde la coordenada inicial
+		int disOrigin = (int)sqrt((float)((gObj[tObjNum].X - lpObj->m_OfflineCoordX) * (gObj[tObjNum].X - lpObj->m_OfflineCoordX) + (gObj[tObjNum].Y - lpObj->m_OfflineCoordY) * (gObj[tObjNum].Y - lpObj->m_OfflineCoordY)));
 
-		if(dis > distance)
+		if(disOrigin > distance)
 		{
 			return;
 		}
+
+		bool bInRange = (gSkillManager.CheckSkillRange(SkillRender->m_index, lpObj->X, lpObj->Y, gObj[tObjNum].X, gObj[tObjNum].Y) != 0
+			|| gSkillManager.CheckSkillRadio(SkillRender->m_index, lpObj->X, lpObj->Y, gObj[tObjNum].X, gObj[tObjNum].Y) != 0);
+
+		if(bInRange)
+		{
+			caminar = 0;
+			atacar = 1;
+		}
 		else
 		{
-			if(gSkillManager.CheckSkillRange(SkillRender->m_index, lpObj->X, lpObj->Y, gObj[tObjNum].X, gObj[tObjNum].Y) != 0)
+			// Si Long Distance esta desactivado, no perseguir monstruos fuera de rango
+			if(lpObj->DistanceLongOn == 0)
 			{
-				caminar = 0;
-			}
-			else
-			{
-				caminar = 1;
+				return;
 			}
 
-			if(gSkillManager.CheckSkillRadio(SkillRender->m_index, lpObj->X, lpObj->Y, gObj[tObjNum].X, gObj[tObjNum].Y) != 0)
+			// Si Long Distance esta activado, avanzar 1 casilla hacia el monstruo sin salirse del rango original
+			int dirX = (gObj[tObjNum].X > lpObj->X) ? 1 : ((gObj[tObjNum].X < lpObj->X) ? -1 : 0);
+			int dirY = (gObj[tObjNum].Y > lpObj->Y) ? 1 : ((gObj[tObjNum].Y < lpObj->Y) ? -1 : 0);
+			int targetX = lpObj->X + dirX;
+			int targetY = lpObj->Y + dirY;
+
+			int newDisOrigin = (int)sqrt((float)((targetX - lpObj->m_OfflineCoordX) * (targetX - lpObj->m_OfflineCoordX) + (targetY - lpObj->m_OfflineCoordY) * (targetY - lpObj->m_OfflineCoordY)));
+
+			if(newDisOrigin <= distance && gMap[lpObj->Map].CheckAttr(targetX, targetY, 1) == 0)
 			{
-				caminar = 0;
-			}
-			else
-			{
-				caminar = 1;
+				AnimationMove(lpObj->Index, targetX, targetY);
 			}
 
-			if(caminar == 1)
-			{
-				AnimationMove(lpObj->Index, gObj[tObjNum].X, gObj[tObjNum].Y);
-			}
+			bInRange = (gSkillManager.CheckSkillRange(SkillRender->m_index, lpObj->X, lpObj->Y, gObj[tObjNum].X, gObj[tObjNum].Y) != 0
+				|| gSkillManager.CheckSkillRadio(SkillRender->m_index, lpObj->X, lpObj->Y, gObj[tObjNum].X, gObj[tObjNum].Y) != 0);
 
-			atacar = 1;
+			if(bInRange)
+			{
+				atacar = 1;
+			}
 		}
 
 		if(atacar != 0)
@@ -675,6 +808,11 @@ void OfflineMode::RenderAttack(int aIndex)
 				else
 				{
 					gCustomAttack.SendMultiSkillAttack(lpObj, tObjNum, SkillRender->m_index);
+				}
+
+				if(lpObj->Class == CLASS_DK && lpObj->ComboOn != 0)
+				{
+					lpObj->OfflineComboStep = (lpObj->OfflineComboStep + 1) % 3;
 				}
 			}
 		}
@@ -852,16 +990,36 @@ void OfflineMode::regresar(int aIndex)
 		return;
 	}
 
-	// Si el personaje se ha movido demasiado lejos de su posicion original, volver
+	int distance = (lpObj->HuntingRange > 0) ? lpObj->HuntingRange : 6;
 	int dis = (int)sqrt((float)((lpObj->X - lpObj->m_OfflineCoordX) * (lpObj->X - lpObj->m_OfflineCoordX) + (lpObj->Y - lpObj->m_OfflineCoordY) * (lpObj->Y - lpObj->m_OfflineCoordY)));
 
-	if(dis > (int)lpObj->HuntingRange)
+	if(dis == 0)
 	{
-		if((GetTickCount() - lpObj->m_OfflineTimeResetMove) > 3000)
+		return;
+	}
+
+	bool shouldReturn = false;
+
+	if(dis > distance)
+	{
+		if((GetTickCount() - lpObj->m_OfflineTimeResetMove) > 2000)
 		{
-			lpObj->m_OfflineTimeResetMove = GetTickCount();
-			AnimationMove(aIndex, lpObj->m_OfflineCoordX, lpObj->m_OfflineCoordY);
+			shouldReturn = true;
 		}
+	}
+	else if(lpObj->DistanceReturnOn != 0)
+	{
+		DWORD returnDelay = (lpObj->DistanceMin > 0) ? (lpObj->DistanceMin * 1000) : 3000;
+		if((GetTickCount() - lpObj->m_OfflineTimeResetMove) > returnDelay)
+		{
+			shouldReturn = true;
+		}
+	}
+
+	if(shouldReturn)
+	{
+		lpObj->m_OfflineTimeResetMove = GetTickCount();
+		AnimationMove(aIndex, lpObj->m_OfflineCoordX, lpObj->m_OfflineCoordY);
 	}
 }
 

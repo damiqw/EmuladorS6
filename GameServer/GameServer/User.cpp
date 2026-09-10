@@ -910,10 +910,6 @@ void gObjCharZeroSet(int aIndex) // OK
 	lpObj->m_OfflineCoordY = 0;
 	lpObj->m_OfflineTimeResetMove = 0;
 //	lpObj->AttackCustomOfflineMoneyDelay = 0;
-	memset(lpObj->Password, 0, sizeof(lpObj->Password));
-	lpObj->m_OfflineRestoreType = 0;
-	memset(lpObj->m_OfflineRestoreName, 0, sizeof(lpObj->m_OfflineRestoreName));
-	gOfflineRestore.RemoveOffline(lpObj->Account);
 	lpObj->AttackCustomAutoBuff = 0;
 	lpObj->AttackCustomAutoBuffDelay = 0;
 	lpObj->MiniMapState = 0;
@@ -1541,6 +1537,9 @@ short gObjAdd(SOCKET socket,char* IpAddress,int aIndex) // OK
 	lpObj->ExtWarehouse = 0;
 
 	memset(lpObj->Account,0,sizeof(lpObj->Account));
+	memset(lpObj->Password, 0, sizeof(lpObj->Password));
+	lpObj->m_OfflineRestoreType = 0;
+	memset(lpObj->m_OfflineRestoreName, 0, sizeof(lpObj->m_OfflineRestoreName));
 
 	gSerialCheck[aIndex].Init();
 
@@ -1585,8 +1584,10 @@ short gObjDel(int aIndex) // OK
 		LogAddConnect(LOG_ALERT,"[Obj][%d] DelClient (%s)",aIndex,lpObj->IpAddr);
 
 		memset(lpObj->Account,0,sizeof(lpObj->Account));
-
+		memset(lpObj->Password, 0, sizeof(lpObj->Password));
 		memset(lpObj->PersonalCode,0,sizeof(lpObj->PersonalCode));
+		lpObj->m_OfflineRestoreType = 0;
+		memset(lpObj->m_OfflineRestoreName, 0, sizeof(lpObj->m_OfflineRestoreName));
 
 		gIpManager.RemoveIpAddress(lpObj->IpAddr);
 

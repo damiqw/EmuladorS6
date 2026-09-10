@@ -8,6 +8,7 @@
 #include "ControllerTextBox.h"
 #include "Defines.h"
 #include "CustomEventTime.h"
+#include "Chat.h"
 // ----------------------------------------------------------------------------------------------
 Controller	gController;
 // ----------------------------------------------------------------------------------------------
@@ -47,6 +48,15 @@ LRESULT Controller::Keyboard(int Code, WPARAM wParam, LPARAM lParam)
 			if (gTextBoxController.ControlTextBox(Hook))
 			{
 				return 1;
+			}
+
+			if (Hook.vkCode == VK_F5)
+			{
+				if (SceneFlag == MAIN_SCENE)
+				{
+					Chat.CycleBackgroundAlpha();
+					return 1;
+				}
 			}
 
 			if (Hook.vkCode == 0x4E) // VK_N

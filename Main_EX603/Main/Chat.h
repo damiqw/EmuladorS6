@@ -1,4 +1,5 @@
 #pragma once
+#include "Defines.h"
 
 struct ChatTextObj
 {
@@ -24,13 +25,17 @@ struct ChatTextObj
 	BYTE gap1[46];
 };
 
+int GetUINewChatLogWindow();
+
 class cChat
 {
 public:
 	cChat();
 	~cChat();
+	void Init();
 	void CreateMessage(char* strID, char* strText, int MsgType);
 	void CreatePlayerHeadMessage(char* m, int i);
+	void CycleBackgroundAlpha();
 private:
 
 };

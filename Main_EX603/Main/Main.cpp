@@ -30,6 +30,7 @@
 #include "TMemory.h"
 #include "Font.h"
 #include "cfreetype.h"
+#include "Chat.h"
 #include "CustomBow.h"
 #include "CustomBuffIcon.h"
 #include "CustomCloak.h"
@@ -1257,6 +1258,7 @@ extern "C" _declspec(dllexport) void EntryProc() // OK
 	HookMS = SetWindowsHookEx(WH_MOUSE,MouseProc,hins,GetCurrentThreadId());
 
 	cfreetype::Instance()->Init();
+	Chat.Init();
 }
 
 

@@ -1,6 +1,12 @@
 #include "stdafx.h"
 #include "Chat.h"
 #include "Object.h"
+#include "Util.h"
+#include "Defines.h"
+#include "Defines2.h"
+#include "SEASON3B.h"
+#include "cfreetype.h"
+#include "Import.h"
 
 cChat Chat;
 
@@ -10,6 +16,52 @@ cChat::cChat()
 
 cChat::~cChat()
 {
+}
+
+void cChat::Init()
+{
+	// Elimina el llamado incondicional a ShowBackground(false) en CNewUIChatInputBox::Hide (hace el fondo persistente)
+	MemorySet(0x00787C77, 0x90, 11);
+}
+
+void cChat::CycleBackgroundAlpha()
+{
+	int pChatLog = GetUINewChatLogWindow();
+	if (!pChatLog)
+	{
+		return;
+	}
+
+	BYTE* pShowBackground = (BYTE*)(pChatLog + 0x158);
+	float* pBackgroundAlpha = (float*)(pChatLog + 0x150);
+
+	if (*pShowBackground == 0)
+	{
+		*pShowBackground = 1;
+		*pBackgroundAlpha = 0.2f;
+	}
+	else
+	{
+		if (*pBackgroundAlpha < 0.35f)
+		{
+			*pBackgroundAlpha = 0.4f;
+		}
+		else if (*pBackgroundAlpha < 0.55f)
+		{
+			*pBackgroundAlpha = 0.6f;
+		}
+		else if (*pBackgroundAlpha < 0.75f)
+		{
+			*pBackgroundAlpha = 0.8f;
+		}
+		else
+		{
+			*pShowBackground = 0;
+			*pBackgroundAlpha = 0.2f;
+		}
+	}
+
+	PlayBuffer(25, 0, 0);
 }
 
 void cChat::CreateMessage(char* strID, char* strText, int MsgType)

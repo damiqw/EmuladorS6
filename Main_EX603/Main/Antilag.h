@@ -6,6 +6,10 @@
 #include "Import.h"
 
 extern int ButtonReset;
+#define AutoCtrl ButtonReset
+
+bool __cdecl CheckAttackCtrlKey(int key);
+
 extern int ButtonMasterReset;
 extern int ButtonActive;
 extern int ButtonDaily;

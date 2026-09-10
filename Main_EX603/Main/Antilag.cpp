@@ -22,8 +22,19 @@ int ButtonDaily;
 
 cAntiLagSystem gAntiLagSystem;
 
+bool __cdecl CheckAttackCtrlKey(int key)
+{
+	if (ButtonReset != 0)
+	{
+		return true;
+	}
+
+	return pIsKeyRepeat(key);
+}
+
 cAntiLagSystem::cAntiLagSystem()
 {
+	this->m_Loaded = false;
 	this->Init();
 }
 
@@ -34,6 +45,22 @@ cAntiLagSystem::~cAntiLagSystem()
 void cAntiLagSystem::Init()
 {
 	this->Click = false;
+
+	if (this->m_Loaded)
+	{
+		return;
+	}
+
+	this->m_Loaded = true;
+
+	ButtonReset = GetPrivateProfileIntA("AntiLag", "AutoCtrl", GetPrivateProfileIntA("AntiLag", "DisableButtonReset", 0, ".\\Settings.ini"), ".\\Settings.ini");
+
+	SetOp((LPVOID)0x0059A420, (LPVOID)CheckAttackCtrlKey, ASM::CALL);
+	SetOp((LPVOID)0x0059A844, (LPVOID)CheckAttackCtrlKey, ASM::CALL);
+	SetOp((LPVOID)0x0059A9B1, (LPVOID)CheckAttackCtrlKey, ASM::CALL);
+	SetOp((LPVOID)0x0059AF48, (LPVOID)CheckAttackCtrlKey, ASM::CALL);
+	SetOp((LPVOID)0x0059B20A, (LPVOID)CheckAttackCtrlKey, ASM::CALL);
+	SetOp((LPVOID)0x0059B23D, (LPVOID)CheckAttackCtrlKey, ASM::CALL);
 }
 
 void cAntiLagSystem::Load()
@@ -1284,9 +1311,9 @@ void cAntiLagSystem::Draw()
 	BotonX -= 24;
 	BotonY += 17;
 
-	// --- Button Reset ---
+	// --- Auto CTRL (Atacar sin CTRL) ---
 	nInterface.DrawBarForm(x + BotonX - 58, y + BotonY, 103, 13, 0.2, 0.0, 0.0, 0.6);
-	gInterface.DrawFormat(eOrion, x + BotonX - 136, y + BotonY + 1, 210, 3, "Button Reset");
+	gInterface.DrawFormat(eOrion, x + BotonX - 136, y + BotonY + 1, 210, 3, "Auto CTRL");
 
 	if (ButtonReset == 1)
 	{
@@ -1305,6 +1332,7 @@ void cAntiLagSystem::Draw()
 			if (GetKeyState(1) & 0x8000)
 			{
 				ButtonReset = 1;
+				WritePrivateProfileStringA("AntiLag", "AutoCtrl", " 1", ".\\Settings.ini");
 				WritePrivateProfileStringA("AntiLag", "DisableButtonReset", " 1", ".\\Settings.ini");
 				TickCount = GetTickCount();
 			}
@@ -1338,6 +1366,7 @@ void cAntiLagSystem::Draw()
 			{
 				glColor3f(1.0f, 0.0f, 0.0f);
 				ButtonReset = 0;
+				WritePrivateProfileStringA("AntiLag", "AutoCtrl", " 0", ".\\Settings.ini");
 				WritePrivateProfileStringA("AntiLag", "DisableButtonReset", " 0", ".\\Settings.ini");
 				TickCount = GetTickCount();
 			}

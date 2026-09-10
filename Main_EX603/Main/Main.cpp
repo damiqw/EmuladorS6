@@ -1259,6 +1259,7 @@ extern "C" _declspec(dllexport) void EntryProc() // OK
 
 	cfreetype::Instance()->Init();
 	Chat.Init();
+	gAntiLagSystem.Init();
 }
 
 

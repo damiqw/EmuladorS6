@@ -161,47 +161,97 @@ void OfflineMode::Start(CG_OFFMODE_RESULT* aRecv, int aIndex)
 	}
 
 	// Copiar la configuracion del Helper enviada por el cliente
-	/*+172*/lpObj->HuntingRange = aRecv->HuntingRange;
-	//--
-	lpObj->RecoveryPotionOn = aRecv->RecoveryPotionOn;
-	lpObj->RecoveryPotionPercent = aRecv->RecoveryPotionPercent;
-	lpObj->RecoveryHealOn = (lpObj->Class == CLASS_FE) ? aRecv->RecoveryHealOn : 0;
-	lpObj->RecoveryHealPercent = (lpObj->Class == CLASS_FE) ? aRecv->RecoveryHealPercent : 0;
-	lpObj->RecoveryDrainOn = (lpObj->Class == CLASS_SU) ? aRecv->RecoveryDrainOn : 0;
-	lpObj->RecoveryDrainPercent = (lpObj->Class == CLASS_SU) ? aRecv->RecoveryDrainPercent : 0;
-	//--
-	lpObj->DistanceLongOn = aRecv->DistanceLongOn;
-	lpObj->DistanceReturnOn = aRecv->DistanceReturnOn;
-	lpObj->DistanceMin = aRecv->DistanceMin;
-	lpObj->SkillBasicID = aRecv->SkillBasicID;
-	lpObj->SkillSecond1ID = aRecv->SkillSecond1ID;
-	lpObj->SkillSecond2ID = aRecv->SkillSecond2ID;
-	lpObj->OfflineComboStep = 0;
-	lpObj->ComboOn = (lpObj->Class == CLASS_DK) ? aRecv->ComboOn : 0;
-	//--
-	lpObj->PartyModeOn = aRecv->PartyModeOn;
-	lpObj->PartyModeHealOn = (lpObj->Class == CLASS_FE) ? aRecv->PartyModeHealOn : 0;
-	lpObj->PartyModeHealPercent = (lpObj->Class == CLASS_FE) ? aRecv->PartyModeHealPercent : 0;
-	lpObj->PartyModeBuffOn = aRecv->PartyModeBuffOn;
-	//--
-	lpObj->BuffOn = aRecv->BuffOn;
-	lpObj->BuffSkill[0] = aRecv->BuffSkill[0];
-	lpObj->BuffSkill[1] = aRecv->BuffSkill[1];
-	lpObj->BuffSkill[2] = aRecv->BuffSkill[2];
-	lpObj->ObtainRange = (DWORD)aRecv->ObtainRange;
-	lpObj->ObtainRepairOn = aRecv->ObtainRepairOn;
-	lpObj->ObtainPickNear = (aRecv->ObtainPickNear != 0) ? 1 : 0;
-	lpObj->ObtainPickSelected = aRecv->ObtainPickSelected;
-	lpObj->ObtainPickJewels = (aRecv->ObtainPickJewels != 0) ? 1 : 0;
-	lpObj->ObtainPickAncient = (aRecv->ObtainPickAncient != 0) ? 1 : 0;
-	lpObj->ObtainPickMoney = (aRecv->ObtainPickMoney != 0) ? 1 : 0;
-	lpObj->ObtainPickExcellent = (aRecv->ObtainPickExcellent != 0) ? 1 : 0;
-	lpObj->ObtainPickExtra = (aRecv->ObtainPickExtra != 0) ? 1 : 0;
-	lpObj->ObtainPickExtraCount = aRecv->ObtainPickExtraCount;
-
-	for(int i = 0; i < lpObj->ObtainPickExtraCount; ++i)
+	if (aRecv->h.size < sizeof(CG_OFFMODE_RESULT_OLD))
 	{
-		memcpy(lpObj->ObtainPickItemList[i], aRecv->ObtainPickItemList[i], sizeof(lpObj->ObtainPickItemList[i]));
+		return;
+	}
+
+	if (aRecv->h.size == sizeof(CG_OFFMODE_RESULT_OLD))
+	{
+		CG_OFFMODE_RESULT_OLD* aRecvOld = (CG_OFFMODE_RESULT_OLD*)aRecv;
+		lpObj->HuntingRange = aRecvOld->HuntingRange;
+		lpObj->RecoveryPotionOn = aRecvOld->RecoveryPotionOn;
+		lpObj->RecoveryPotionPercent = aRecvOld->RecoveryPotionPercent;
+		lpObj->RecoveryHealOn = (lpObj->Class == CLASS_FE) ? aRecvOld->RecoveryHealOn : 0;
+		lpObj->RecoveryHealPercent = (lpObj->Class == CLASS_FE) ? aRecvOld->RecoveryHealPercent : 0;
+		lpObj->RecoveryDrainOn = (lpObj->Class == CLASS_SU) ? aRecvOld->RecoveryDrainOn : 0;
+		lpObj->RecoveryDrainPercent = (lpObj->Class == CLASS_SU) ? aRecvOld->RecoveryDrainPercent : 0;
+		lpObj->DistanceLongOn = aRecvOld->DistanceLongOn;
+		lpObj->DistanceReturnOn = aRecvOld->DistanceReturnOn;
+		lpObj->DistanceMin = aRecvOld->DistanceMin;
+		lpObj->SkillBasicID = aRecvOld->SkillBasicID;
+		lpObj->SkillSecond1ID = 0;
+		lpObj->SkillSecond2ID = 0;
+		lpObj->OfflineComboStep = 0;
+		lpObj->ComboOn = (lpObj->Class == CLASS_DK) ? aRecvOld->ComboOn : 0;
+		lpObj->PartyModeOn = aRecvOld->PartyModeOn;
+		lpObj->PartyModeHealOn = (lpObj->Class == CLASS_FE) ? aRecvOld->PartyModeHealOn : 0;
+		lpObj->PartyModeHealPercent = (lpObj->Class == CLASS_FE) ? aRecvOld->PartyModeHealPercent : 0;
+		lpObj->PartyModeBuffOn = aRecvOld->PartyModeBuffOn;
+		lpObj->BuffOn = aRecvOld->BuffOn;
+		lpObj->BuffSkill[0] = aRecvOld->BuffSkill[0];
+		lpObj->BuffSkill[1] = aRecvOld->BuffSkill[1];
+		lpObj->BuffSkill[2] = aRecvOld->BuffSkill[2];
+		lpObj->ObtainRange = (DWORD)aRecvOld->ObtainRange;
+		lpObj->ObtainRepairOn = aRecvOld->ObtainRepairOn;
+		lpObj->ObtainPickNear = (aRecvOld->ObtainPickNear != 0) ? 1 : 0;
+		lpObj->ObtainPickSelected = aRecvOld->ObtainPickSelected;
+		lpObj->ObtainPickJewels = (aRecvOld->ObtainPickJewels != 0) ? 1 : 0;
+		lpObj->ObtainPickAncient = (aRecvOld->ObtainPickAncient != 0) ? 1 : 0;
+		lpObj->ObtainPickMoney = (aRecvOld->ObtainPickMoney != 0) ? 1 : 0;
+		lpObj->ObtainPickExcellent = (aRecvOld->ObtainPickExcellent != 0) ? 1 : 0;
+		lpObj->ObtainPickExtra = (aRecvOld->ObtainPickExtra != 0) ? 1 : 0;
+		lpObj->ObtainPickExtraCount = (aRecvOld->ObtainPickExtraCount < 0) ? 0 : ((aRecvOld->ObtainPickExtraCount > 12) ? 12 : aRecvOld->ObtainPickExtraCount);
+
+		memset(lpObj->ObtainPickItemList, 0, sizeof(lpObj->ObtainPickItemList));
+		for(int i = 0; i < lpObj->ObtainPickExtraCount && i < 12; ++i)
+		{
+			memcpy(lpObj->ObtainPickItemList[i], aRecvOld->ObtainPickItemList[i], sizeof(lpObj->ObtainPickItemList[i]));
+			lpObj->ObtainPickItemList[i][sizeof(lpObj->ObtainPickItemList[i]) - 1] = 0;
+		}
+	}
+	else
+	{
+		lpObj->HuntingRange = aRecv->HuntingRange;
+		lpObj->RecoveryPotionOn = aRecv->RecoveryPotionOn;
+		lpObj->RecoveryPotionPercent = aRecv->RecoveryPotionPercent;
+		lpObj->RecoveryHealOn = (lpObj->Class == CLASS_FE) ? aRecv->RecoveryHealOn : 0;
+		lpObj->RecoveryHealPercent = (lpObj->Class == CLASS_FE) ? aRecv->RecoveryHealPercent : 0;
+		lpObj->RecoveryDrainOn = (lpObj->Class == CLASS_SU) ? aRecv->RecoveryDrainOn : 0;
+		lpObj->RecoveryDrainPercent = (lpObj->Class == CLASS_SU) ? aRecv->RecoveryDrainPercent : 0;
+		lpObj->DistanceLongOn = aRecv->DistanceLongOn;
+		lpObj->DistanceReturnOn = aRecv->DistanceReturnOn;
+		lpObj->DistanceMin = aRecv->DistanceMin;
+		lpObj->SkillBasicID = aRecv->SkillBasicID;
+		lpObj->SkillSecond1ID = aRecv->SkillSecond1ID;
+		lpObj->SkillSecond2ID = aRecv->SkillSecond2ID;
+		lpObj->OfflineComboStep = 0;
+		lpObj->ComboOn = (lpObj->Class == CLASS_DK) ? aRecv->ComboOn : 0;
+		lpObj->PartyModeOn = aRecv->PartyModeOn;
+		lpObj->PartyModeHealOn = (lpObj->Class == CLASS_FE) ? aRecv->PartyModeHealOn : 0;
+		lpObj->PartyModeHealPercent = (lpObj->Class == CLASS_FE) ? aRecv->PartyModeHealPercent : 0;
+		lpObj->PartyModeBuffOn = aRecv->PartyModeBuffOn;
+		lpObj->BuffOn = aRecv->BuffOn;
+		lpObj->BuffSkill[0] = aRecv->BuffSkill[0];
+		lpObj->BuffSkill[1] = aRecv->BuffSkill[1];
+		lpObj->BuffSkill[2] = aRecv->BuffSkill[2];
+		lpObj->ObtainRange = (DWORD)aRecv->ObtainRange;
+		lpObj->ObtainRepairOn = aRecv->ObtainRepairOn;
+		lpObj->ObtainPickNear = (aRecv->ObtainPickNear != 0) ? 1 : 0;
+		lpObj->ObtainPickSelected = aRecv->ObtainPickSelected;
+		lpObj->ObtainPickJewels = (aRecv->ObtainPickJewels != 0) ? 1 : 0;
+		lpObj->ObtainPickAncient = (aRecv->ObtainPickAncient != 0) ? 1 : 0;
+		lpObj->ObtainPickMoney = (aRecv->ObtainPickMoney != 0) ? 1 : 0;
+		lpObj->ObtainPickExcellent = (aRecv->ObtainPickExcellent != 0) ? 1 : 0;
+		lpObj->ObtainPickExtra = (aRecv->ObtainPickExtra != 0) ? 1 : 0;
+		lpObj->ObtainPickExtraCount = (aRecv->ObtainPickExtraCount < 0) ? 0 : ((aRecv->ObtainPickExtraCount > 12) ? 12 : aRecv->ObtainPickExtraCount);
+
+		memset(lpObj->ObtainPickItemList, 0, sizeof(lpObj->ObtainPickItemList));
+		for(int i = 0; i < lpObj->ObtainPickExtraCount && i < 12; ++i)
+		{
+			memcpy(lpObj->ObtainPickItemList[i], aRecv->ObtainPickItemList[i], sizeof(lpObj->ObtainPickItemList[i]));
+			lpObj->ObtainPickItemList[i][sizeof(lpObj->ObtainPickItemList[i]) - 1] = 0;
+		}
 	}
 
 	// Guardar posicion de inicio y configurar modo offline
@@ -887,9 +937,9 @@ static bool isJewels(int index)
 // Auxiliar: comprobar si el nombre del item esta en la lista personalizada
 static bool itemListPickUp(int Index, int Level, LPOBJ lpObj)
 {
-	for(int i = 0; i < lpObj->ObtainPickExtraCount; i++)
+	for(int i = 0; i < lpObj->ObtainPickExtraCount && i < 12; i++)
 	{
-		if(strstr(gItemLevel.GetItemName(Index, Level), lpObj->ObtainPickItemList[i]) != NULL)
+		if(lpObj->ObtainPickItemList[i][0] != '\0' && strstr(gItemLevel.GetItemName(Index, Level), lpObj->ObtainPickItemList[i]) != NULL)
 		{
 			return true;
 		}

@@ -396,9 +396,9 @@ bool FakeisJewels(int index)
 
 bool FakeitemListPickUp(int Index, int Level, LPOBJ lpObj)
 {
-	for (int i = 0; i < lpObj->ObtainPickExtraCount; i++)
+	for (int i = 0; i < lpObj->ObtainPickExtraCount && i < 12; i++)
 	{
-		if (strstr(gItemLevel.GetItemName(Index, Level), lpObj->ObtainPickItemList[i]) != NULL)
+		if (lpObj->ObtainPickItemList[i][0] != '\0' && strstr(gItemLevel.GetItemName(Index, Level), lpObj->ObtainPickItemList[i]) != NULL)
 		{
 			return true;
 		}

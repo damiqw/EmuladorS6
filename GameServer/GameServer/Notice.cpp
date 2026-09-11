@@ -125,13 +125,42 @@ void CNotice::MainProc() // OK
 	}
 }
 
+static void FormatNoticeMessage(char* output, size_t outputSize, const char* message, va_list arg)
+{
+	if (message == 0 || message[0] == '\0')
+	{
+		if (outputSize > 0) output[0] = '\0';
+		return;
+	}
+
+	if (strchr(message, '%') == 0)
+	{
+		strncpy_s(output, outputSize, message, outputSize - 1);
+		return;
+	}
+
+	__try
+	{
+		vsprintf_s(output, outputSize, message, arg);
+	}
+	__except (EXCEPTION_EXECUTE_HANDLER)
+	{
+		strncpy_s(output, outputSize, message, outputSize - 1);
+	}
+}
+
 void CNotice::GCNoticeSend(int aIndex,BYTE type,BYTE count,BYTE opacity,WORD delay,DWORD color,BYTE speed,char* message,...) // OK
 {
+	if (message == 0 || message[0] == '\0')
+	{
+		return;
+	}
+
 	char buff[256] = {0};
 
 	va_list arg;
 	va_start(arg,message);
-	vsprintf_s(buff,message,arg);
+	FormatNoticeMessage(buff, sizeof(buff), message, arg);
 	va_end(arg);
 
 	int size = strlen(buff);
@@ -163,11 +192,16 @@ void CNotice::GCNoticeSend(int aIndex,BYTE type,BYTE count,BYTE opacity,WORD del
 
 void CNotice::GCNoticeSendToAll(BYTE type,BYTE count,BYTE opacity,WORD delay,DWORD color,BYTE speed,char* message,...) // OK
 {
+	if (message == 0 || message[0] == '\0')
+	{
+		return;
+	}
+
 	char buff[256] = {0};
 
 	va_list arg;
 	va_start(arg,message);
-	vsprintf_s(buff,message,arg);
+	FormatNoticeMessage(buff, sizeof(buff), message, arg);
 	va_end(arg);
 
 	int size = strlen(buff);
@@ -208,11 +242,16 @@ void CNotice::GCNoticeSendToAll(BYTE type,BYTE count,BYTE opacity,WORD delay,DWO
 // SCF BOT 
 void CNotice::NewMessageDevTeam(int aIndex,char* message,...) // OK
 {
+	if (message == 0 || message[0] == '\0')
+	{
+		return;
+	}
+
 	char buff[256] = {0};
 
 	va_list arg;
 	va_start(arg,message);
-	vsprintf_s(buff,message,arg);
+	FormatNoticeMessage(buff, sizeof(buff), message, arg);
 	va_end(arg);
 
 	int size = strlen(buff);
@@ -233,11 +272,16 @@ void CNotice::NewMessageDevTeam(int aIndex,char* message,...) // OK
 
 void CNotice::NewNoticeSend(int aIndex,BYTE count,BYTE opacity,WORD delay,DWORD color,BYTE speed,char* message,...) // OK
 {
+	if (message == 0 || message[0] == '\0')
+	{
+		return;
+	}
+
 	char buff[256] = {0};
 
 	va_list arg;
 	va_start(arg,message);
-	vsprintf_s(buff,message,arg);
+	FormatNoticeMessage(buff, sizeof(buff), message, arg);
 	va_end(arg);
 
 	int size = strlen(buff);

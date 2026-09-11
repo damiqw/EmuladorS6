@@ -222,11 +222,32 @@ void GJConnectAccountRecv(SDHP_CONNECT_ACCOUNT_RECV* lpMsg,int index) // OK
 
 	gQueryManager.Close();
 
+	char SafeHardwareId[36] = {0};
+
+	for(int n = 0; n < (sizeof(SafeHardwareId) - 1) && lpMsg->HardwareId[n] != '\0'; n++)
+	{
+		char c = lpMsg->HardwareId[n];
+		if(isalnum((unsigned char)c) || c == '-' || c == '_')
+		{
+			SafeHardwareId[n] = c;
+		}
+		else
+		{
+			break;
+		}
+	}
+
+	gQueryManager.ExecQuery("UPDATE MEMB_STAT SET HardwareId='%s' WHERE memb___id='%s'",SafeHardwareId,lpMsg->account);
+
+	gQueryManager.Close();
+
 	gSocketManager.DataSend(index,(BYTE*)&pMsg,pMsg.header.size);
 
 	strcpy_s(AccountInfo.Account,lpMsg->account);
 
 	strcpy_s(AccountInfo.IpAddress,lpMsg->IpAddress);
+
+	strcpy_s(AccountInfo.HardwareId,lpMsg->HardwareId);
 
 	AccountInfo.UserIndex = lpMsg->index;
 	AccountInfo.GameServerCode = gServerManager[index].m_ServerCode;
@@ -244,7 +265,7 @@ void GJConnectAccountRecv(SDHP_CONNECT_ACCOUNT_RECV* lpMsg,int index) // OK
 
 	gAccountManager.InsertAccountInfo(AccountInfo);
 
-	gLog.Output(LOG_ACCOUNT,"[AccountInfo] Account connected (Account: %s, IpAddress: %s, GameServerCode: %d)",AccountInfo.Account,AccountInfo.IpAddress,AccountInfo.GameServerCode);
+	gLog.Output(LOG_ACCOUNT,"[AccountInfo] Account connected (Account: %s, IpAddress: %s, HardwareId: %s, GameServerCode: %d)",AccountInfo.Account,AccountInfo.IpAddress,AccountInfo.HardwareId,AccountInfo.GameServerCode);
 }
 
 void GJRegisterAccountRecv(SDHP_REGISTER_ACCOUNT_SEND* lpMsg, int index)

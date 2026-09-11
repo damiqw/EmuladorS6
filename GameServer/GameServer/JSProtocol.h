@@ -106,6 +106,7 @@ struct SDHP_CONNECT_ACCOUNT_SEND
 	char account[11];
 	char password[11];
 	char IpAddress[16];
+	char HardwareId[36];
 };
 
 struct SDHP_DISCONNECT_ACCOUNT_SEND
@@ -206,7 +207,7 @@ void JGAccountLevelRecv(SDHP_ACCOUNT_LEVEL_RECV* lpMsg);
 void JGAccountLevelRecv2(SDHP_ACCOUNT_LEVEL_RECV* lpMsg);
 void JGAccountAlreadyConnectedRecv(SDHP_ACCOUNT_ALREADY_CONNECTED_RECV* lpMsg);
 void GJServerInfoSend();
-void GJConnectAccountSend(int aIndex,char* account,char* password,char* IpAddress);
+void GJConnectAccountSend(int aIndex,char* account,char* password,char* IpAddress,char* HardwareId=0);
 void GJDisconnectAccountSend(int aIndex,char* account,char* IpAddress);
 void GJMapServerMoveSend(int aIndex,WORD NextServerCode,WORD map,BYTE x,BYTE y);
 void GJMapServerMoveAuthSend(int aIndex,char* account,char* name,DWORD AuthCode1,DWORD AuthCode2,DWORD AuthCode3,DWORD AuthCode4);

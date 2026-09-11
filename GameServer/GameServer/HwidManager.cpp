@@ -3,6 +3,7 @@
 #include "ServerInfo.h"
 #include "SocketManager.h"
 #include "Util.h"
+#include "MemScript.h"
 
 CHwidManager gHwidManager;
 //////////////////////////////////////////////////////////////////////
@@ -19,8 +20,93 @@ CHwidManager::~CHwidManager()
 
 }
 
+void CHwidManager::Load(char* path) // OK
+{
+	if(GetFileAttributes(path) == INVALID_FILE_ATTRIBUTES)
+	{
+		LogAdd(LOG_BLUE, "[HwidManager] HardwareIdExceptionList not found (%s)", path);
+		return;
+	}
+
+	CMemScript* lpMemScript = new CMemScript;
+
+	if(lpMemScript == 0)
+	{
+		ErrorMessageBox(MEM_SCRIPT_ALLOC_ERROR,path);
+		return;
+	}
+
+	if(lpMemScript->SetBuffer(path) == 0)
+	{
+		delete lpMemScript;
+		return;
+	}
+
+	this->m_HwidExceptionInfo.clear();
+
+	try
+	{
+		while(true)
+		{
+			if(lpMemScript->GetToken() == TOKEN_END)
+			{
+				break;
+			}
+
+			int section = lpMemScript->GetNumber();
+
+			while(true)
+			{
+				if(section == 0)
+				{
+					if(strcmp("end",lpMemScript->GetAsString()) == 0)
+					{
+						break;
+					}
+
+					std::string hwid = lpMemScript->GetString();
+					if(!hwid.empty())
+					{
+						this->m_HwidExceptionInfo.insert(hwid);
+					}
+				}
+				else
+				{
+					break;
+				}
+			}
+		}
+	}
+	catch(...)
+	{
+		ErrorMessageBox(lpMemScript->GetLastError());
+	}
+
+	delete lpMemScript;
+}
+
+bool CHwidManager::CheckHwidException(char* HardwarewId) // OK
+{
+	if(HardwarewId == 0 || HardwarewId[0] == '\0')
+	{
+		return 0;
+	}
+
+	if(this->m_HwidExceptionInfo.find(std::string(HardwarewId)) != this->m_HwidExceptionInfo.end())
+	{
+		return 1;
+	}
+
+	return 0;
+}
+
 bool CHwidManager::CheckHwid(char* HardwarewId) // OK
 {
+	if(this->CheckHwidException(HardwarewId) != 0)
+	{
+		return 1;
+	}
+
 	std::map<std::string,HardwareId_INFO>::iterator it = this->m_HwidInfo.find(std::string(HardwarewId));
 
 	if(it == this->m_HwidInfo.end())

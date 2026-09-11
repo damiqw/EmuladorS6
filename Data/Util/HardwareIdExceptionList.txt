@@ -1,0 +1,11 @@
+// =========================================================================
+// Hardware ID Exception List
+// Los HWID listados en esta seccion no se ven afectados por el limite de HWID (MaxHwidConnection_ALx)
+// =========================================================================
+0
+// HardwareId
+"56DBC24A-ACC9F2DA-CC6FE00E-BA1E9CD0-69746E65-0000000D-178BFBFF-FED83203"
+"5CB7D030-B4DDE6A5-D47B9F6C-BC15EBB0-49656E69-0000000D-BFEBFBFF-7FDAFBBF"
+"55D3B74A-92FFC6EA-F25CA223-8828B7EF-69746E65-00000010-178BFBFF-7ED8320B"
+"21A5C54D-A1C5F5DA-C563E07F-B81EE9A5-49656E69-00000020-BFEBFBFF-FFDAF38F"
+end

@@ -133,6 +133,7 @@ struct SDHP_CONNECT_ACCOUNT_RECV
 	char account[11];
 	char password[11];
 	char IpAddress[16];
+	char HardwareId[36];
 };
 
 struct SDHP_DISCONNECT_ACCOUNT_RECV

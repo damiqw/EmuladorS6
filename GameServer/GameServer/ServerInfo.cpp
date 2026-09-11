@@ -54,6 +54,7 @@
 #include "Filter.h"
 #include "FilterRename.h"
 #include "GameMaster.h"
+#include "HwidManager.h"
 #include "Gate.h"
 #include "HackPacketCheck.h"
 #include "HackSkillCheck.h"
@@ -830,6 +831,8 @@ void CServerInfo::ReadUtilInfo() // OK
 	gNotice.Load(gPath.GetFullPath("Util\\Notice.txt"));
 
 	gResetTable.Load(gPath.GetFullPath("Util\\ResetTable.txt"));
+
+	gHwidManager.Load(gPath.GetFullPath("Util\\HardwareIdExceptionList.txt"));
 
 	LogAdd(LOG_BLUE,"[ServerInfo] Util loaded successfully");
 }

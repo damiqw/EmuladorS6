@@ -122,7 +122,7 @@ void CFakeOnline::RestoreFakeOnline()
 			gObj[aIndex].DestX = 0;
 			gObj[aIndex].DestY = 0;
 			memcpy(gObj[aIndex].Account, it->second.Account, (sizeof(gObj[aIndex].Account) - 1));
-			GJConnectAccountSend(aIndex, account, password, "127.0.0.1");
+			GJConnectAccountSend(aIndex, account, password, "127.0.0.1", "FAKE-ONLINE");
 
 			gObj[aIndex].Socket = INVALID_SOCKET;
 

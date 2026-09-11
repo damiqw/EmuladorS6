@@ -12,6 +12,7 @@ struct ACCOUNT_INFO
 {
 	char Account[11];
 	char IpAddress[16];
+	char HardwareId[36];
 	WORD UserIndex;
 	WORD GameServerCode;
 	bool MapServerMove;

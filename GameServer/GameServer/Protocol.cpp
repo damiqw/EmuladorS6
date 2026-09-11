@@ -2285,7 +2285,7 @@ void CGConnectAccountRecv(PMSG_CONNECT_ACCOUNT_RECV* lpMsg,int aIndex) // OK
 		lpObj->DestX = 0;
 		lpObj->DestY = 0;
 
-		GJConnectAccountSend(aIndex,account,password,lpObj->IpAddr);
+		GJConnectAccountSend(aIndex,account,password,lpObj->IpAddr,lpObj->HardwareId);
 	}
 }
 

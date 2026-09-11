@@ -393,7 +393,7 @@ void COfflineRestore::MainProc()
 		memcpy(account, data.Account, sizeof(account) - 1);
 		memcpy(password, data.Password, sizeof(password) - 1);
 
-		GJConnectAccountSend(aIndex, account, password, (char*)restoreIp);
+		GJConnectAccountSend(aIndex, account, password, (char*)restoreIp, lpObj->HardwareId);
 
 		LogAdd(LOG_BLUE, "[OfflineRestore] Restoring [%s][%s] Type: %d (Slot: %d, IP: %s, PassLen: %d)",
 			data.Account, data.Name, data.Type, aIndex, restoreIp, (int)strlen(password));

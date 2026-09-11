@@ -143,7 +143,7 @@ void JGConnectAccountRecv(SDHP_CONNECT_ACCOUNT_RECV* lpMsg) // OK
 
 	GCConnectAccountSend(lpMsg->index, 1);
 
-	LogAddConnect(LOG_GREEN, "[Obj][%d] AddAccount (%s)", lpMsg->index, gObj[lpMsg->index].Account);
+	LogAddConnect(LOG_GREEN, "[Obj][%d] AddAccount (%s) [HWID: %s]", lpMsg->index, gObj[lpMsg->index].Account, gObj[lpMsg->index].HardwareId);
 }
 
 void JGDisconnectAccountRecv(SDHP_DISCONNECT_ACCOUNT_RECV* lpMsg) // OK
@@ -387,7 +387,7 @@ void GJServerInfoSend() // OK
 	gJoinServerConnection.DataSend((BYTE*)&pMsg,pMsg.header.size);
 }
 
-void GJConnectAccountSend(int aIndex,char* account,char* password,char* IpAddress) // OK
+void GJConnectAccountSend(int aIndex,char* account,char* password,char* IpAddress,char* HardwareId) // OK
 {
 	SDHP_CONNECT_ACCOUNT_SEND pMsg;
 
@@ -400,6 +400,13 @@ void GJConnectAccountSend(int aIndex,char* account,char* password,char* IpAddres
 	memcpy(pMsg.password,password,sizeof(pMsg.password));
 
 	memcpy(pMsg.IpAddress,IpAddress,sizeof(pMsg.IpAddress));
+
+	memset(pMsg.HardwareId,0,sizeof(pMsg.HardwareId));
+
+	if(HardwareId != 0)
+	{
+		memcpy(pMsg.HardwareId,HardwareId,sizeof(pMsg.HardwareId));
+	}
 
 	gJoinServerConnection.DataSend((BYTE*)&pMsg,pMsg.header.size);
 }

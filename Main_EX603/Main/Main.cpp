@@ -298,7 +298,7 @@ LRESULT CALLBACK MouseProc(int nCode,WPARAM wParam,LPARAM lParam) // OK
 					gCustomRanking.EventRankingWindow_Close(wParam);
 					gCustomRanking.EventVipWindow_Close(wParam);
 
-					if (gProtect.m_MainInfo.SelectCharacterSystem = 1)
+					if (gProtect.m_MainInfo.SelectCharacterSystem == 1)
 					{
 						gCSCharacterS13.SelectCharButton(wParam);
 					}
@@ -336,7 +336,7 @@ SHORT WINAPI KeysProc(int nCode) // OK
 		return 0;
 	}
 
-	return GetKeyState(nCode);
+	return GetAsyncKeyState(nCode);
 }
 
 HICON WINAPI IconProc(HINSTANCE hInstance,LPCSTR lpIconName) // OK

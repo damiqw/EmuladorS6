@@ -1540,6 +1540,7 @@ short gObjAdd(SOCKET socket,char* IpAddress,int aIndex) // OK
 	memset(lpObj->Password, 0, sizeof(lpObj->Password));
 	lpObj->m_OfflineRestoreType = 0;
 	memset(lpObj->m_OfflineRestoreName, 0, sizeof(lpObj->m_OfflineRestoreName));
+	lpObj->m_OfflineHwidGrace = false;
 
 	gSerialCheck[aIndex].Init();
 
@@ -1588,10 +1589,13 @@ short gObjDel(int aIndex) // OK
 		memset(lpObj->PersonalCode,0,sizeof(lpObj->PersonalCode));
 		lpObj->m_OfflineRestoreType = 0;
 		memset(lpObj->m_OfflineRestoreName, 0, sizeof(lpObj->m_OfflineRestoreName));
+		lpObj->m_OfflineHwidGrace = false;
 
 		gIpManager.RemoveIpAddress(lpObj->IpAddr);
 
 		gHwidManager.RemoveHwid(lpObj->HardwareId);
+
+		memset(lpObj->HardwareId, 0, sizeof(lpObj->HardwareId));
 	}
 
 	lpObj->Connected = OBJECT_OFFLINE;

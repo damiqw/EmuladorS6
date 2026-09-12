@@ -2221,9 +2221,12 @@ void CGConnectAccountRecv(PMSG_CONNECT_ACCOUNT_RECV* lpMsg,int aIndex) // OK
 	{
 		if (gObjIsOfflineAccount(account_tmp, lpObj->HardwareId) == 0)
 		{
+			lpObj->m_OfflineHwidGrace = false;
 			CloseClient(aIndex);
 			return;
 		}
+
+		lpObj->m_OfflineHwidGrace = false;
 	}
 
 	for (int i = OBJECT_START_USER; i < MAX_OBJECT; i++)

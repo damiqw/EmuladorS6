@@ -28,6 +28,24 @@ DWORD ModelModifier3 = 0;
 DWORD g_FrameCountActive = 16;      // 60 FPS (~16.6ms)
 DWORD g_FrameCountBackground = 40;  // 25 FPS (40ms)
 DWORD g_FrameCountMinimized = 100;  // 10 FPS (100ms)
+DWORD g_CurrentFrameCount = 16;
+
+void __cdecl UpdateFrameCount()
+{
+	HWND hWnd = *(HWND*)(MAIN_WINDOW);
+	if(hWnd != 0 && (IsIconic(hWnd) != 0 || IsWindowVisible(hWnd) == 0))
+	{
+		g_CurrentFrameCount = g_FrameCountMinimized;
+	}
+	else if(hWnd != 0 && GetForegroundWindow() != hWnd)
+	{
+		g_CurrentFrameCount = g_FrameCountBackground;
+	}
+	else
+	{
+		g_CurrentFrameCount = g_FrameCountActive;
+	}
+}
 
 void LoadFpsSettings()
 {
@@ -48,6 +66,8 @@ void LoadFpsSettings()
 	if (minFps > bgFps) minFps = bgFps;
 	g_FrameCountMinimized = 1000 / minFps;
 	if (g_FrameCountMinimized == 0) g_FrameCountMinimized = 1;
+
+	g_CurrentFrameCount = g_FrameCountActive;
 }
 
 void DecryptData(BYTE* lpMsg,int size) // OK
@@ -131,25 +151,14 @@ _declspec(naked) void CheckTickCount1() // OK
 _declspec(naked) void CheckTickCount2() // OK
 {
 	static DWORD CheckTickCountAddress1 = 0x004DA3F0;
-	static DWORD FrameCount = 16;
-
-	static HWND hWnd;
-	hWnd = *(HWND*)(MAIN_WINDOW);
-	if(hWnd != 0 && (IsIconic(hWnd) != 0 || IsWindowVisible(hWnd) == 0))
-	{
-		FrameCount = g_FrameCountMinimized;
-	}
-	else if(hWnd != 0 && GetForegroundWindow() != hWnd)
-	{
-		FrameCount = g_FrameCountBackground;
-	}
-	else
-	{
-		FrameCount = g_FrameCountActive;
-	}
 
 	_asm
 	{
+		Pushad
+		Pushfd
+		Call UpdateFrameCount
+		Popfd
+		Popad
 		Mov Ecx, Dword Ptr Ss : [Ebp - 0x6C]
 		Mov CountModifier, Ecx
 		Mov Edx, Dword Ptr Ss : [Ebp - 0x74]
@@ -174,10 +183,10 @@ _declspec(naked) void CheckTickCount2() // OK
 		Mov Eax, MainTickCount
 		Sub Eax, Dword Ptr Ss : [Ebp - 0x74]
 		Mov Dword Ptr Ss : [Ebp - 0x68] , Eax
-		Mov Eax, FrameCount //-- fps
+		Mov Eax, g_CurrentFrameCount //-- fps
 		Cmp Dword Ptr Ss : [Ebp - 0x68] , Eax
 		Jge CONTINUE
-		Mov Ecx, FrameCount
+		Mov Ecx, g_CurrentFrameCount
 		Sub Ecx, Dword Ptr Ss : [Ebp - 0x68]
 		Mov Dword Ptr Ss : [Ebp - 0x18C] , Ecx
 		Mov Edx, Dword Ptr Ss : [Ebp - 0x18C]
@@ -226,7 +235,7 @@ _declspec(naked) void CheckTickCount2() // OK
 			Jnz HACK
 			Add Eax, Dword Ptr Ss : [Ebp - 0x18C]
 			Mov MainTickCount, Eax
-			Mov Eax, FrameCount //-- fps
+			Mov Eax, g_CurrentFrameCount //-- fps
 			Mov Dword Ptr Ss : [Ebp - 0x68] , Eax
 			CONTINUE :
 		Mov Ecx, Dword Ptr Ss : [Ebp - 0x178]

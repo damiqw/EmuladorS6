@@ -111,7 +111,7 @@ bool gObjIsOfflineAccount(char* account, char* HardwareId)
 				{
 					if (HardwareId != 0 && HardwareId[0] != '\0')
 					{
-						if (strcmp(gObj[i].HardwareId, HardwareId) == 0)
+						if (_stricmp(gObj[i].HardwareId, HardwareId) == 0)
 						{
 							return true;
 						}

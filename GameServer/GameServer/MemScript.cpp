@@ -193,6 +193,8 @@ eTokenResult CMemScript::GetTokenNumber(char ch) // OK
 		this->m_string[count++] = ch;
 	}
 
+	this->m_string[count] = 0;
+
 	if(strcmp(this->m_string,"*") == 0)
 	{
 		this->m_number = -1;
@@ -201,8 +203,6 @@ eTokenResult CMemScript::GetTokenNumber(char ch) // OK
 	{
 		this->m_number = (float)atof(this->m_string);
 	}
-
-	this->m_string[count] = 0;
 
 	return TOKEN_NUMBER;
 }

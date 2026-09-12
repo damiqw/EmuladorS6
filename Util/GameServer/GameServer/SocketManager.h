@@ -8,7 +8,7 @@
 #include "Queue.h"
 
 #define MAX_MAIN_PACKET_SIZE 8192
-#define MAX_SIDE_PACKET_SIZE 16384
+#define MAX_SIDE_PACKET_SIZE 65536
 #define MAX_SERVER_WORKER_THREAD 8
 #define MAX_IO_OPERATION 2
 #define IO_RECV 0

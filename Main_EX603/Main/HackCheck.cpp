@@ -25,6 +25,31 @@ DWORD ModelModifier1 = 0;
 DWORD ModelModifier2 = 0;
 DWORD ModelModifier3 = 0;
 
+DWORD g_FrameCountActive = 16;      // 60 FPS (~16.6ms)
+DWORD g_FrameCountBackground = 40;  // 25 FPS (40ms)
+DWORD g_FrameCountMinimized = 100;  // 10 FPS (100ms)
+
+void LoadFpsSettings()
+{
+	int maxFps = GetPrivateProfileIntA("Graphics", "MaxFPS", 60, ".\\Settings.ini");
+	if (maxFps <= 0) maxFps = 60;
+	if (maxFps > 300) maxFps = 300;
+	g_FrameCountActive = 1000 / maxFps;
+	if (g_FrameCountActive == 0) g_FrameCountActive = 1;
+
+	int bgFps = GetPrivateProfileIntA("Graphics", "BackgroundFPS", 25, ".\\Settings.ini");
+	if (bgFps <= 0) bgFps = 25;
+	if (bgFps > maxFps) bgFps = maxFps;
+	g_FrameCountBackground = 1000 / bgFps;
+	if (g_FrameCountBackground == 0) g_FrameCountBackground = 1;
+
+	int minFps = GetPrivateProfileIntA("Graphics", "MinimizedFPS", 20, ".\\Settings.ini");
+	if (minFps <= 0) minFps = 20;
+	if (minFps > bgFps) minFps = bgFps;
+	g_FrameCountMinimized = 1000 / minFps;
+	if (g_FrameCountMinimized == 0) g_FrameCountMinimized = 1;
+}
+
 void DecryptData(BYTE* lpMsg,int size) // OK
 {
 	for(int n=0;n < size;n++)
@@ -106,17 +131,21 @@ _declspec(naked) void CheckTickCount1() // OK
 _declspec(naked) void CheckTickCount2() // OK
 {
 	static DWORD CheckTickCountAddress1 = 0x004DA3F0;
-	static DWORD FrameCount = 0x11;
+	static DWORD FrameCount = 16;
 
 	static HWND hWnd;
 	hWnd = *(HWND*)(MAIN_WINDOW);
 	if(hWnd != 0 && (IsIconic(hWnd) != 0 || IsWindowVisible(hWnd) == 0))
 	{
-		FrameCount = 40; // Throttle to ~25 FPS and Sleep when minimized or in tray
+		FrameCount = g_FrameCountMinimized;
+	}
+	else if(hWnd != 0 && GetForegroundWindow() != hWnd)
+	{
+		FrameCount = g_FrameCountBackground;
 	}
 	else
 	{
-		FrameCount = 0x5;
+		FrameCount = g_FrameCountActive;
 	}
 
 	_asm
@@ -212,6 +241,8 @@ _declspec(naked) void CheckTickCount2() // OK
 
 void InitHackCheck() // OK
 {
+	LoadFpsSettings();
+
 	WORD EncDecKey = 0;
 
 	for(int n=0;n < sizeof(gProtect.m_MainInfo.CustomerName);n++)

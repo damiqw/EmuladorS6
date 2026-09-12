@@ -13,3 +13,8 @@ int WINAPI MySend(SOCKET s,char* buf,int len,int flags);
 void CheckTickCount1();
 void CheckTickCount2();
 void InitHackCheck();
+
+extern DWORD g_FrameCountActive;
+extern DWORD g_FrameCountBackground;
+extern DWORD g_FrameCountMinimized;
+void LoadFpsSettings();

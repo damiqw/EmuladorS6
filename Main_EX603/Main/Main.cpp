@@ -353,8 +353,13 @@ void WINAPI ReduceConsumeProc() // OK
 	while(true)
 	{
 		Sleep(5000);
-		SetProcessWorkingSetSize(GetCurrentProcess(),0xFFFFFFFF,0xFFFFFFFF);
-		SetThreadPriority(GetCurrentProcess(),THREAD_PRIORITY_LOWEST);
+
+		HWND hWnd = *(HWND*)(MAIN_WINDOW);
+
+		if(hWnd != 0 && (IsIconic(hWnd) != 0 || IsWindowVisible(hWnd) == 0))
+		{
+			SetProcessWorkingSetSize(GetCurrentProcess(),0xFFFFFFFF,0xFFFFFFFF);
+		}
 	}
 }
 
@@ -1268,10 +1273,13 @@ BOOL APIENTRY DllMain(HANDLE hModule,DWORD ul_reason_for_call,LPVOID lpReserved)
 	switch(ul_reason_for_call)
 	{
 		case DLL_PROCESS_ATTACH:
+			timeBeginPeriod(1);
 			hins = (HINSTANCE)hModule;
 			gController.Instance = static_cast<HMODULE>(hModule);
 			break;
 		case DLL_PROCESS_DETACH:
+			timeEndPeriod(1);
+			break;
 		case DLL_THREAD_ATTACH:
 		case DLL_THREAD_DETACH:
 		default:

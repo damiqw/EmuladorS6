@@ -15,6 +15,11 @@ Controller	gController;
 
 Controller::~Controller()
 {
+	if( this->KeyboardHook )
+	{
+		UnhookWindowsHookEx(this->KeyboardHook);
+		this->KeyboardHook = NULL;
+	}
 }
 
 bool Controller::Load()
@@ -22,7 +27,7 @@ bool Controller::Load()
 	// ----
 	if( !this->KeyboardHook )
 	{
-		this->KeyboardHook = SetWindowsHookEx(WH_KEYBOARD_LL, this->Keyboard, gController.Instance, NULL);
+		this->KeyboardHook = SetWindowsHookEx(WH_KEYBOARD, (HOOKPROC)this->Keyboard, NULL, GetCurrentThreadId());
 		// ----
 		if( !this->KeyboardHook )
 		{
@@ -35,12 +40,16 @@ bool Controller::Load()
 
 LRESULT Controller::Keyboard(int Code, WPARAM wParam, LPARAM lParam)
 {
-	if( (Code == HC_ACTION) && (wParam == WM_KEYDOWN))
+	if( Code == HC_ACTION )
 	{
-		KBDLLHOOKSTRUCT Hook = *((KBDLLHOOKSTRUCT*)lParam);
-		
-		if( GetForegroundWindow() == *(HWND*)(MAIN_WINDOW) )
+		bool isKeyDown = ((lParam & (1 << 31)) == 0);
+
+		if( isKeyDown && GetForegroundWindow() == *(HWND*)(MAIN_WINDOW) )
 		{
+			KBDLLHOOKSTRUCT Hook;
+			memset(&Hook, 0, sizeof(Hook));
+			Hook.vkCode = (DWORD)wParam;
+
 			if (gInterface.ControlTextBox(Hook))
 			{
 				return 1;
